@@ -2,8 +2,18 @@ import { useEffect, useState, useRef } from 'react'
 import { toast, Toaster } from 'sonner'
 import { getAuthToken } from '@/lib/auth'
 import { GITHUB_CONFIG } from '@/consts'
-import { readTextFileFromRepo, putFile } from '@/lib/github-client'
-import { toBase64Utf8 } from '@/lib/github-client'
+import { 
+    readTextFileFromRepo, 
+    putFile, 
+    toBase64Utf8,
+    createBlob,
+    createTree,
+    createCommit,
+    updateRef,
+    getRef,
+    getCommit,
+    type TreeItem
+} from '@/lib/github-client'
 import yaml from 'js-yaml'
 import { useAuthStore } from './hooks/use-auth'
 import { readFileAsText, fileToBase64NoPrefix } from '@/lib/file-utils'
@@ -160,29 +170,29 @@ export function ConfigPage() {
             if (!token) throw new Error('未授权')
 
             let configToUpdate = parsedConfig ? JSON.parse(JSON.stringify(parsedConfig)) : null
+            const treeItems: TreeItem[] = []
 
-            // Upload pending images
+            // 1. Process Images
             if (Object.keys(pendingImages).length > 0) {
                 const totalImages = Object.keys(pendingImages).length
                 toast.info(`准备上传 ${totalImages} 张图片...`)
                 
                 let idx = 1
                 for (const [target, { file }] of Object.entries(pendingImages)) {
-                    toast.info(`正在上传第 ${idx}/${totalImages} 张图片: ${file.name}...`)
+                    toast.info(`正在处理第 ${idx}/${totalImages} 张图片: ${file.name}...`)
                     const base64 = await fileToBase64NoPrefix(file)
                     const ext = file.name.split('.').pop() || 'png'
                     const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`
                     const path = `public/images/uploads/${filename}`
                     
-                    await putFile(
-                        token,
-                        GITHUB_CONFIG.OWNER,
-                        GITHUB_CONFIG.REPO,
-                        path,
-                        base64,
-                        `upload: ${filename}`,
-                        GITHUB_CONFIG.BRANCH
-                    )
+                    // Create Blob
+                    const { sha } = await createBlob(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, base64, 'base64')
+                    treeItems.push({
+                        path: path,
+                        mode: '100644',
+                        type: 'blob',
+                        sha: sha
+                    })
 
                     const publicPath = `/images/uploads/${filename}`
                     
@@ -199,9 +209,9 @@ export function ConfigPage() {
                     idx++
                 }
                 setPendingImages({})
-                toast.success('所有图片上传完成')
             }
 
+            // 2. Process Config File
             let contentToSave = configContent
             if (mode === 'visual' && configToUpdate) {
                 contentToSave = yaml.dump(configToUpdate)
@@ -209,15 +219,43 @@ export function ConfigPage() {
                 setConfigContent(contentToSave)
             }
 
-			await putFile(
-				token,
-				GITHUB_CONFIG.OWNER,
-				GITHUB_CONFIG.REPO,
-				'ryuchan.config.yaml',
-				toBase64Utf8(contentToSave), // Base64 encode
-				'update: ryuchan.config.yaml',
-				GITHUB_CONFIG.BRANCH
-			)
+            const configBase64 = toBase64Utf8(contentToSave)
+            const { sha: configSha } = await createBlob(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, configBase64, 'base64')
+            treeItems.push({
+                path: 'ryuchan.config.yaml',
+                mode: '100644',
+                type: 'blob',
+                sha: configSha
+            })
+
+            // 3. Create Commit
+            toast.info('正在提交更改...')
+            
+            // Get current ref
+            const refName = `heads/${GITHUB_CONFIG.BRANCH}`
+            const ref = await getRef(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, refName)
+            const currentCommitSha = ref.sha
+            
+            // Get tree of current commit
+            const commit = await getCommit(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, currentCommitSha)
+            const baseTreeSha = commit.tree.sha
+
+            // Create new tree
+            const { sha: newTreeSha } = await createTree(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, treeItems, baseTreeSha)
+
+            // Create new commit
+            const { sha: newCommitSha } = await createCommit(
+                token, 
+                GITHUB_CONFIG.OWNER, 
+                GITHUB_CONFIG.REPO, 
+                'update: config and images', 
+                newTreeSha, 
+                [currentCommitSha]
+            )
+
+            // Update ref
+            await updateRef(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, refName, newCommitSha)
+
 			toast.success('配置已更新！等待部署生效')
 		} catch (error: any) {
             console.error(error)
