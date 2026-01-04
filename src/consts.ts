@@ -8,7 +8,7 @@ export const BLOG_SLUG_KEY = import.meta.env.BLOG_SLUG_KEY || ''
  * GitHub 仓库配置
  */
 export const GITHUB_CONFIG = {
-	OWNER: import.meta.env.PUBLIC_GITHUB_OWNER || 'yysuni',
+	OWNER: import.meta.env.PUBLIC_GITHUB_OWNER || 'kobaridev',
 	REPO: import.meta.env.PUBLIC_GITHUB_REPO || '2025-blog-public',
 	BRANCH: import.meta.env.PUBLIC_GITHUB_BRANCH || 'main',
 	APP_ID: import.meta.env.PUBLIC_GITHUB_APP_ID || '-',
