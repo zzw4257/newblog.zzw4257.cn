@@ -220,6 +220,7 @@ export function ConfigPage() {
             }
 
             const configBase64 = toBase64Utf8(contentToSave)
+            toast.info('正在创建配置文件 Blob...')
             const { sha: configSha } = await createBlob(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, configBase64, 'base64')
             treeItems.push({
                 path: 'ryuchan.config.yaml',
@@ -229,7 +230,7 @@ export function ConfigPage() {
             })
 
             // 3. Create Commit
-            toast.info('正在提交更改...')
+            toast.info('正在获取分支信息...')
             
             // Get current ref
             const refName = `heads/${GITHUB_CONFIG.BRANCH}`
@@ -241,9 +242,11 @@ export function ConfigPage() {
             const baseTreeSha = commit.tree.sha
 
             // Create new tree
+            toast.info('正在创建文件树...')
             const { sha: newTreeSha } = await createTree(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, treeItems, baseTreeSha)
 
             // Create new commit
+            toast.info('正在创建提交...')
             const { sha: newCommitSha } = await createCommit(
                 token, 
                 GITHUB_CONFIG.OWNER, 
@@ -254,6 +257,7 @@ export function ConfigPage() {
             )
 
             // Update ref
+            toast.info('正在更新分支...')
             await updateRef(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, refName, newCommitSha)
 
 			toast.success('配置已更新！等待部署生效')
@@ -301,7 +305,25 @@ export function ConfigPage() {
 
 	return (
 		<div className="w-full max-w-4xl mx-auto my-12 font-sans">
-            <Toaster richColors position="top-center" />
+            <Toaster 
+                richColors 
+                position="top-center" 
+                toastOptions={{
+                    className: 'shadow-2xl border-2 border-base-200',
+                    style: {
+                        fontSize: '1.1rem',
+                        padding: '16px 24px',
+                    },
+                    classNames: {
+                        title: 'text-lg font-bold',
+                        description: 'text-base font-medium',
+                        error: 'bg-error text-error-content border-error',
+                        success: 'bg-success text-success-content border-success',
+                        warning: 'bg-warning text-warning-content border-warning',
+                        info: 'bg-info text-info-content border-info',
+                    }
+                }}
+            />
             
             <input
 				ref={keyInputRef}
@@ -410,7 +432,7 @@ export function ConfigPage() {
                                         />
                                     </div>
                                     <div className="space-y-4">
-                                        <div className="text-sm font-medium text-base-content/70 ml-1">阿凡达 (Avatar)</div>
+                                        <div className="text-sm font-medium text-base-content/70 ml-1">用户头像</div>
                                         <div className="group relative flex justify-center p-8 bg-base-100 rounded-3xl border border-base-200 shadow-sm hover:shadow-md transition-all duration-300">
                                             <div className="w-24 h-24 rounded-2xl overflow-hidden bg-base-200 ring-4 ring-base-100 shadow-xl group-hover:scale-105 transition-transform duration-300">
                                                 <img src={parsedConfig?.user?.avatar || '/avatar.png'} alt="Avatar" className="w-full h-full object-cover" />

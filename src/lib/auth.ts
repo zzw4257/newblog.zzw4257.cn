@@ -2,6 +2,7 @@ import { createInstallationToken, getInstallationId, signAppJwt } from './github
 import { GITHUB_CONFIG } from '@/consts'
 import { toast } from 'sonner'
 import { decrypt,encrypt } from './aes256-util'
+import { useAuthStore } from '@/components/write/hooks/use-auth'
 
 const GITHUB_TOKEN_CACHE_KEY = 'github_token'
 const GITHUB_PEM_CACHE_KEY = 'p_info'
@@ -88,7 +89,7 @@ export async function getAuthToken(): Promise<string> {
 	}
 
 	// 2. 获取私钥（从缓存）
-	const privateKey = await getPemFromCache()
+	const privateKey = useAuthStore.getState().privateKey
 	if (!privateKey) {
 		throw new Error('需要先设置私钥。请使用 useAuth().setPrivateKey()')
 	}

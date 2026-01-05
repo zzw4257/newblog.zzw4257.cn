@@ -186,13 +186,17 @@ export async function updateRef(token: string, owner: string, repo: string, ref:
 	if (!res.ok) throw new Error(`update ref failed: ${res.status}`)
 }
 
-export async function readTextFileFromRepo(token: string, owner: string, repo: string, path: string, ref: string): Promise<string | null> {
+export async function readTextFileFromRepo(token: string | null | undefined, owner: string, repo: string, path: string, ref: string): Promise<string | null> {
+	const headers: HeadersInit = {
+		Accept: 'application/vnd.github+json',
+		'X-GitHub-Api-Version': '2022-11-28'
+	}
+	if (token) {
+		headers.Authorization = `Bearer ${token}`
+	}
+
 	const res = await fetch(`${GH_API}/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}?ref=${encodeURIComponent(ref)}`, {
-		headers: {
-			Authorization: `Bearer ${token}`,
-			Accept: 'application/vnd.github+json',
-			'X-GitHub-Api-Version': '2022-11-28'
-		}
+		headers
 	})
 	if (res.status === 401) handle401Error()
 	if (res.status === 422) handle422Error()
@@ -207,14 +211,18 @@ export async function readTextFileFromRepo(token: string, owner: string, repo: s
 	}
 }
 
-export async function listRepoFilesRecursive(token: string, owner: string, repo: string, path: string, ref: string): Promise<string[]> {
+export async function listRepoFilesRecursive(token: string | null | undefined, owner: string, repo: string, path: string, ref: string): Promise<string[]> {
 	async function fetchPath(targetPath: string): Promise<string[]> {
+		const headers: HeadersInit = {
+			Accept: 'application/vnd.github+json',
+			'X-GitHub-Api-Version': '2022-11-28'
+		}
+		if (token) {
+			headers.Authorization = `Bearer ${token}`
+		}
+
 		const res = await fetch(`${GH_API}/repos/${owner}/${repo}/contents/${encodeURIComponent(targetPath)}?ref=${encodeURIComponent(ref)}`, {
-			headers: {
-				Authorization: `Bearer ${token}`,
-				Accept: 'application/vnd.github+json',
-				'X-GitHub-Api-Version': '2022-11-28'
-			}
+			headers
 		})
 		if (res.status === 401) handle401Error()
 		if (res.status === 422) handle422Error()

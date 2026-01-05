@@ -39,8 +39,9 @@ export async function deleteBlog(slug: string): Promise<void> {
         sha: null
     })
 
-	toast.info('正在创建提交...')
+	toast.info('正在创建文件树...')
 	const treeData = await createTree(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, treeItems, latestCommitSha)
+	toast.info('正在创建提交...')
 	const commitData = await createCommit(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, `删除文章: ${slug}`, treeData.sha, [latestCommitSha])
 
 	toast.info('正在更新分支...')

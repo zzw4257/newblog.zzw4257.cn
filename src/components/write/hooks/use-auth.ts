@@ -46,6 +46,8 @@ if (typeof window !== 'undefined') {
 	})
 
 	checkAuth().then((isAuth) => {
-		useAuthStore.setState({ isAuth })
+		if (isAuth) {
+			useAuthStore.setState({ isAuth })
+		}
 	})
 }
