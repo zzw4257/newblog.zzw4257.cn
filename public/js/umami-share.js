@@ -1,31 +1,34 @@
 (function (global) {
-  const cacheKey = 'umami-share-cache';
+  // 缓存前缀，后面会拼接 shareId
+  const cacheKeyPrefix = 'umami-share-cache-';
   const cacheTTL = 3600_000; // 1h
 
   async function fetchShareData(baseUrl, shareId) {
-    const cached = localStorage.getItem(cacheKey);
+    const key = cacheKeyPrefix + shareId;
+    const cached = localStorage.getItem(key);
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
         if (Date.now() - parsed.timestamp < cacheTTL) {
+          console.log('[Umami] Using cached token for', shareId);
           return parsed.value;
         }
       } catch {
-        localStorage.removeItem(cacheKey);
+        localStorage.removeItem(key);
       }
     }
+    console.log('[Umami] Fetching new token for', shareId);
     const res = await fetch(`${baseUrl}/api/share/${shareId}`);
     if (!res.ok) {
       throw new Error('获取 Umami 分享信息失败');
     }
     const data = await res.json();
-    localStorage.setItem(cacheKey, JSON.stringify({ timestamp: Date.now(), value: data }));
+    localStorage.setItem(key, JSON.stringify({ timestamp: Date.now(), value: data }));
     return data;
   }
 
   /**
    * 获取 Umami 分享数据（websiteId、token）
-   * 在缓存 TTL 内复用；并用全局 Promise 避免并发请求
    * @param {string} baseUrl
    * @param {string} shareId
    * @returns {Promise<{websiteId: string, token: string}>}
@@ -40,14 +43,16 @@
     return global.__umamiSharePromise;
   };
 
-  global.clearUmamiShareCache = function () {
-    localStorage.removeItem(cacheKey);
+  global.clearUmamiShareCache = function (shareId) {
+    const key = cacheKeyPrefix + shareId;
+    localStorage.removeItem(key);
+    // 兼容旧的 key
+    localStorage.removeItem('umami-share-cache');
     delete global.__umamiSharePromise;
   };
 
   /**
    * 获取 Umami 统计数据
-   * 自动处理 token 获取和过期重试
    * @param {string} baseUrl
    * @param {string} shareId
    * @param {object} queryParams
@@ -57,16 +62,19 @@
     async function doFetch(isRetry = false) {
       const { websiteId, token } = await global.getUmamiShareData(baseUrl, shareId);
       const currentTimestamp = Date.now();
+      
+      // 构建参数，移除默认的 unit: 'hour'，只在 queryParams 没有指定时使用默认值
       const params = new URLSearchParams({
         startAt: 0,
         endAt: currentTimestamp,
-        unit: 'hour',
-        timezone: queryParams.timezone || 'Asia/Shanghai',
+        // unit: 'hour', // 暂时移除，视情况而定
+        timezone: 'Asia/Shanghai',
         compare: false,
         ...queryParams
       });
       
       const statsUrl = `${baseUrl}/api/websites/${websiteId}/stats?${params.toString()}`;
+      console.log('[Umami] Fetching stats:', statsUrl);
       
       const res = await fetch(statsUrl, {
         headers: {
@@ -76,13 +84,15 @@
 
       if (!res.ok) {
         if (res.status === 401 && !isRetry) {
-          global.clearUmamiShareCache();
+          console.warn('[Umami] Token expired or invalid, retrying...');
+          global.clearUmamiShareCache(shareId);
           return doFetch(true);
         }
-        throw new Error('获取统计数据失败');
+        throw new Error('获取统计数据失败: ' + res.status);
       }
 
-      return await res.json();
+      const json = await res.json();
+      return json;
     }
 
     return doFetch();

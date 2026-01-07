@@ -65,11 +65,11 @@ const slug = url ? url.split('/').filter(Boolean).pop() : undefined;
             
             const statsData = await window.fetchUmamiStats(umamiConfig.baseUrl, umamiConfig.shareId, {
               timezone: umamiConfig.timezone,
-              url: queryPath
+              path: queryPath
             });
             
-            const pageViews = statsData.pageviews && statsData.pageviews.value ? statsData.pageviews.value : 0;
-            const visits = statsData.visits && statsData.visits.value ? statsData.visits.value : 0;
+            const pageViews = (typeof statsData.pageviews === 'object' ? statsData.pageviews.value : statsData.pageviews) || 0;
+            const visits = (typeof statsData.visitors === 'object' ? statsData.visitors.value : statsData.visitors) || 0;
             
             const viewsElement = document.getElementById(`page-views-${slug}`);
             const visitorsElement = document.getElementById(`page-visitors-${slug}`);

@@ -254,16 +254,30 @@ const getCategoryDisplayName = (category: string): string => {
   async function loadSiteStats() {  
     if (!umamiConfig.enable) {  
       return;  
-    }  
-      
-    // 检查是否已经有缓存的数据  
-    const cachedStats = sessionStorage.getItem('siteStatsData');  
-    if (cachedStats) {  
-      statsData = JSON.parse(cachedStats);  
-      updateStatsDisplay();  
-      return;  
-    }  
+    }
+    
+    const CACHE_KEY = 'ryuchan_site_stats_v4';
+    // 缓存时间：5 分钟 (300000 毫秒)
+    // 既能减少请求频率，又能保证数据相对新鲜
+    const CACHE_TTL = 300000; 
+
+    // 1. 尝试读取缓存
+    const cachedStr = sessionStorage.getItem(CACHE_KEY);
+    if (cachedStr) {
+      try {
+        const { data, timestamp } = JSON.parse(cachedStr);
+        // 如果缓存未过期，直接使用
+        if (Date.now() - timestamp < CACHE_TTL) {
+          statsData = data;
+          updateStatsDisplay();
+          return;
+        }
+      } catch (e) {
+        // 缓存解析失败，继续执行下面的获取逻辑
+      }
+    }
           
+    // 2. 缓存不存在或已过期，发起新请求
     const checkInterval = setInterval(async () => {
       if (typeof window.fetchUmamiStats === 'function') {
         clearInterval(checkInterval);
@@ -273,15 +287,20 @@ const getCategoryDisplayName = (category: string): string => {
           });
           
           statsData = { 
-            pageviews: stats.pageviews && stats.pageviews.value ? stats.pageviews.value : 0, 
-            visitors: stats.visits && stats.visits.value ? stats.visits.value : 0 
+            pageviews: (typeof stats.pageviews === 'object' ? stats.pageviews.value : stats.pageviews) || 0, 
+            visitors: (typeof stats.visitors === 'object' ? stats.visitors.value : stats.visitors) || 0 
           };
-          sessionStorage.setItem('siteStatsData', JSON.stringify(statsData));  
+
+          // 存入缓存，包含当前时间戳
+          sessionStorage.setItem(CACHE_KEY, JSON.stringify({
+            data: statsData,
+            timestamp: Date.now()
+          }));
+          
           updateStatsDisplay();
         } catch (error) {  
           console.error('获取全站统计失败:', error);  
           statsData = { error: true };  
-          sessionStorage.setItem('siteStatsData', JSON.stringify(statsData));  
           updateStatsDisplay();  
         }  
       }
@@ -360,15 +379,8 @@ function initTagsToggle() {
   // 初始化函数  
   function init() {  
     if (umamiConfig.enable) {
-      // 如果已有缓存数据，立即显示  
-      const cachedStats = sessionStorage.getItem('siteStatsData');  
-      if (cachedStats) {  
-        statsData = JSON.parse(cachedStats);  
-        updateStatsDisplay();  
-      } else {  
-        // 否则加载新数据  
-        loadSiteStats();  
-      }  
+      // 总是加载最新数据，以保持实时更新
+      loadSiteStats();  
     }
       
     // 初始化分类切换功能  
