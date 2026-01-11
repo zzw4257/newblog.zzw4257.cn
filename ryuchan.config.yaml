@@ -112,6 +112,7 @@ umami:
   timezone: "Asia/Shanghai"
 user:
   name: RyuChan
+  description: Ciallo～(∠・ω<)⌒★
   site: https://hub.xiaozhangya.xin
   avatar: /images/uploads/1767534109675-0p1nho.jpg
   sidebar:
