@@ -1,0 +1,56 @@
+---
+title: 算力杂谈 (Ep.4)：木桶的短板 —— CPU、PCIe 拓扑与系统级瓶颈
+description: 显卡买得再好，插在 PCIe x4 插槽上也跑不起来。从主板拓扑到硬盘 IO，排查那些拖慢 RTX 5080 的“猪队友”。
+pubDate: 2026-01-29T10:00:00
+author: zzw4257
+series: "Compute-2026-DeepDive"
+chapter: 4
+image: /images/pcie-topology.jpg
+badge: System
+---
+
+这是《算力杂谈》系列的最终章。在弄懂了显卡本身的算力（Ep.2）和带宽（Ep.3）之后，我们最后要解决的是**“木桶效应”**。
+
+你手中的 **RTX 5080** 是一台每秒能吞吐 900GB 数据的怪兽，但如果你把它插在一个老旧的主板上，或者用机械硬盘喂数据，它的性能可能会暴跌 80%。
+
+本章我们将拆解 `主板.ipynb`、`硬盘.ipynb` 和 `硬件与组机.ipynb` 中的关键知识点，教你如何为你的 GPU 搭建一个不拖后腿的家。
+
+## 一、 最大的误区：CPU 只是陪衬？
+
+很多人配深度学习主机，预算 90% 给显卡，CPU 随便买个 i5。这是极其危险的。
+
+### 1. 主仆关系
+在 `主板.ipynb` 中我们提到，CPU 并不是 GPU 的“外设”，相反，**CPU 是整个系统的主人**。
+* **数据预处理**：在图像训练（ResNet/ViT）中，CPU 负责解码图片、做 Augmentation（旋转/裁剪）。如果 CPU 忙不过来，GPU 就会显示 `Volatile GPU-Util: 0%` —— 它在等饭吃。
+* **PCIe 控制器**：所有的 GPU 数据传输（CPU <-> GPU, GPU <-> SSD）都要受 CPU 调度的 PCIe 通道管辖。
+
+### 2. PCIe Lane 的数学题
+这是多卡系统的噩梦。
+* **消费级 CPU (Intel Core / AMD Ryzen)**：通常只有 **20-24 条** 直连 CPU 的 PCIe Lanes。
+    * 一张 RTX 5080 需要 **x16** 通道才能满血。
+    * 一块 NVMe SSD 需要 **x4** 通道。
+    * **算账**：插一张 5080 + 两个 SSD，通道就满了。如果你强行插第二张显卡，主板通常会把两张卡拆分为 **x8/x8** 模式。对于需要大量卡间通信的 LLM 训练，这是致命的。
+* **工作站/服务器 CPU (Threadripper / EPYC / Xeon)**：
+    * 提供 **128 条** 甚至更多 PCIe Lanes。
+    * 这就是为什么做 4 卡/8 卡集群必须上服务器平台的原因。
+
+**给你的建议**：
+既然你用的是单卡 RTX 5080，主流的 i7/i9 或 Ryzen 9 足够应付。但如果你未来想加卡，请务必检查主板说明书的“通道拆分规则”。
+
+---
+
+## 二、 看不见的公路：PCIe 拓扑
+
+在 `主板.ipynb` 笔记中，提到了一个非常硬核的命令：`sudo dmidecode -t slot`。
+
+### 1. 物理插槽 vs 电气插槽
+看着是 x16 长短的插槽，内部针脚可能只有 x4。
+* **实战检查**：
+  不要相信眼睛，要相信系统。
+  ```bash
+  # 查看 RTX 5080 当前的连接速度
+  sudo lspci -vv | grep -i nvidia -A 20 | grep "LnkSta"
+  
+  # 理想输出：Speed 32GT/s (PCIe 5.0), Width x16
+  # 翻车输出：Width x8 或 Width x4
+  ```
