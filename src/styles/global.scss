@@ -927,6 +927,206 @@ code {
   animation: fadeInUp 0.5s ease-out forwards;
 }
 
+/* ===================================================
+   Resume page (Academic / breathing / print)
+   =================================================== */
+
+.resume-page {
+  /* Typography layering: sans for UI, serif for long-form body */
+  --resume-font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Noto Sans", Arial, sans-serif;
+  --resume-font-serif: ui-serif, Georgia, "Times New Roman", "Noto Serif CJK SC", "Songti SC", serif;
+
+  font-family: var(--resume-font-sans);
+
+  .resume-title,
+  .resume-subtitle {
+    font-family: var(--resume-font-sans);
+    letter-spacing: 0.01em;
+  }
+
+  .resume-bio {
+    font-family: var(--resume-font-serif);
+    letter-spacing: 0.005em;
+  }
+}
+
+/* Hero mesh: subtle animated light, theme-friendly */
+.resume-hero {
+  position: relative;
+  isolation: isolate;
+}
+
+.resume-hero::before,
+.resume-hero::after {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  z-index: -1;
+  background:
+    radial-gradient(closest-side, oklch(var(--p) / 0.18), transparent 65%),
+    radial-gradient(closest-side, oklch(var(--s) / 0.14), transparent 65%),
+    radial-gradient(closest-side, oklch(var(--a) / 0.10), transparent 70%);
+  filter: blur(28px);
+  transform: translate3d(var(--rx, 0px), var(--ry, 0px), 0) scale(1);
+  transition: transform 220ms ease;
+  animation: resume-float 10s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.resume-hero::after {
+  animation-duration: 14s;
+  opacity: 0.75;
+}
+
+@keyframes resume-float {
+  0% { transform: translate3d(calc(var(--rx, 0px) - 6px), calc(var(--ry, 0px) - 4px), 0) scale(1); }
+  50% { transform: translate3d(calc(var(--rx, 0px) + 8px), calc(var(--ry, 0px) + 6px), 0) scale(1.02); }
+  100% { transform: translate3d(calc(var(--rx, 0px) - 6px), calc(var(--ry, 0px) - 4px), 0) scale(1); }
+}
+
+.resume-section-kicker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.2rem;
+  height: 1.6rem;
+  padding: 0 0.55rem;
+  border-radius: 9999px;
+  border: 1px solid oklch(var(--bc) / 0.14);
+  background: oklch(var(--b2) / 0.55);
+  backdrop-filter: blur(8px);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: oklch(var(--bc) / 0.72);
+}
+
+/* Reveal motion: calm, breathing */
+.resume-section {
+  opacity: 0;
+  transform: translate3d(0, 18px, 0);
+  transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 700ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 300ms ease,
+    border-color 300ms ease;
+}
+
+.resume-section.is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+.resume-header {
+  opacity: 1;
+  transform: none;
+}
+
+.resume-card {
+  transition: transform 280ms ease, box-shadow 280ms ease, border-color 280ms ease;
+}
+
+.resume-card:hover {
+  border-color: oklch(var(--p) / 0.22);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.10);
+}
+
+/* Academic timeline */
+.resume-timeline {
+  position: relative;
+}
+
+.resume-timeline-item {
+  position: relative;
+  padding-left: 1.25rem;
+  border-left: 1px solid oklch(var(--bc) / 0.12);
+}
+
+.resume-timeline-item::before {
+  content: "";
+  position: absolute;
+  left: -0.5px;
+  top: 0.6rem;
+  width: 10px;
+  height: 10px;
+  transform: translateX(-50%);
+  border-radius: 9999px;
+  background: oklch(var(--p) / 0.75);
+  box-shadow: 0 0 0 6px oklch(var(--p) / 0.08);
+}
+
+.resume-timeline-item:hover::before {
+  box-shadow: 0 0 0 9px oklch(var(--p) / 0.10);
+}
+
+/* Top progress bar (only resume) */
+#resume-scroll-progress {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 3px;
+  width: 0%;
+  z-index: 70;
+  background: linear-gradient(90deg, oklch(var(--p)), oklch(var(--s)));
+  box-shadow: 0 8px 22px oklch(var(--p) / 0.22);
+  border-bottom-right-radius: 9999px;
+  transition: width 80ms linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .resume-section {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .resume-hero::before,
+  .resume-hero::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Print: clean CV output */
+@media print {
+  /* Hide nav/banner/sidebar elements rendered by BaseLayout */
+  #navbar-desktop,
+  #navbar-mobile,
+  #banner,
+  aside,
+  footer,
+  #mobile-toc-button,
+  dialog {
+    display: none !important;
+  }
+
+  body {
+    background: #fff !important;
+  }
+
+  .page-content-animate {
+    margin-top: 0 !important;
+    animation: none !important;
+  }
+
+  .resume-page {
+    max-width: none !important;
+    margin: 0 !important;
+  }
+
+  .resume-section,
+  .resume-header {
+    opacity: 1 !important;
+    transform: none !important;
+    box-shadow: none !important;
+    border-color: rgba(0, 0, 0, 0.12) !important;
+  }
+
+  a {
+    color: #000 !important;
+    text-decoration: none !important;
+  }
+}
+
 /* 强制统一所有主题的圆角设置，防止某些主题（如 retro, cyberpunk）修改圆角 */
 :root,
 [data-theme] {

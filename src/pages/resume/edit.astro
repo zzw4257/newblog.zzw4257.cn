@@ -1,0 +1,9 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import ResumeEditPage from '@/components/resume/ResumeEditPage'
+---
+
+<BaseLayout title="简历编辑" showSidebar={false} showBanner={false} isIndexed={false}>
+  <ResumeEditPage client:only="react" />
+</BaseLayout>
+

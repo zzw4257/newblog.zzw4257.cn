@@ -1,0 +1,94 @@
+personal:
+  name: "zzw4257"
+  title: "Developer & Tech Enthusiast"
+  avatar: "/profile.png"
+  email: "zzw4257-809050685@qq.com"
+  phone: ""
+  location: ""
+  website: "https://newblog.zzw4257.cn"
+  bio: "热爱技术的开发者，专注于技术学习和实践，喜欢探索新技术，享受用代码解决问题的过程。"
+  social:
+    - platform: "GitHub"
+      url: "https://github.com/zzw4257"
+      icon: "ri:github-line"
+    - platform: "Email"
+      url: "mailto:zzw4257-809050685@qq.com"
+      icon: "lucide:mail"
+
+education:
+  - degree: "Bachelor's Degree"
+    field: "Computer Science"
+    institution: "University Name"
+    location: "City, Country"
+    startDate: "2020-09"
+    endDate: "2024-06"
+    gpa: "3.8/4.0"
+    description: "Relevant coursework, honors, etc."
+    honors:
+      - "Dean's List"
+      - "Outstanding Student"
+
+experience:
+  - title: "Software Engineer"
+    company: "Company Name"
+    location: "City, Country"
+    startDate: "2024-01"
+    endDate: "present"
+    description: |
+      - Developed and maintained web applications using modern frameworks
+      - Collaborated with cross-functional teams to deliver high-quality software
+      - Optimized application performance and user experience
+    technologies:
+      - "React"
+      - "TypeScript"
+      - "Node.js"
+    achievements:
+      - "Improved application performance by 40%"
+      - "Led a team of 3 developers"
+
+projects:
+  - name: "Personal Blog"
+    description: "A modern static blog built with Astro and Tailwind CSS"
+    url: "https://newblog.zzw4257.cn"
+    github: "https://github.com/zzw4257/newblog.zzw4257.cn"
+    technologies:
+      - "Astro"
+      - "TypeScript"
+      - "Tailwind CSS"
+    highlights:
+      - "Online article publishing"
+      - "Visual configuration management"
+      - "GitHub integration"
+
+skills:
+  - category: "Programming Languages"
+    items:
+      - "JavaScript"
+      - "TypeScript"
+      - "Python"
+    level: "advanced"
+  - category: "Frameworks & Libraries"
+    items:
+      - "React"
+      - "Vue.js"
+      - "Astro"
+      - "Node.js"
+    level: "advanced"
+  - category: "Tools & Technologies"
+    items:
+      - "Git"
+      - "Docker"
+      - "Linux"
+    level: "intermediate"
+
+publications: []
+
+languages:
+  - name: "Chinese"
+    level: "Native"
+  - name: "English"
+    level: "Fluent"
+
+certifications: []
+
+awards: []
