@@ -1,9 +1,9 @@
 site:
   tab: zzw4257's Blog
   title: zzw4257's Blog
-  description: 🌸 轻盈、优雅、纯净 —— 用文字与图片记录生活与创意
+  description: 😁你别急
   language: zh
-  favicon: /favicon.ico
+  favicon: /images/uploads/1768904316342-wnb2xp.jpg
   theme:
     light: garden
     dark: dracula
@@ -18,8 +18,8 @@ site:
     height: 60vh
     images:
       - https://tc.alcy.cc/q/20250908/b2d656670551cb9ea6eda7b46b6c8ec0.webp
-  icp: 
-  icp_link: 
+  icp: null
+  icp_link: null
   pages:
     home:
       title: zzw4257's Blog
@@ -106,8 +106,8 @@ anime:
   bilibili:
     uid: ''
   tmdb:
-    apiKey: 
-    listId: 
+    apiKey: null
+    listId: null
 github:
   owner: zzw4257
   repo: newblog.zzw4257.cn
@@ -116,15 +116,15 @@ github:
   encryptKey: wudishiduomejimo
 umami:
   enable: false
-  baseUrl: 
-  shareId: 
-  websiteId: 
+  baseUrl: null
+  shareId: null
+  websiteId: null
   timezone: Asia/Shanghai
 user:
   name: zzw4257
-  description: 记录生活与技术的点点滴滴
+  description: zzw4257 的新版小站
   site: https://newblog.zzw4257.cn
-  avatar: /profile.png
+  avatar: /images/uploads/1768904312267-9vskuq.jpg
   sidebar:
     social:
       - href: https://github.com/zzw4257
@@ -146,9 +146,9 @@ comments:
   type: giscus
   giscus:
     repo: zzw4257/blog-comments
-    repoId: 
+    repoId: null
     category: General
-    categoryId: 
+    categoryId: null
     mapping: pathname
     lang: zh-CN
     inputPosition: top
