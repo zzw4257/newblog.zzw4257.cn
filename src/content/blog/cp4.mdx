@@ -22,7 +22,7 @@ badge: System
 ### 1. 主仆关系
 在 `主板.ipynb` 中我们提到，CPU 并不是 GPU 的“外设”，相反，**CPU 是整个系统的主人**。
 * **数据预处理**：在图像训练（ResNet/ViT）中，CPU 负责解码图片、做 Augmentation（旋转/裁剪）。如果 CPU 忙不过来，GPU 就会显示 `Volatile GPU-Util: 0%` —— 它在等饭吃。
-* **PCIe 控制器**：所有的 GPU 数据传输（CPU <-> GPU, GPU <-> SSD）都要受 CPU 调度的 PCIe 通道管辖。
+* **PCIe 控制器**：所有的 GPU 数据传输（CPU ↔ GPU, GPU ↔ SSD）都要受 CPU 调度的 PCIe 通道管辖。
 
 ### 2. PCIe Lane 的数学题
 这是多卡系统的噩梦。
