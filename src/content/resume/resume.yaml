@@ -14,24 +14,24 @@ personal:
 
 education:
   - degree: "B.Eng."
-  field: "InfoSec"
-  institution: "Zhejiang University (ZJU)"
-  location: "Hangzhou, China"
-  startDate: "2023"
-  endDate: "Present"
-  gpa: "3.95/4.15"
-  avgScore: "92.5/100"
-  program: "Chu Kochen Honors College (Mixed Class)"
-  eliteProgram: "Advanced Class of Engineering Education (ACEE)"
-  keyCourses:
-    - name: "Data Security"
-      score: 99
-    - name: "System II"
-      score: 98
-    - name: "Algo"
-      score: 96
-    - name: "Adv. Data Structure"
-      score: 96
+    field: "InfoSec"
+    institution: "Zhejiang University (ZJU)"
+    location: "Hangzhou, China"
+    startDate: "2023"
+    endDate: "Present"
+    gpa: "3.95/4.15"
+    avgScore: "92.5/100"
+    program: "Chu Kochen Honors College (Mixed Class)"
+    eliteProgram: "Advanced Class of Engineering Education (ACEE)"
+    keyCourses:
+      - name: "Data Security"
+        score: 99
+      - name: "System II"
+        score: 98
+      - name: "Algo"
+        score: 96
+      - name: "Adv. Data Structure"
+        score: 96
 
 researchExperience:
   - title: "cve-genesis: Self-Healing Agentic Vulnerability Reproduction"
