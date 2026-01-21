@@ -28,6 +28,10 @@ export interface Education {
   startDate: string
   endDate: string
   gpa?: string
+  avgScore?: string
+  program?: string
+  eliteProgram?: string
+  keyCourses?: { name: string; score: number }[]
   description?: string
   honors?: string[]
 }
@@ -43,6 +47,29 @@ export interface Experience {
   achievements?: string[]
 }
 
+export interface ResearchExperience {
+  title: string
+  subtitle?: string
+  affiliation?: string
+  role?: string
+  startDate: string
+  endDate: string | "present"
+  description: string
+  highlights?: string[]
+  venue?: string
+  status?: "preparing" | "under-review" | "accepted" | "published"
+}
+
+export interface Leadership {
+  title: string
+  organization: string
+  location: string
+  startDate?: string
+  endDate?: string | "present"
+  description: string
+  awards?: string[]
+}
+
 export interface Project {
   name: string
   description: string
@@ -51,6 +78,7 @@ export interface Project {
   technologies: string[]
   highlights: string[]
   image?: string
+  context?: string
 }
 
 export interface SkillCategory {
@@ -72,11 +100,16 @@ export interface Publication {
 export interface ResumeData {
   personal: PersonalInfo
   education: Education[]
-  experience: Experience[]
+  experience?: Experience[]
+  researchExperience?: ResearchExperience[]
   projects: Project[]
   skills: SkillCategory[]
+  researchInterests?: string[]
   publications?: Publication[]
-  languages?: { name: string; level: string }[]
+  languages?: { name: string; level: string; note?: string }[]
   certifications?: { name: string; issuer: string; date: string; url?: string }[]
-  awards?: { name: string; issuer: string; date: string; description?: string }[]
+  awards?: { name: string; issuer: string; date: string; description?: string; note?: string }[]
+  leadership?: Leadership[]
+  algorithmicSkill?: { platform: string; rating?: string; achievement?: string }[]
+  references?: { name: string; title: string; affiliation: string; email: string }[]
 }
