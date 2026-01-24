@@ -1,0 +1,84 @@
+---
+title: 'Welcome to zzw4257''s Notebook: 站点维护与语法规范'
+description: 本文介绍了本站的 GitHub Actions 部署流程，并详细列举了 Markdown 扩展语法的转换规范，包括各类告警框和折叠块的使用方法。
+pubDate: '2026-01-24T12:09:16.695Z'
+image: /images/uploads/index-cover.jpg
+badge: Note
+draft: false
+categories:
+  - Notebook
+  - Tools
+tags:
+  - Markdown
+  - GitHub Actions
+  - 部署
+  - MkDocs
+  - 语法指南
+---
+
+> **[迁移说明]** 本文最初发布于 `blog.zzw4257.cn`，现已迁移并在本站进行结构化整理与增强。
+
+
+本页面用于记录本站的部署方式及一些常用的 Markdown 语法规范，主要用于备忘和维护指南。<br />
+
+## 部署相关
+
+本站点通过 **GitHub Actions** 自动生成 `gh-pages` 分支并进行静态部署。开发者仅需将修改推送至远程仓库，GitHub Actions 将自动触发构建流程，无需手动干预。
+
+## Markdown 扩充语法
+
+为了保持内容的可读性与一致性，本站将原本 MkDocs 风格的扩展语法转换为标准的 MDX 兼容格式。
+
+### 告警提示 (Admonitions)
+
+原有的 `!!! [type]` 语法在 MDX 中建议使用加粗标题配合引用块（Blockquote）来实现：
+
+> **Note: 默认标题**
+> 这是一个带标题的笔记提示框。
+
+> **自定义标题**
+> 这是一个使用自定义标题的笔记提示。
+
+> **Example: 一个特殊的例子**
+> 这里展示了一个示例内容。
+
+> **Tip: 温馨提示**
+> 这是一个温馨提示，用于提供建议。
+
+> **Warning**
+> 这是一个警告信息。
+
+### 折叠内容 (Collapsible Blocks)
+
+对于需要隐藏或折叠的内容，请使用 HTML5 的 `<details>` 和 `<summary>` 标签，这是 MDX 中最通用的折叠实现方案：
+
+<details>
+<summary>点击展开：折叠 Note 示例</summary>
+
+这里是折叠后的详细内容。
+
+</details>
+
+<details>
+<summary>点击展开：高尔基名言</summary>
+
+“书籍是人类进步的阶梯。”
+
+</details>
+
+### 信息块布局
+
+原有的 `inline end` 右侧浮动布局在响应式设计中表现不佳，在 MDX 转换中已统一调整为标准块级元素：
+
+> **Info: 信息概览**
+>
+> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla et euismod nulla. Curabitur feugiat, tortor non consequat finibus, justo purus auctor massa, nec semper lorem quam in massa.
+
+### 自定义部分
+
+<details>
+<summary>zzw 自定义折叠</summary>
+
+哈哈哈哈
+
+</details>
