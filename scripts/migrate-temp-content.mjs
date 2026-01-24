@@ -164,20 +164,32 @@ function deriveDates(frontmatterData, fallbackDateISO) {
     frontmatterData?.date,
   ].filter(Boolean);
 
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const lastYear = currentYear - 1;
+
+  // 1) 优先使用 frontmatter 中给出的时间（认为是“真实创作时间”，不做强行回退）
   if (candidates.length > 0) {
     const d = new Date(String(candidates[0]));
     if (!Number.isNaN(d.getTime()))
       return { pubDate: d.toISOString(), updated: undefined };
   }
 
+  // 2) 其次尝试使用传入的回退时间（通常是文件的 mtime）
   if (fallbackDateISO) {
     const d = new Date(String(fallbackDateISO));
-    if (!Number.isNaN(d.getTime()))
-      return { pubDate: d.toISOString(), updated: undefined };
+    if (!Number.isNaN(d.getTime())) {
+      // 如果回退时间早于今年（例如去年或更早），就直接采用
+      if (d.getFullYear() < currentYear)
+        return { pubDate: d.toISOString(), updated: undefined };
+    }
   }
 
-  const now = new Date();
-  return { pubDate: now.toISOString(), updated: undefined };
+  // 3) 如果完全拿不到合理的时间，则生成“去年的随机日期”
+  const randomMonth = Math.floor(Math.random() * 12); // 0-11
+  const randomDay = Math.floor(Math.random() * 28) + 1; // 1-28，避免月底越界
+  const randomDate = new Date(Date.UTC(lastYear, randomMonth, randomDay, 12, 0, 0));
+  return { pubDate: randomDate.toISOString(), updated: undefined };
 }
 
 async function resolveGeminiApiKey() {
@@ -296,12 +308,27 @@ async function buildSourceDescriptor(absolutePath) {
     .split("-")
     .slice(0, 8)
     .join("-");
-  const slugSource = [titleSlugPart, baseName]
+  const slugSource = [sourceTopFolder, titleSlugPart, baseName]
     .filter(Boolean)
     .join("-");
-  const slug =
+
+  let slug =
     slugify(slugSource, { lower: true, strict: true }) ||
     slugify(baseName, { lower: true, strict: true });
+
+  // 处理全中文或过于泛化（只剩顶层目录名）等情况：
+  // - slug 为空
+  // - slug 仅等于 sourceTopFolder（例如 "aigc" / "curricular"）
+  const folderSlug = (sourceTopFolder || "").toLowerCase();
+  const isAsciiBaseName = /^[\x00-\x7F]+$/.test(baseName);
+  if (!slug || (!isAsciiBaseName && slug === folderSlug)) {
+    const encoded =
+      encodeURIComponent(baseName || "post")
+        .replace(/%/g, "-")
+        .replace(/-+/g, "-")
+        .replace(/^-|-$/g, "") || "post";
+    slug = encoded.toLowerCase();
+  }
   const heroImageFileName = `${slug}-cover.jpg`;
   const heroImagePath = `/images/uploads/${heroImageFileName}`;
   const heroImageAbsolute = path.join(CONFIG.paths.imagesOutput, heroImageFileName);
@@ -503,9 +530,6 @@ async function generateHeroImage(imagePrompt, destAbsolutePath, { dryRun }) {
 
   log("  调用 ModelScope 创建生图任务...");
 
-  // 强化横版 16:9 要求，避免再次生成竖图
-  const finalPrompt = `${imagePrompt} , 16:9 wide horizontal composition, cinematic landscape, no text, highly detailed`;
-
   const createResp = await fetch(`${baseUrl}/v1/images/generations`, {
     method: "POST",
     headers: {
@@ -514,7 +538,8 @@ async function generateHeroImage(imagePrompt, destAbsolutePath, { dryRun }) {
     },
     body: JSON.stringify({
       model: CONFIG.modelscope.model,
-      prompt: finalPrompt,
+      prompt: imagePrompt,
+      size: "1280x720", // 16:9 横版
     }),
   });
 
@@ -576,7 +601,6 @@ async function generateHeroImage(imagePrompt, destAbsolutePath, { dryRun }) {
 
       await ensureDir(path.dirname(destAbsolutePath));
       await fs.writeFile(destAbsolutePath, buffer);
-
       log("  生图完成，已保存到：", getRelativeToRoot(destAbsolutePath));
       break;
     }
@@ -620,10 +644,21 @@ async function processOne(descriptor, { dryRun }) {
     const base = descriptor.frontmatterData || {};
     const pubDate = descriptor.suggested.pubDate;
 
-    const categories = normalizeStringArray(
+    let categories = normalizeStringArray(
       base.categories || base.category || [],
     );
-    const tags = normalizeStringArray(base.tags || []);
+    let tags = normalizeStringArray(base.tags || []);
+
+    // categories / tags 绝对不能为空：为空时给一个合理的回退
+    if (categories.length === 0) {
+      categories = [
+        descriptor.sourceTopFolder ||
+          (descriptor.kind === "post" ? "Post" : "Doc"),
+      ];
+    }
+    if (tags.length === 0) {
+      tags = [descriptor.suggested.title || baseName || "Untitled"];
+    }
 
     fm = {
       title: base.title || descriptor.suggested.title,
@@ -662,6 +697,19 @@ async function processOne(descriptor, { dryRun }) {
 
     imagePrompt = ip;
 
+    let normCategories = normalizeStringArray(categories);
+    let normTags = normalizeStringArray(tags);
+
+    if (normCategories.length === 0) {
+      normCategories = [
+        descriptor.sourceTopFolder ||
+          (descriptor.kind === "post" ? "Post" : "Doc"),
+      ];
+    }
+    if (normTags.length === 0) {
+      normTags = [title || descriptor.suggested.title || "Untitled"];
+    }
+
     fm = {
       title: title || descriptor.suggested.title,
       description:
@@ -670,8 +718,8 @@ async function processOne(descriptor, { dryRun }) {
       image: descriptor.suggested.heroImagePath,
       badge: badge || undefined,
       draft: false,
-      categories: normalizeStringArray(categories),
-      tags: normalizeStringArray(tags),
+      categories: normCategories,
+      tags: normTags,
     };
 
     const note = buildMigrationNote(descriptor);
