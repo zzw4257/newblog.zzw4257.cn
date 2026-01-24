@@ -157,7 +157,7 @@ async function walkMarkdownFiles(startDir) {
   return results;
 }
 
-function deriveDates(frontmatterData) {
+function deriveDates(frontmatterData, fallbackDateISO) {
   const candidates = [
     frontmatterData?.pubDate,
     frontmatterData?.published,
@@ -166,6 +166,12 @@ function deriveDates(frontmatterData) {
 
   if (candidates.length > 0) {
     const d = new Date(String(candidates[0]));
+    if (!Number.isNaN(d.getTime()))
+      return { pubDate: d.toISOString(), updated: undefined };
+  }
+
+  if (fallbackDateISO) {
+    const d = new Date(String(fallbackDateISO));
     if (!Number.isNaN(d.getTime()))
       return { pubDate: d.toISOString(), updated: undefined };
   }
@@ -259,8 +265,17 @@ async function buildSourceDescriptor(absolutePath) {
   const sourceTopFolder = segments[2] || null;
   const sourceSubFolders = segments.slice(3, -1);
   const baseName = path.basename(relPath).replace(/\.(md|mdx)$/i, "");
-  const slug = slugify(baseName, { lower: true, strict: true });
-  const { pubDate } = deriveDates(frontmatterData || {});
+
+  // 文件系统最后修改时间，用作日期回退值
+  let stat;
+  try {
+    stat = await fs.stat(absolutePath);
+  }
+  catch {
+    stat = null;
+  }
+  const fallbackISO = stat?.mtime?.toISOString();
+  const { pubDate } = deriveDates(frontmatterData || {}, fallbackISO);
 
   function guessTitle() {
     if (frontmatterData?.title)
@@ -268,10 +283,25 @@ async function buildSourceDescriptor(absolutePath) {
     const m = content.match(/^#\s+(.+)$/m);
     if (m)
       return m[1].trim();
-    return slug;
+    return baseName;
   }
 
   const titleGuess = guessTitle();
+
+  // slug：使用「标题摘要 + 原文件名」组合，避免大量 index、final 之类的重复且不可读命名
+  const titleSlugPart = slugify(titleGuess, {
+    lower: true,
+    strict: true,
+  })
+    .split("-")
+    .slice(0, 8)
+    .join("-");
+  const slugSource = [titleSlugPart, baseName]
+    .filter(Boolean)
+    .join("-");
+  const slug =
+    slugify(slugSource, { lower: true, strict: true }) ||
+    slugify(baseName, { lower: true, strict: true });
   const heroImageFileName = `${slug}-cover.jpg`;
   const heroImagePath = `/images/uploads/${heroImageFileName}`;
   const heroImageAbsolute = path.join(CONFIG.paths.imagesOutput, heroImageFileName);
@@ -473,6 +503,9 @@ async function generateHeroImage(imagePrompt, destAbsolutePath, { dryRun }) {
 
   log("  调用 ModelScope 创建生图任务...");
 
+  // 强化横版 16:9 要求，避免再次生成竖图
+  const finalPrompt = `${imagePrompt} , 16:9 wide horizontal composition, cinematic landscape, no text, highly detailed`;
+
   const createResp = await fetch(`${baseUrl}/v1/images/generations`, {
     method: "POST",
     headers: {
@@ -481,7 +514,7 @@ async function generateHeroImage(imagePrompt, destAbsolutePath, { dryRun }) {
     },
     body: JSON.stringify({
       model: CONFIG.modelscope.model,
-      prompt: imagePrompt,
+      prompt: finalPrompt,
     }),
   });
 
@@ -585,7 +618,7 @@ async function processOne(descriptor, { dryRun }) {
   if (descriptor.kind === "post") {
     // posts：不经过 Gemini，仅整理 frontmatter，并添加迁移说明
     const base = descriptor.frontmatterData || {};
-    const { pubDate } = deriveDates(base || {});
+    const pubDate = descriptor.suggested.pubDate;
 
     const categories = normalizeStringArray(
       base.categories || base.category || [],

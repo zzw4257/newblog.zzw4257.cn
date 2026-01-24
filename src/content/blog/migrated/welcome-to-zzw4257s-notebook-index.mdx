@@ -1,0 +1,98 @@
+---
+title: Markdown 语法扩展与笔记库部署指南
+description: 本文档介绍了个人笔记库的自动化部署流程，并详细整理了所采用的 Markdown 扩展语法，包括提示框、折叠区块及行内样式的实现参考。
+pubDate: '2026-01-24T11:41:32.661Z'
+image: /images/uploads/welcome-to-zzw4257s-notebook-index-cover.jpg
+badge: Note
+draft: false
+categories:
+  - Notebook
+  - Tools
+tags:
+  - Markdown
+  - MkDocs
+  - GitHub Actions
+  - 静态部署
+  - 语法指南
+---
+
+> **[迁移说明]** 本文最初发布于 `blog.zzw4257.cn`，现已迁移并在本站进行结构化整理与增强。
+
+
+## 部署说明
+
+本笔记库目前采用 GitHub Actions 进行自动化构建。系统会自动监听源码变动，生成 `gh-pages` 分支并完成静态部署。在完成首次环境搭建后，后续更新仅需提交 Markdown 源码，无需手动干预部署流程。
+
+## Markdown 扩展语法参考
+
+为了增强笔记的可读性，本库借鉴了 MkDocs 的 [Admonitions](https://squidfunk.github.io/mkdocs-material/reference/admonitions) 扩展语法。在 MDX 环境下，建议采用以下方式进行转换和呈现。
+
+### 提示框 (Call-out)
+
+支持的语义化类型包括：`note`, `abstract`, `info`, `tip`, `success`, `question`, `failure`, `warning`, `danger`, `bug`, `example`, `quote`。
+
+#### 基础用法
+
+在标准 MDX 中，建议使用加粗标题配合块引用（Blockquotes）来模拟提示框：
+
+> **Note: 默认标题**
+> <br />
+> 这是一个带有系统默认标题的提示框示例。
+
+> **Note**
+> <br />
+> 这是一个无标题或隐藏标题的提示框，通常用于纯文本强调。
+
+> **自定义标题**
+> <br />
+> 这是一个手动指定标题的 Note 示例。
+
+> **Example: 特殊示例**
+
+> **Tip: 温馨提示**
+
+> **Warning: 警告事项**
+
+### 内容折叠 (Collapsible Blocks)
+
+对于篇幅较长或次要的信息，可以使用折叠区块以保持页面简洁。在 MDX 中通过 `<details>` 和 `<summary>` 标签实现：
+
+<details>
+<summary>点击展开：折叠 Note 示例</summary>
+
+这里是折叠在内部的详细内容，支持嵌套其他 Markdown 语法。
+
+</details>
+
+<details>
+<summary>点击展开：折叠 Tip 示例</summary>
+
+保持专注，持续学习。
+
+</details>
+
+<details>
+<summary>引用示例：高尔基名言</summary>
+
+> 我是傻逼 (此处保留原文示例内容)
+
+</details>
+
+### 行内区块 (Inline Blocks)
+
+行内区块通常用于将补充信息浮动至页面一侧。在 MDX 布局中，可以通过标准引用块来实现类似的视觉隔离：
+
+> **Info: 侧边信息参考**
+> <br />
+> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla et euismod nulla. Curabitur feugiat, tortor non consequat finibus, justo purus auctor massa, nec semper lorem quam in massa.
+
+## 自定义扩展
+
+针对特定需求的自定义区块：
+
+<details>
+<summary>自定义区块：zzw</summary>
+
+用于记录特定场景下的个性化内容。
+
+</details>
