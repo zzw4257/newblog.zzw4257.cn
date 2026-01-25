@@ -1,0 +1,578 @@
+# 离散数学核心概念笔记
+
+## 第一部分：数理逻辑 (Mathematical Logic)
+
+### 1. 命题逻辑 (Propositional Logic)
+
+* **引出**：命题逻辑是研究命题及其之间逻辑关系的演算系统，是形式化人类推理的基础。
+* **核心概念**：
+
+  * **命题 (Proposition)**：一个具有确定真值（真或假，但不能既真又假）的陈述句。
+    * **原子命题 (Atomic Proposition)**：不能再分解为更简单命题的命题。通常用 $P, Q, R, \dots$ 表示。
+    * **复合命题 (Compound Proposition)**：由原子命题通过逻辑联接词联接而成的命题。
+  * **真值 (Truth Value)**：命题的真假性，通常用 $T$ (True) 或 $1$ 表示真，$F$ (False) 或 $0$ 表示假。
+  * **逻辑联接词 (Logical Connectives)**：
+    * **否定 (Negation)**：$\neg P$ (或 $\sim P, \bar{P}$)，「非 P」。
+    * **合取 (Conjunction)**：$P \land Q$，「P 且 Q」。
+    * **析取 (Disjunction)**：$P \lor Q$，「P 或 Q」（包含或）。
+    * **条件 (Conditional/Implication)**：$P \to Q$，「若 P 则 Q」。P 称为**前件 (antecedent)**，Q 称为**后件 (consequent)**。
+    * **双条件 (Biconditional/Equivalence)**：$P \leftrightarrow Q$，「P 当且仅当 Q」。
+* **命题公式 (Propositional Formula)**：合乎语法的由命题变元、逻辑联接词和括号组成的符号串。
+* **语法规则**：
+
+  1. 每个命题变元（如 $P, Q, R$）本身是命题公式。
+  2. 若 $A$ 是命题公式，则 $\neg A$ 也是命题公式。
+  3. 若 $A, B$ 是命题公式，则 $(A \land B), (A \lor B), (A \to B), (A \leftrightarrow B)$ 也是命题公式。
+  4. 只有有限次应用上述规则得到的表达式才是命题公式。
+* **语义**：
+
+  * 给定每个命题变元的真值，通过逻辑联接词的定义，可以递归地确定整个命题公式的真值。
+  * 逻辑联接词的真值表如下：
+    | $P$ | $Q$ | $\neg P$ | $P \land Q$ | $P \lor Q$ | $P \to Q$ | $P \leftrightarrow Q$ |
+    | :---: | :---: | :--------: | :-----------: | :----------: | :---------: | :---------------------: |
+    |   T   |   T   |     F     |       T       |      T      |      T      |            T            |
+    |   T   |   F   |     F     |       F       |      T      |      F      |            F            |
+    |   F   |   T   |     T     |       F       |      T      |      T      |            F            |
+    |   F   |   F   |     T     |       F       |      F      |      T      |            T            |
+* **命题逻辑的作用**：
+
+  * 形式化推理和证明。
+  * 设计和分析数字电路（布尔代数）。
+  * 作为更高阶逻辑（如谓词逻辑）的基础。
+
+### 2. 逻辑联接词集功能完备性 (Functional Completeness of Logical Connectives)
+
+* **引出**：是否可以用一个较小的联接词集合来表达所有可能的逻辑运算？
+* **核心概念**：
+  * **真值函数 (Truth Function)**：一个将 $n$ 个命题变元的真值指派映射到一个真值的函数，即 $f: \{T, F\}^n \to \{T, F\}$。任何一个命题公式都对应一个真值函数。
+  * **功能完备集 (Functionally Complete Set)**：一个逻辑联接词的集合，如果任何 $n$ 元真值函数都可以由仅包含该集合中联接词的命题公式表示，则称该集合是功能完备的。
+  * **常见的完备集**：
+    * $\{\neg, \land, \lor\}$
+    * $\{\neg, \land\}$ (因为 $P \lor Q \Leftrightarrow \neg(\neg P \land \neg Q)$)
+    * $\{\neg, \lor\}$ (因为 $P \land Q \Leftrightarrow \neg(\neg P \lor \neg Q)$)
+    * $\{\neg, \to\}$ (因为 $P \lor Q \Leftrightarrow \neg P \to Q$; $P \land Q \Leftrightarrow \neg(P \to \neg Q)$)
+    * **与非 (NAND)**：$P \uparrow Q \Leftrightarrow \neg(P \land Q)$。$\{\uparrow\}$ 是功能完备的。
+    * **或非 (NOR)**：$P \downarrow Q \Leftrightarrow \neg(P \lor Q)$。$\{\downarrow\}$ 是功能完备的。
+* **意义**：在逻辑电路设计中，功能完备性意味着可以用一种或几种基本逻辑门构建任何复杂的逻辑电路。
+
+### 3. 真值表 (Truth Table)
+
+* **引出**：一种系统性地确定复合命题真值的方法，它枚举了所有原子命题可能的真值组合。
+* **构造**：
+  * 列出所有原子命题。
+  * 为每个原子命题的真值组合（$2^n$ 行，其中 $n$ 为原子命题个数）创建一行。
+  * 逐步计算复合命题中各子公式的真值，直到得到整个公式的真值。
+* **应用**：
+  * 定义逻辑联接词的语义。
+  * 判断命题公式的类型：
+    * **重言式/永真式 (Tautology)**：对于原子命题的所有真值指派，公式恒为真。
+    * **矛盾式/永假式 (Contradiction)**：对于原子命题的所有真值指派，公式恒为假。
+    * **可满足式 (Satisfiable Formula)**：至少存在一种真值指派使公式为真。
+  * 判断逻辑等价和逻辑蕴涵。
+
+### 4. 逻辑等价式 (Logical Equivalence)
+
+* **引出**：两个不同的命题公式在何种情况下可以认为是「逻辑上相同」的？
+* **定义**：若两个命题公式 $P$ 和 $Q$ 对于其原子命题的任何真值指派都具有相同的真值，则称 $P$ 和 $Q$ 是逻辑等价的，记作 $P \Leftrightarrow Q$ 或 $P \equiv Q$。等价地，$P \leftrightarrow Q$ 是一个重言式。
+* **常用逻辑等价式**：
+  * **双重否定律**：$\neg\neg P \Leftrightarrow P$
+  * **幂等律**：$P \land P \Leftrightarrow P$; $P \lor P \Leftrightarrow P$
+  * **交换律**：$P \land Q \Leftrightarrow Q \land P$; $P \lor Q \Leftrightarrow Q \lor P$
+  * **结合律**：$(P \land Q) \land R \Leftrightarrow P \land (Q \land R)$; $(P \lor Q) \lor R \Leftrightarrow P \lor (Q \lor R)$
+  * **分配律**：$P \land (Q \lor R) \Leftrightarrow (P \land Q) \lor (P \land R)$; $P \lor (Q \land R) \Leftrightarrow (P \lor Q) \land (P \lor R)$
+  * **德摩根律 (De Morgan's Laws)**：$\neg(P \land Q) \Leftrightarrow \neg P \lor \neg Q$; $\neg(P \lor Q) \Leftrightarrow \neg P \land \neg Q$
+  * **吸收律**：$P \land (P \lor Q) \Leftrightarrow P$; $P \lor (P \land Q) \Leftrightarrow P$
+  * **蕴涵等价式**：$P \to Q \Leftrightarrow \neg P \lor Q$
+  * **假言易位 (Contraposition)**：$P \to Q \Leftrightarrow \neg Q \to \neg P$
+  * **等价等价式**：$P \leftrightarrow Q \Leftrightarrow (P \to Q) \land (Q \to P)$
+* **应用**：简化命题公式，进行逻辑推演。
+
+### 5. 逻辑蕴涵式 (Logical Implication)
+
+* **引出**：如何形式化地表达「前提能推出结论」这一推理过程的有效性？
+* **定义**：若对于原子命题的任何真值指派，只要公式 $P$ 为真，则公式 $Q$ 必为真，则称 $P$ 逻辑蕴涵 $Q$，记作 $P \Rightarrow Q$。等价地，$P \to Q$ 是一个重言式。
+* **判断**：
+  * 通过真值表：检查是否存在 $P$ 为 T 而 $Q$ 为 F 的情况，若不存在则 $P \Rightarrow Q$。
+  * $P \Rightarrow Q$ 当且仅当 $P \land \neg Q$ 是一个矛盾式。
+* **与条件联接词的区别**：$P \to Q$ 是一个命题公式，其本身有真值；$P \Rightarrow Q$ 是一种关于 $P$ 和 $Q$ 之间逻辑关系（元语言层面）的断言。
+* **推理规则**：许多有效的推理规则是基于逻辑蕴涵的，如：
+  * **肯定前件式 (Modus Ponens)**：$((P \to Q) \land P) \Rightarrow Q$
+  * **否定后件式 (Modus Tollens)**：$((P \to Q) \land \neg Q) \Rightarrow \neg P$
+  * **假言三段论 (Hypothetical Syllogism)**：$((P \to Q) \land (Q \to R)) \Rightarrow (P \to R)$
+
+### 6. 代入原理、替换原理 (Substitution Principle, Replacement Principle)
+
+* **代入原理 (Substitution Principle)**：
+  * **内容**：若公式 $A$ 是一个重言式，将 $A$ 中的某个原子命题 $P$ 的所有出现都替换为任意一个命题公式 $B$，得到的新公式 $A'$ 仍然是重言式。
+  * **意义**：保证了重言式的普适性。
+* **替换原理 (Replacement Principle / Rule of Equivalence)**：
+  * **内容**：设公式 $A$ 是公式 $B$ 的一个子公式，若 $A \Leftrightarrow A'$，则将 $B$ 中的 $A$ 替换为 $A'$ 得到公式 $B'$，有 $B \Leftrightarrow B'$。
+  * **意义**：允许在逻辑推导和公式化简中使用逻辑等价式进行等价替换，而不改变原公式的逻辑特性。这是化简逻辑表达式和进行逻辑证明的基石。
+
+### 7. （主）合取范式、（主）析取范式 ((Principal) Conjunctive Normal Form (CNF), (Principal) Disjunctive Normal Form (DNF))
+
+* **引出**：任何命题公式是否都可以化为一种标准形式？
+* **基本概念**：
+  * **文字 (Literal)**：一个原子命题或其否定 (如 $P, \neg P$）。
+  * **简单合取式/子句 (Elementary Conjunction / Clause in some contexts)**：有限个文字的合取。
+  * **简单析取式/子句 (Elementary Disjunction / Clause)**：有限个文字的析取。
+* **析取范式 (DNF)**：
+  * **定义**：由有限个简单合取式组成的析取式。形如：$C_1 \lor C_2 \lor \dots \lor C_k$，其中每个 $C_i$ 是简单合取式。
+  * **求法**：利用逻辑等价律，特别是分配律和德摩根律。
+* **合取范式 (CNF)**：
+  * **定义**：由有限个简单析取式组成的合取式。形如：$D_1 \land D_2 \land \dots \land D_k$，其中每个 $D_i$ 是简单析取式。
+  * **求法**：类似 DNF 的求法。
+* **主析取范式 (PDNF / Full Disjunctive Normal Form)**：
+  * **定义**：一个 DNF，其中每个简单合取式（称为**极小项 Minterm**）都包含公式中出现的每一个原子命题或其否定，且每个极小项仅出现一次。
+  * **性质**：对于任何非矛盾式的命题公式，其主析取范式是存在且唯一的（不考虑极小项的排列顺序和极小项内文字的排列顺序）。
+  * **构造**：由真值表中使公式为真的所有行的真值指派构成，每个真值指派对应一个极小项（变量为真则取变量本身 $P_i$，为假则取其否定 $\neg P_i$）。
+* **主合取范式 (PCNF / Full Conjunctive Normal Form)**：
+  * **定义**：一个 CNF，其中每个简单析取式（称为**极大项 Maxterm**）都包含公式中出现的每一个原子命题或其否定，且每个极大项仅出现一次。
+  * **性质**：对于任何非重言式的命题公式，其主合取范式是存在且唯一的（不考虑极大项的排列顺序和极大项内文字的排列顺序）。
+  * **构造**：由真值表中使公式为假的所有行的真值指派构成，每个真值指派对应一个极大项（变量为假则取变量本身 $P_i$，为真则取其否定 $\neg P_i$，然后构成析取式）。
+* **应用**：电路设计（和之积、积之和），逻辑推理（如归结原理基于 CNF），可满足性问题 (SAT)。
+
+### 8. 谓词逻辑 (Predicate Logic / First-Order Logic, FOL)
+
+* **引出**：命题逻辑无法表达「所有」、「存在」等量化概念，也无法分析命题的内部结构（主谓宾）。谓词逻辑扩展了命题逻辑的表达能力。
+* **核心概念**：
+  * **个体词 (Individual Term)**：表示所讨论对象。
+    * **个体常量 (Individual Constant)**：表示特定个体，如 $a, b, c, \text{Socrates}$。
+    * **个体变元 (Individual Variable)**：表示任意个体，如 $x, y, z$。其取值范围称为**论域 (Domain of Discourse / Universe)**，记为 $U$。
+  * **谓词 (Predicate)**：表示个体的性质或个体间的关系。$n$元谓词是一个从 $U^n$ 到 $\{T, F\}$ 的函数。
+    * 如：$P(x)$：「$x$ 是偶数」；$L(x,y)$：「$x$ 爱 $y$」。
+  * **量词 (Quantifier)**：
+    * **全称量词 (Universal Quantifier)**：$\forall x$，「对所有的 $x$」。$\forall x P(x)$ 意为论域中所有个体都具有性质 $P$。
+    * **存在量词 (Existential Quantifier)**：$\exists x$，「存在某个 $x$」。$\exists x P(x)$ 意为论域中至少有一个个体具有性质 $P$。
+  * **约束变元 (Bound Variable)**：出现在量词作用域内的变元。
+  * **自由变元 (Free Variable)**：未被量词约束的变元。
+  * **谓词公式 (Predicate Formula)**：由谓词符号、个体词、逻辑联接词和量词按语法规则构成的表达式。
+    * **原子公式 (Atomic Formula)**：形如 $P(t_1, \dots, t_n)$ 的表达式。
+    * **合式公式 (Well-formed Formula, WFF)**：递归定义。
+* **解释 (Interpretation)**：为谓词公式赋予意义的过程，包括：
+  * 指定非空论域 $U$。
+  * 为每个个体常量指派 $U$ 中的一个元素。
+  * 为每个 $n$ 元函数符号指派 $U^n \to U$ 的一个具体函数。
+  * 为每个 $n$ 元谓词符号指派 $U^n \to \{T, F\}$ 的一个具体谓词。
+
+### 9. 谓词演算的永真式 (Valid Formulas in Predicate Calculus)
+
+* **引出**：类似于命题逻辑中的重言式，谓词逻辑中也有在任何解释下都为真的公式。
+* **定义**：
+  * **永真式 (Valid Formula / Logically Valid)**：一个谓词公式，在任何解释下，对变元的所有赋值都为真。
+  * **矛盾式 (Contradiction / Unsatisfiable)**：一个谓词公式，在任何解释下，对变元的所有赋值都为假。
+  * **可满足式 (Satisfiable Formula)**：存在某个解释，使得公式在该解释下对变元的某个赋值为真。
+* **与命题逻辑的区别**：谓词逻辑的永真性判定是**不可判定**的（Church-Turing 定理），即不存在一个通用算法能在有限步骤内判断任意谓词公式是否永真。但对于某些子类是可判定的。
+* **常用永真（等价/蕴涵）模式**（设 $A(x)$ 是含自由变元 $x$ 的公式，$B$ 是不含自由变元 $x$ 的公式）：
+  * **量词否定**：
+    * $\neg \forall x A(x) \Leftrightarrow \exists x \neg A(x)$
+    * $\neg \exists x A(x) \Leftrightarrow \forall x \neg A(x)$
+  * **量词分配**（对 $\to$ 要小心）：
+    * $\forall x (A(x) \land B(x)) \Leftrightarrow \forall x A(x) \land \forall x B(x)$
+    * $\exists x (A(x) \lor B(x)) \Leftrightarrow \exists x A(x) \lor \exists x B(x)$
+    * $\forall x A(x) \lor \forall x B(x) \Rightarrow \forall x (A(x) \lor B(x))$  (反向不一定成立)
+    * $\exists x (A(x) \land B(x)) \Rightarrow \exists x A(x) \land \exists x B(x)$  (反向不一定成立)
+  * **量词辖域扩张与收缩** (当 $B$ 不含自由变元 $x$):
+    * $\forall x (A(x) \land B) \Leftrightarrow (\forall x A(x)) \land B$
+    * $\forall x (A(x) \lor B) \Leftrightarrow (\forall x A(x)) \lor B$
+    * $\exists x (A(x) \land B) \Leftrightarrow (\exists x A(x)) \land B$
+    * $\exists x (A(x) \lor B) \Leftrightarrow (\exists x A(x)) \lor B$
+  * **量词换名**：只要不引起新的约束。
+  * **一些基本永真蕴涵**：$\forall x P(x) \Rightarrow P(t)$ (t为任意个体词，Universal Instantiation, UI规则)；$P(t) \Rightarrow \exists x P(x)$ (Existential Generalization, EG规则)。
+* **前束范式 (Prenex Normal Form)**：所有量词都在公式最前端，其后是一个无量词的母式。任何谓词公式都可等价地化为前束范式。
+
+## 第二部分：集合论 (Set Theory)
+
+### 10. 公理化集合论 (Axiomatic Set Theory)
+
+* **引出**：朴素集合论（允许任何满足某种性质的对象构成集合）会导致悖论（如罗素悖论："令 $R$ 为所有不包含自身作为元素的集合的集合，问 $R$ 是否包含自身？"）。公理化集合论通过一组公理来规定哪些对象可以构成集合，以及集合有哪些基本性质，从而避免悖论。
+* **核心思想**：不直接定义「什么是集合」，而是通过公理规定集合的行为和构造方式。
+* **常用公理系统**：ZFC (Zermelo-Fraenkel set theory with the Axiom of Choice) 是最常用的。
+* **部分重要公理示例 (概念性)**：
+  * **外延公理 (Axiom of Extensionality)**：两个集合相等，当且仅当它们有相同的元素。
+    $$
+    \forall A \forall B (\forall x (x \in A \leftrightarrow x \in B) \rightarrow A = B)
+    $$
+  * **空集公理 (Axiom of Empty Set)**：存在一个不含任何元素的集合（空集 $\emptyset$）。
+    $$
+    \exists A \forall x (x \notin A)
+    $$
+  * **对集公理 (Axiom of Pairing)**：对任意两个集合 $x$ 和 $y$，存在一个集合 $\{x, y\}$，其元素仅为 $x$ 和 $y$。
+    $$
+    \forall x \forall y \exists A \forall z (z \in A \leftrightarrow (z=x \lor z=y))
+    $$
+  * **并集公理 (Axiom of Union)**：对任意集合族 $\mathcal{F}$，存在一个集合 $U$，其元素是 $\mathcal{F}$ 中所有集合的元素的并集。
+    $$
+    \forall \mathcal{F} \exists A \forall x (x \in A \leftrightarrow \exists S (S \in \mathcal{F} \land x \in S))
+    $$
+  * **幂集公理 (Axiom of Power Set)**：对任意集合 $A$，存在一个集合 $\mathcal{P}(A)$，其元素是 $A$ 的所有子集。
+    $$
+    \forall A \exists P \forall X (X \in P \leftrightarrow X \subseteq A)
+    $$
+  * **无穷公理 (Axiom of Infinity)**：保证至少存在一个无穷集合（如包含所有自然数构造的集合）。
+  * **替换公理模式 (Axiom Schema of Replacement)**：若一个函数类 $F$ 定义在集合 $A$ 上，则 $F$ 的值域也是一个集合。
+  * **正则公理/基础公理 (Axiom of Regularity/Foundation)**：每个非空集合 $x$ 都包含一个元素 $y$，使得 $x$ 和 $y$ 不相交（防止无限下降的属于链 $x_1 \in x_2 \in x_3 \in \dots$）。
+    $$
+    \forall A (A \neq \emptyset \rightarrow \exists x (x \in A \land x \cap A = \emptyset))
+    $$
+  * **选择公理 (Axiom of Choice, AC)**：对于任何非空集合的集合族，存在一个选择函数，可以从每个集合中选取一个元素。
+* **意义**：为现代数学提供了坚实的基础。
+
+### 11. 集合基本运算 (Basic Set Operations)
+
+* **集合 (Set)**：一个无序的、不重复的元素的集合。元素用 $a \in A$ 表示 $a$ 是集合 $A$ 的元素，$a \notin A$ 表示 $a$ 不是 $A$ 的元素。
+* **子集 (Subset)**：$A \subseteq B$，若 $A$ 的每个元素也是 $B$ 的元素。若 $A \subseteq B$ 且 $A \neq B$，则 $A$ 是 $B$ 的**真子集 (Proper Subset)**，记为 $A \subset B$。
+* **幂集 (Power Set)**：$\mathcal{P}(A)$ 或 $2^A$，集合 $A$ 的所有子集构成的集合。如果 $|A|=n$，则 $|\mathcal{P}(A)| = 2^n$。
+* **运算** (设 $U$ 为全集)：
+  * **并集 (Union)**：$A \cup B = \{x \mid x \in A \lor x \in B\}$
+  * **交集 (Intersection)**：$A \cap B = \{x \mid x \in A \land x \in B\}$
+  * **差集 (Difference)**：$A - B$ (或 $A \setminus B$) $= \{x \mid x \in A \land x \notin B\}$
+  * **补集 (Complement)**：$A'$ (或 $A^c, \bar{A}$) $= U - A = \{x \mid x \in U \land x \notin A\}$
+  * **对称差 (Symmetric Difference)**：$A \oplus B = (A - B) \cup (B - A) = (A \cup B) - (A \cap B)$
+* **集合恒等式**（类似逻辑等价式）：
+  * **交换律**：$A \cup B = B \cup A$; $A \cap B = B \cap A$
+  * **结合律**：$(A \cup B) \cup C = A \cup (B \cup C)$; $(A \cap B) \cap C = A \cap (B \cap C)$
+  * **分配律**：$A \cup (B \cap C) = (A \cup B) \cap (A \cup C)$; $A \cap (B \cup C) = (A \cap B) \cup (A \cap C)$
+  * **德摩根律**：$(A \cup B)' = A' \cap B'$; $(A \cap B)' = A' \cup B'$
+  * **吸收律**：$A \cup (A \cap B) = A$; $A \cap (A \cup B) = A$
+  * **同一律/幺元律**：$A \cup \emptyset = A$; $A \cap U = A$
+  * **零元律**：$A \cup U = U$; $A \cap \emptyset = \emptyset$
+  * **补余律**：$A \cup A' = U$; $A \cap A' = \emptyset$
+  * **双重补余律**：$(A')' = A$
+* **文氏图 (Venn Diagram)**：用于可视化集合运算和关系的图形工具。
+
+### 12. 归纳定义 (Inductive Definition / Recursive Definition)
+
+* **引出**：一种精确定义无限集合或结构的方法，特别适用于那些可以通过较简单实例构造出较复杂实例的对象。
+* **结构**：通常包含三个部分：
+  1. **基础步骤 (Basis Step/Base Case)**：明确规定集合中的一些初始元素或对象。
+  2. **归纳步骤 (Inductive Step/Recursive Step)**：给出规则，说明如何从集合中已有的元素构造出新的元素。
+  3. **极小性条款 (Extremal Clause/Closure Clause)**：(有时隐式)声明，只有通过有限次应用基础步骤和归纳步骤得到的元素才属于该集合。
+* **示例**：
+  * **自然数集 $\mathbb{N}$** (以0开始)：
+    1. $0 \in \mathbb{N}$ (基础)
+    2. 若 $n \in \mathbb{N}$，则 $n+1 \in \mathbb{N}$ (归纳)
+  * **合式公式 WFF (命题逻辑)**：
+    1. 原子命题是 WFF (基础)
+    2. 若 $P, Q$ 是 WFF，则 $(\neg P), (P \land Q), (P \lor Q), (P \to Q), (P \leftrightarrow Q)$ 也是 WFF (归纳)
+  * **斐波那契数列**：
+    1. $F(0)=0, F(1)=1$ (基础)
+    2. $F(n) = F(n-1) + F(n-2)$ for $n \ge 2$ (归纳)
+* **与数学归纳法 (Mathematical Induction) 的关系**：归纳定义的对象通常可以用数学归纳法来证明其性质。
+
+## 第三部分：关系与函数 (Relations and Functions)
+
+### 13. 有序组 (Ordered n-tuple)
+
+* **引出**：集合中的元素是无序的，但在许多情况下，元素的顺序很重要。
+* **定义**：一个包含 $n$ 个元素的序列 $(a_1, a_2, \dots, a_n)$，其中元素的顺序是重要的，且元素可以重复。
+* **有序对 (Ordered Pair)**：当 $n=2$ 时，$(a_1, a_2)$ 称为有序对。
+  * $(a, b) = (c, d)$ 当且仅当 $a = c$ 且 $b = d$。
+  * **Kuratowski 定义**：$(a,b) = \{\{a\}, \{a,b\}\}$。此定义表明有序对可以用集合论构造。
+* **应用**：笛卡尔积、关系、函数、向量、坐标等。
+
+### 14. 笛卡尔积 (Cartesian Product)
+
+* **引出**：一种从已有集合构造新集合的方法，其元素是有序组。
+* **定义**：
+  * **两个集合的笛卡尔积**：$A \times B = \{(a, b) \mid a \in A \land b \in B\}$。
+  * **n 个集合的笛卡尔积**：$A_1 \times A_2 \times \dots \times A_n = \{(a_1, a_2, \dots, a_n) \mid a_i \in A_i \text{ for } i=1, \dots, n\}$。
+  * $A^n = A \times A \times \dots \times A$ (n 次)。
+* **性质**：
+  * 若 $A, B$ 有限，则 $|A \times B| = |A| \times |B|$。
+  * 一般情况下，$A \times B \neq B \times A$ (除非 $A=B$ 或 $A=\emptyset$ 或 $B=\emptyset$)。
+  * $(A \times B) \times C \neq A \times (B \times C)$ (元素形式不同，但存在自然的一一对应，即同构)。
+  * $A \times \emptyset = \emptyset \times A = \emptyset$。
+* **应用**：定义关系、函数的基础，坐标系，样本空间。
+
+### 15. 关系、关系矩阵、函数 (Relation, Relation Matrix, Function)
+
+* **关系 (Relation)**：
+  * **二元关系 (Binary Relation)**：从集合 $A$ 到集合 $B$ 的一个二元关系 $R$ 是 $A \times B$ 的一个子集，即 $R \subseteq A \times B$。若 $A=B$，则 $R$ 是 $A$ 上的一个二元关系。
+  * **表示**：$a R b$ 或 $(a,b) \in R$。
+  * **$n$元关系**：$A_1 \times A_2 \times \dots \times A_n$ 的一个子集。
+  * **关系的基本概念**：
+    * **定义域 (Domain)**：$\text{dom}(R) = \{a \in A \mid \exists b \in B, (a,b) \in R\}$ (对于 $R \subseteq A \times B$)
+    * **值域 (Range)**：$\text{ran}(R) = \{b \in B \mid \exists a \in A, (a,b) \in R\}$
+    * **逆关系 (Inverse Relation)**：$R^{-1} = \{(b,a) \mid (a,b) \in R\}$。若 $R \subseteq A \times B$，则 $R^{-1} \subseteq B \times A$。
+    * **复合关系 (Composition of Relations)**：若 $R \subseteq A \times B, S \subseteq B \times C$，则 $S \circ R$ (或 $R ; S$) $= \{(a,c) \in A \times C \mid \exists b \in B, (a,b) \in R \land (b,c) \in S\}$。(注意复合顺序，有的教材写 $R \circ S$)
+* **关系矩阵 (Relation Matrix)** (用于有限集合上的关系)：
+  * **定义**：设 $A = \{a_1, \dots, a_m\}, B = \{b_1, \dots, b_n\}$，$R$ 是从 $A$ 到 $B$ 的关系。则 $R$ 的关系矩阵 $M_R$ 是一个 $m \times n$ 的 $0-1$ 矩阵，其中 $(M_R)_{ij} = 1$ 当且仅当 $(a_i, b_j) \in R$，否则为 $0$。
+  * **运算**：
+    * $M_{R^{-1}} = (M_R)^T$ (转置)
+    * $M_{R \cup S} = M_R \lor M_S$ (逐元素逻辑或)
+    * $M_{R \cap S} = M_R \land M_S$ (逐元素逻辑与)
+    * $M_{S \circ R} = M_R \cdot M_S$ (布尔矩阵乘法， $(A \cdot B)_{ik} = \bigvee_j (A_{ij} \land B_{jk})$ )
+* **函数 (Function)**：
+  * **定义**：从集合 $A$ 到集合 $B$ 的一个函数 $f$ (记作 $f: A \to B$) 是一种特殊的二元关系 $f \subseteq A \times B$，满足：对每个 $a \in A$，都存在**唯一的** $b \in B$ 使得 $(a,b) \in f$。通常记为 $f(a) = b$。
+    * $A$ 称为**定义域 (Domain)**。
+    * $B$ 称为**陪域/上域 (Codomain)**。
+    * $\{f(a) \mid a \in A\}$ 称为**值域 (Range/Image)**，是陪域的子集。
+  * **函数的类型**：
+    * **单射 (Injective / One-to-one)**：若 $a_1 \neq a_2 \Rightarrow f(a_1) \neq f(a_2)$。或者等价地，$f(a_1) = f(a_2) \Rightarrow a_1 = a_2$。
+    * **满射 (Surjective / Onto)**：若对每个 $b \in B$，都存在至少一个 $a \in A$ 使得 $f(a) = b$ (即值域等于陪域)。
+    * **双射 (Bijective / One-to-one correspondence)**：既是单射又是满射。若存在双射 $f:A \to B$，则 $|A|=|B|$。
+  * **逆函数 (Inverse Function)**：若 $f: A \to B$ 是双射，则存在逆函数 $f^{-1}: B \to A$，使得 $f^{-1}(b) = a$ 当且仅当 $f(a) = b$。
+  * **复合函数 (Composition of Functions)**：若 $f: A \to B, g: B \to C$，则复合函数 $g \circ f: A \to C$ 定义为 $(g \circ f)(a) = g(f(a))$。
+
+### 16. 等价关系、等价类、划分 (Equivalence Relation, Equivalence Class, Partition)
+
+* **等价关系 (Equivalence Relation)**：
+  * **定义**：集合 $A$ 上的一个二元关系 $R$ 如果满足以下三个性质，则称 $R$ 为等价关系：
+    1. **自反性 (Reflexivity)**：$\forall a \in A, (a,a) \in R$。
+    2. **对称性 (Symmetry)**：$\forall a,b \in A, \text{若 } (a,b) \in R, \text{ 则 } (b,a) \in R$。
+    3. **传递性 (Transitivity)**：$\forall a,b,c \in A, \text{若 } (a,b) \in R \text{ 且 } (b,c) \in R, \text{ 则 } (a,c) \in R$。
+  * **例子**：整数集上的模 $n$同余关系 ($\equiv_n$)；几何图形中的相似或全等关系。
+* **等价类 (Equivalence Class)**：
+  * **定义**：设 $R$ 是集合 $A$ 上的一个等价关系，对任意 $a \in A$，由 $a$ 确定的等价类 $[a]_R$ (或简写为 $[a]$) 定义为：$[a]_R = \{x \in A \mid (x,a) \in R\}$。
+  * **性质**：
+    1. 对任意 $a \in A, a \in [a]$，故 $[a]$ 非空。
+    2. 若 $(a,b) \in R$，则 $[a] = [b]$。
+    3. 若 $(a,b) \notin R$，则 $[a] \cap [b] = \emptyset$。
+    4. $A$ 中任意两个元素的等价类或者相等，或者不相交。
+* **划分 (Partition)**：
+  * **定义**：集合 $A$ 的一个划分 $\mathcal{P}$ 是 $A$ 的一组非空子集 $\{A_i\}_{i \in I}$ (其中 $I$ 是索引集)，满足：
+    1. $A_i \neq \emptyset$ for all $i \in I$。
+    2. $A_i \cap A_j = \emptyset$ for $i \neq j$ (互不相交)。
+    3. $\bigcup_{i \in I} A_i = A$ (并集为 $A$)。
+* **商集 (Quotient Set)**：$A/R = \{[a]_R \mid a \in A\}$，即由 $A$ 关于 $R$ 的所有等价类构成的集合。
+* **基本定理**：集合 $A$ 上的一个等价关系 $R$ 唯一地确定了 $A$ 的一个划分（即商集 $A/R$ 的元素构成的划分）。反之，$A$ 的任何一个划分也唯一地确定了 $A$ 上的一个等价关系（同一子集内的元素等价）。
+
+### 17. 序关系、哈斯图 (Order Relation, Hasse Diagram)
+
+* **序关系 (Order Relation)**：
+  * **偏序关系 (Partial Order Relation)**：集合 $A$ 上的一个二元关系 $\preceq$ (或 $\le$) 如果满足以下三个性质，则称其为偏序关系，$(A, \preceq)$ 称为**偏序集 (Poset)**：
+
+    1. **自反性 (Reflexivity)**：$\forall a \in A, a \preceq a$。
+    2. **反对称性 (Antisymmetry)**：$\forall a,b \in A, \text{若 } a \preceq b \text{ 且 } b \preceq a, \text{ 则 } a = b$。
+    3. **传递性 (Transitivity)**：$\forall a,b,c \in A, \text{若 } a \preceq b \text{ 且 } b \preceq c, \text{ 则 } a \preceq c$。
+
+    * 若 $a \preceq b$ 且 $a \neq b$，则记为 $a \prec b$。
+  * **全序关系/线性序关系 (Total Order / Linear Order)**：一个偏序关系 $\preceq$，如果对 $A$ 中任意两个元素 $a, b$，都有 $a \preceq b$ 或 $b \preceq a$ 成立（即任何两个元素都可比较），则称为全序关系。
+  * **例子**：自然数集上的“$\le$”关系是全序；集合的幂集 $\mathcal{P}(S)$ 上的“$\subseteq$”关系是偏序。
+* **偏序集中的特殊元素**：设 $(A, \preceq)$ 是一个偏序集， $S \subseteq A$。
+  * **极大元 (Maximal Element)**：$m \in A$ 是极大元，若不存在 $x \in A$ 使得 $m \prec x$。
+  * **极小元 (Minimal Element)**：$m \in A$ 是极小元，若不存在 $x \in A$ 使得 $x \prec m$。
+  * **最大元 (Greatest Element / Maximum)**：$M \in A$ 是最大元，若 $\forall x \in A, x \preceq M$。（最大元若存在则唯一，且是唯一的极大元）
+  * **最小元 (Least Element / Minimum)**：$m \in A$ 是最小元，若 $\forall x \in A, m \preceq x$。（最小元若存在则唯一，且是唯一的极小元）
+  * **上界 (Upper Bound of $S$)**：元素 $u \in A$ 是 $S$ 的上界，若 $\forall s \in S, s \preceq u$。
+  * **下界 (Lower Bound of $S$)**：元素 $l \in A$ 是 $S$ 的下界，若 $\forall s \in S, l \preceq s$。
+  * **最小上界/上确界 (Least Upper Bound, LUB, supremum)**：$\sup S$，是 $S$ 的所有上界中的最小元（如果存在）。
+  * **最大下界/下确界 (Greatest Lower Bound, GLB, infimum)**：$\inf S$，是 $S$ 的所有下界中的最大元（如果存在）。
+  * **格 (Lattice)**：一个偏序集，其中任意两个元素都存在最小上界和最大下界。
+* **哈斯图 (Hasse Diagram)** (用于表示有限偏序集)：
+  * **构造规则**：
+    1. 用节点表示集合 $A$ 中的元素。
+    2. 若 $x \prec y$ 且不存在 $z$ 使得 $x \prec z \prec y$ (即 $y$ **覆盖 (covers)** $x$)，则从 $x$ 向 $y$ 画一条向上的线段。
+    3. 省略因自反性带来的环 (如 $a \preceq a$ 的自环)。
+    4. 省略因传递性可以推导出的边 (若 $x \prec y, y \prec z$，则 $x \prec z$ 的边省略，只保留 $x \to y, y \to z$ 的覆盖关系)。
+    5. 习惯上不画箭头，方向默认为自下向上（较小元在下）。
+  * **特点**：简洁地表示了偏序关系的核心结构——覆盖关系。
+
+## 第四部分：图论 (Graph Theory)
+
+### 18. 图论、图的同构 (Graph Theory, Graph Isomorphism)
+
+* **图 (Graph)**：一个图 $G = (V, E)$ 由两个集合组成：
+  * $V$：**顶点集 (Vertex Set)**，非空有限集。
+  * $E$：**边集 (Edge Set)**，其元素是 $V$ 中顶点的对。
+* **图的类型**：
+  * **无向图 (Undirected Graph)**：边是无序顶点对 $\{u,v\}$。
+  * **有向图 (Directed Graph / Digraph)**：边是有序顶点对 $(u,v)$，表示从 $u$ 到 $v$ 的**弧 (arc)**。
+  * **简单图 (Simple Graph)**：无**环 (loop)**（连接顶点自身的边）且任意两顶点间最多一条边（无向图）或一条有向边（有向图，但 $(u,v)$ 和 $(v,u)$ 可以同时存在）。
+  * **多重图 (Multigraph)**：允许两顶点间有多条边（**平行边 (parallel edges)**）。
+  * **伪图 (Pseudograph)**：允许环和平行边。
+  * **加权图 (Weighted Graph)**：每条边关联一个数值（**权重 (weight)**）。
+* **基本概念**：
+  * **邻接 (Adjacent)**：若 $\{u,v\}$ (或 $(u,v)$) 是一条边，则 $u$ 和 $v$ 邻接。边与它的端点**关联 (incident)**。
+  * **度 (Degree)**：
+    * 无向图中顶点 $v$ 的度 $\deg(v)$ 是与 $v$ 相关联的边的数目（环算两次）。
+    * 有向图中顶点 $v$ 的**入度 (in-degree)** $\deg^-(v)$ 是以 $v$ 为终点的边的数目，**出度 (out-degree)** $\deg^+(v)$ 是以 $v$ 为始点的边的数目。$\deg(v) = \deg^-(v) + \deg^+(v)$。
+  * **握手定理 (Handshaking Lemma)**：
+    * 无向图: $\sum_{v \in V} \deg(v) = 2|E|$
+    * 有向图: $\sum_{v \in V} \deg^-(v) = \sum_{v \in V} \deg^+(v) = |E|$
+  * **路径 (Path)**、**迹 (Trail)**、**通路 (Walk)**：顶点和边的交替序列。
+    * **通路(Walk)**: $v_0, e_1, v_1, e_2, \dots, e_k, v_k$，其中 $e_i = \{v_{i-1}, v_i\}$ (无向)或 $e_i = (v_{i-1}, v_i)$ (有向)。允许顶点和边重复。
+    * **迹(Trail)**: 边不重复的通路。
+    * **路径(Path)**: 顶点不重复的迹 (因此边也必不重复)。
+  * **圈/回路 (Cycle/Circuit)**：起点和终点相同的闭合路径/迹。
+    * **简单圈 (Simple cycle)**: 除起点和终点相同外，其他顶点不重复的闭合路径。
+  * **连通性 (Connectivity)**：
+    * 无向图中，若任意两顶点间都存在路径，则图是**连通的 (Connected)**。
+    * **连通分量 (Connected Component)**：图的极大连通子图。
+    * 有向图中，若忽略边的方向后图是连通的，则称其为**弱连通 (Weakly Connected)**。若任意两顶点 $u,v$ 间都存在从 $u$ 到 $v$ 的路径和从 $v$ 到 $u$ 的路径，则称其为**强连通 (Strongly Connected)**。
+* **图的同构 (Graph Isomorphism)**：
+  * **引出**：两个图在结构上何时可以认为是「相同」的？
+  * **定义**：两个图 $G_1 = (V_1, E_1)$ 和 $G_2 = (V_2, E_2)$ 是同构的 (记为 $G_1 \cong G_2$)，如果存在一个双射函数 $f: V_1 \to V_2$，使得对任意 $u, v \in V_1$，$\{u,v\} \in E_1$ 当且仅当 $\{f(u),f(v)\} \in E_2$ (对于无向图)，或者 $(u,v) \in E_1$ 当且仅当 $(f(u),f(v)) \in E_2$ (对于有向图)。
+  * **同构不变量 (Isomorphism Invariants)**：若 $G_1 \cong G_2$，则它们必须具有相同的：
+    * 顶点数、边数。
+    * 度序列（顶点度的排序列表）。
+    * 连通分量个数。
+    * 特定长度的圈的个数等。
+    * 注意：拥有相同的已知不变量是同构的必要条件，但非充分条件。
+  * **判定**：图同构判定问题是计算复杂性理论中的一个著名问题，属于 NP 类，但尚未确定是否为 NP-完全或P。
+
+### 19. 欧拉图、哈密尔顿图 (Eulerian Graph, Hamiltonian Graph)
+
+* **欧拉图 (Eulerian Graph)** (研究边)：
+  * **欧拉迹 (Eulerian Trail)**：通过图中每条边恰好一次的迹。
+  * **欧拉回路 (Eulerian Circuit/Cycle)**：起点和终点相同的欧拉迹。
+  * **欧拉图**：包含欧拉回路的图。
+  * **定理 (无向图)**：
+    * 一个连通图 $G$ 具有欧拉回路当且仅当 $G$ 中每个顶点的度都是偶数。
+    * 一个连通图 $G$ 具有欧拉迹（但非回路）当且仅当 $G$ 中恰好有两个奇度顶点（迹必须从一个奇度顶点开始，到另一个奇度顶点结束）。
+  * **定理 (有向图)**：
+    * 一个强连通有向图 $G$ 具有欧拉回路当且仅当 $G$ 中每个顶点的入度等于出度 ($\deg^-(v) = \deg^+(v)$ for all $v \in V$)。
+    * 一个弱连通有向图 $G$ 具有欧拉迹当且仅当至多有一个顶点 $u$ 满足 $\deg^+(u) - \deg^-(u) = 1$，至多有一个顶点 $w$ 满足 $\deg^-(w) - \deg^+(w) = 1$，其余所有顶点 $v$ 满足 $\deg^-(v) = \deg^+(v)$。
+* **哈密尔顿图 (Hamiltonian Graph)** (研究点)：
+  * **哈密尔顿路径 (Hamiltonian Path)**：通过图中每个顶点恰好一次的路径。
+  * **哈密尔顿圈/回路 (Hamiltonian Cycle/Circuit)**：通过图中每个顶点恰好一次并返回起点的简单圈。
+  * **哈密尔顿图**：包含哈密尔顿圈的图。
+  * **判定**：哈密尔顿路径/圈的判定是 NP-完全问题，没有简单的充要条件。
+  * **充分条件 (Sufficient Conditions)** (对于 $n \ge 3$ 的简单图)：
+    * **Dirac 定理 (1952)**：若图 $G$ 中每个顶点的度至少为 $n/2$ (即 $\forall v \in V, \deg(v) \ge n/2$)，则 $G$ 是哈密尔顿图。
+    * **Ore 定理 (1960)**：若图 $G$ 中任意两个不邻接顶点的度数之和至少为 $n$ (即 $\forall u,v \in V, \{u,v\} \notin E \implies \deg(u) + \deg(v) \ge n$)，则 $G$ 是哈密尔顿图。
+  * **必要条件 (Necessary Condition)**：若图 $G$ 有哈密尔顿圈，则对 $V$ 的任意非空真子集 $S$，图 $G-S$ (从 $G$ 中删除 $S$ 中的顶点及其关联的边得到的图) 的连通分支数 $\omega(G-S) \le |S|$。
+
+### 20. 二分图、匹配算法 (Bipartite Graph, Matching Algorithm)
+
+* **二分图 (Bipartite Graph)**：
+  * **定义**：一个图 $G = (V,E)$ 是二分图，如果其顶点集 $V$ 可以划分为两个不相交的子集 $V_1$ 和 $V_2$ ($V = V_1 \cup V_2, V_1 \cap V_2 = \emptyset$)，使得图中的每条边都连接 $V_1$ 中的一个顶点和 $V_2$ 中的一个顶点。$(V_1, V_2)$ 称为二分图的一个**部 (part)**。
+  * **判定**：一个无向图是二分图当且仅当它不包含奇数长度的圈。
+  * **应用**：任务分配问题，资源调度。
+* **匹配 (Matching)**：
+  * **定义**：图 $G$ 中的一个匹配 $M$ 是 $E$ 的一个子集，使得 $M$ 中任意两条边都没有公共顶点。
+  * **极大匹配 (Maximal Matching)**：不能再添加任何边到 $M$ 中仍保持其为匹配的匹配。
+  * **最大匹配 (Maximum Matching)**：包含边数最多的匹配。其边数称为**匹配数 (matching number)**。
+  * **完美匹配 (Perfect Matching)**：覆盖了图中所有顶点的匹配（要求 $|V|$ 为偶数）。
+  * **饱和点 (Saturated Vertex)**：被匹配 $M$ 中的某条边覆盖的顶点。非饱和点称为**未饱和点**。
+* **二分图中的匹配**：
+  * **交错路 (Alternating Path)**：相对于匹配 $M$，路径 $P$ 的边交替地属于 $M$ 和 $E \setminus M$。
+  * **增广路 (Augmenting Path)**：起点和终点都是 $M$-未饱和顶点的交错路。
+  * **Berge 定理**：匹配 $M$ 是最大匹配当且仅当不存在相对于 $M$ 的增广路。
+  * **Hall 婚配定理 (Hall's Marriage Theorem)** (用于二分图 $G=(V_1 \cup V_2, E)$)：
+    * 存在一个饱和 $V_1$ 中所有顶点的匹配 (即 $|M| = |V_1|$ 的匹配)，当且仅当对 $V_1$ 的任意子集 $W \subseteq V_1$，都有 $|N(W)| \ge |W|$，其中 $N(W) = \{v \in V_2 \mid \exists w \in W, \{w,v\} \in E\}$ 是 $W$ 在 $V_2$ 中的邻居集合。
+* **匹配算法**：
+  * **匈牙利算法 (Hungarian Algorithm)**：用于求解二分图的最大权完美匹配问题（或无权最大匹配，通过寻找增广路）。
+  * **Hopcroft-Karp 算法**：用于求解无权二分图的最大基数匹配，时间复杂度 $O(|E|\sqrt{|V|})$。
+  * **Ford-Fulkerson 方法** (基于最大流最小割定理)：可用于求解二分图最大匹配。
+
+## 第五部分：代数结构 (Algebraic Structures)
+
+### 21. 抽象代数、代数结构、同态 (Abstract Algebra, Algebraic Structure, Homomorphism)
+
+* **抽象代数 (Abstract Algebra)**：研究代数结构的数学分支。代数结构由一个集合和在该集合上定义的一个或多个运算组成，这些运算满足特定的公理。
+* **代数结构 (Algebraic Structure / System)**：一个非空集合 $S$ 与定义在该集合上的一个或多个 $n$元运算 $f_1, f_2, \dots$ 以及一组公理所组成的系统，记为 $\langle S, f_1, f_2, \dots \rangle$。
+  * **运算的性质**：封闭性、结合律、交换律、单位元、逆元、分配律等。
+* **同态 (Homomorphism)**：
+  * **引出**：在不同代数结构之间，如何描述它们在结构上的相似性？
+  * **定义**：设 $\langle A, *\rangle$ 和 $\langle B, \bullet \rangle$ 是两个具有相同类型（例如，都是一个二元运算）的代数结构。一个映射 $\phi: A \to B$ 称为从 $\langle A, *\rangle$ 到 $\langle B, \bullet \rangle$ 的同态，如果对于 $A$ 中所有的元素 $x, y$，都有：
+
+    $$
+    \phi(x * y) = \phi(x) \bullet \phi(y)
+    $$
+
+    （即运算在映射下保持不变，或者说，先运算再映射等于先映射再运算）
+  * 如果代数系统有多个运算，则同态必须保持所有相应的运算。
+* **同态的种类**：
+  * **单同态 (Monomorphism)**：单射的同态。
+  * **满同态 (Epimorphism)**：满射的同态。
+  * **同构 (Isomorphism)**：双射的同态。若存在同构映射，则称两个代数结构是同构的 ($\cong$)，表示它们在代数上是无法区分的。
+  * **自同态 (Endomorphism)**：从一个代数结构到其自身的同态。
+  * **自同构 (Automorphism)**：从一个代数结构到其自身的同构。
+* **核 (Kernel)** 和 **像 (Image)**：
+  * **像 (Image of $\phi$)**：$\text{Im}(\phi) = \{\phi(a) \mid a \in A\} \subseteq B$。$\text{Im}(\phi)$ 是 $\langle B, \bullet \rangle$ 的一个子代数。
+  * **核 (Kernel of $\phi$)** (常用于群、环等结构)：对于群同态 $\phi: G \to H$ (单位元分别为 $e_G, e_H$)，$\text{Ker}(\phi) = \{g \in G \mid \phi(g) = e_H\}$。核是 $G$ 的一个正规子群。
+
+### 22. 群、环、域 (Group, Ring, Field)
+
+* **半群 (Semigroup)**：$\langle S, *\rangle$，其中 $*$ 是 $S$ 上的一个二元运算，满足**结合律**: $\forall a,b,c \in S, (a * b) * c = a * (b * c)$。
+* **幺半群/独异点 (Monoid)**：$\langle M, *, e\rangle$，是一个半群，且存在**单位元 (Identity Element)** $e \in M$，使得对任意 $a \in M, a * e = e * a = a$。
+* **群 (Group)**：$\langle G, *, e\rangle$，是一个幺半群，并且每个元素都存在**逆元 (Inverse Element)**。即满足：
+
+  1. **封闭性**：$\forall a,b \in G, a * b \in G$ (由运算定义隐含)。
+  2. **结合律**：$\forall a,b,c \in G, (a * b) * c = a * (b * c)$。
+  3. **单位元**：$\exists e \in G, \forall a \in G, a * e = e * a = a$。
+  4. **逆元**：$\forall a \in G, \exists a^{-1} \in G, a * a^{-1} = a^{-1} * a = e$。
+
+  * **阿贝尔群 (Abelian Group / Commutative Group)**：若群运算 $*$ 还满足**交换律** ($\forall a,b \in G, a * b = b * a$)。
+  * **子群 (Subgroup)**：群 $G$ 的非空子集 $H$，如果 $H$ 在 $G$ 的运算下也构成群，则 $H$ 是 $G$ 的子群 ($H \le G$)。
+  * **例子**：整数集关于加法 $\langle \mathbb{Z}, +, 0 \rangle$；非零有理数集关于乘法 $\langle \mathbb{Q}\setminus\{0\}, \cdot, 1 \rangle$；置换群 $S_n$。
+* **环 (Ring)**：$\langle R, +, \cdot, 0 \rangle$，是一个集合 $R$ 和两个二元运算 $+$ (加法) 和 $\cdot$ (乘法)，满足：
+
+  1. $\langle R, +, 0 \rangle$ 是一个**阿贝尔群** (加法群)。
+  2. $\langle R, \cdot \rangle$ 是一个**半群** (乘法满足结合律)。
+  3. 乘法对加法满足**分配律**：
+     * $a \cdot (b + c) = (a \cdot b) + (a \cdot c)$ (左分配律)
+     * $(a + b) \cdot c = (a \cdot c) + (b \cdot c)$ (右分配律)
+
+  * **交换环 (Commutative Ring)**：若乘法 $\cdot$ 满足交换律。
+  * **含幺环 (Ring with Unity/Identity)**：若乘法 $\cdot$ 存在单位元 $1_R$ (且通常要求 $1_R \neq 0_R$)。
+  * **整环/积分域 (Integral Domain)**：一个交换的含幺环，且没有**零因子 (zero divisors)** (即若 $a \cdot b = 0_R$，则 $a=0_R$ 或 $b=0_R$)。
+  * **例子**：整数环 $\langle \mathbb{Z}, +, \cdot \rangle$；多项式环 $R[x]$。
+* **域 (Field)**：$\langle F, +, \cdot, 0_F, 1_F \rangle$，是一个交换的含幺环，并且每个非零元素都有**乘法逆元**。即满足：
+
+  1. $\langle F, +, \cdot, 0_F, 1_F \rangle$ 是一个交换的含幺环。
+  2. $\langle F \setminus \{0_F\}, \cdot, 1_F \rangle$ 是一个**阿贝尔群** (非零元关于乘法构成阿贝尔群)。
+
+  * **等价定义**：域是一个集合 $F$，其上定义了加法和乘法，使得 $\langle F, +, 0_F \rangle$ 是阿贝尔群，$\langle F \setminus \{0_F\}, \cdot, 1_F \rangle$ 是阿贝尔群，并且乘法对加法分配。
+  * **特征 (Characteristic)**：域 $F$ 的特征是使得 $n \cdot 1_F = 0_F$ (即 $1_F$ 自身相加 $n$ 次) 的最小正整数 $n$ (若存在)，否则特征为 $0$。
+  * **例子**：有理数域 $\langle \mathbb{Q}, +, \cdot \rangle$；实数域 $\langle \mathbb{R}, +, \cdot \rangle$；复数域 $\langle \mathbb{C}, +, \cdot \rangle$；有限域/伽罗瓦域 $\text{GF}(p^n)$ (如 $\mathbb{Z}_p$ 当 $p$ 是素数时，也记作 $\mathbb{F}_p$)。
+
+## 第六部分：计算理论初步 (Introduction to Theory of Computation)
+
+### 23. 语言分析、有限状态自动机 (Language Analysis, Finite State Automaton / FSA)
+
+* **形式语言 (Formal Language)**：
+  * **字母表 (Alphabet)** $\Sigma$：一个非空有穷符号集合。
+  * **字符串/字 (String/Word)**：由字母表中符号组成的有穷序列。空串记为 $\epsilon$ 或 $\lambda$。
+  * $\Sigma^*$：字母表 $\Sigma$ 上所有可能字符串的集合 (包括空串)，称为 $\Sigma$ 的 **Kleene 星闭包 (Kleene Star)**。 $\Sigma^+ = \Sigma^* \setminus \{\epsilon\}$。
+  * **语言 (Language)** $L$：$\Sigma^*$ 的一个子集，即 $L \subseteq \Sigma^*$。
+* **有限状态自动机 (Finite State Automaton / FSA / Finite Automaton, FA)**：
+  * **引出**：一种识别特定模式字符串的计算模型，具有有限内存。
+  * **确定性有限自动机 (Deterministic Finite Automaton, DFA)**：一个五元组 $M = (Q, \Sigma, \delta, q_0, F)$
+    * $Q$：有穷**状态集**。
+    * $\Sigma$：有穷**输入字母表**。
+    * $\delta: Q \times \Sigma \to Q$，**转移函数**。对于每个状态和输入符号，精确地转移到下一个状态。
+    * $q_0 \in Q$：**初始状态**。
+    * $F \subseteq Q$：**接受状态/终止状态集**。
+  * **非确定性有限自动机 (Nondeterministic Finite Automaton, NFA)**：一个五元组 $M = (Q, \Sigma, \delta, q_0, F)$
+    * $\delta: Q \times (\Sigma \cup \{\epsilon\}) \to \mathcal{P}(Q)$，**转移函数** (其中 $\mathcal{P}(Q)$ 是 $Q$ 的幂集)。对于每个状态和输入符号（或 $\epsilon$），可以转移到状态集的一个子集（可能为空，可能有多个选择，或不消耗输入符号的 $\epsilon$ 转移）。
+  * **工作方式**：从初始状态开始，根据输入字符串的符号和转移函数，逐个改变状态。如果字符串处理完毕后，自动机停在某个接受状态，则该字符串被自动机**接受 (accepted)**（识别）。
+  * **语言识别**：$L(M) = \{w \in \Sigma^* \mid M \text{ 接受 } w\}$。
+  * **等价性**：对于任何 NFA，都存在一个等价的 DFA (即识别相同语言)。DFA 是 NFA 的一个特例。
+* **正则语言 (Regular Language)**：可以被 FSA (DFA 或 NFA) 识别的语言。
+* **正则表达式 (Regular Expression)**：一种简洁地描述正则语言的代数表示法。正则表达式与 FSA 在表达能力上是等价的。
+* **泵引理 (Pumping Lemma for Regular Languages)**：一个用于证明某个语言**不是**正则语言的工具。
+* **应用**：词法分析 (编译器)、文本编辑器中的模式匹配、网络协议分析。
+
+### 24. 图灵机、停机问题 (Turing Machine, Halting Problem)
+
+* **图灵机 (Turing Machine, TM)**：
+  * **引出**：一种比 FSA 更强大的计算模型，具有无限存储（纸带）和读写能力，被认为是通用计算的模型。
+  * **定义**：一个七元组 $M = (Q, \Sigma, \Gamma, \delta, q_0, B, F)$
+    * $Q$：有穷**状态集**。
+    * $\Sigma$：有穷**输入字母表** (不包含空白符)。
+    * $\Gamma$：有穷**带字母表** ($\Sigma \subseteq \Gamma$，且 $B \in \Gamma \setminus \Sigma$)。
+    * $\delta: (Q \setminus F) \times \Gamma \to Q \times \Gamma \times \{L, R, S\}$，**转移函数**。(当前状态, 读到符号) $\to$ (新状态, 写下符号, 磁头移动 左/右/不动)。(有时允许在接受状态转移，或定义为 $Q \times \Gamma \to Q \times \Gamma \times \{L,R\}$)
+    * $q_0 \in Q$：**初始状态**。
+    * $B \in \Gamma \setminus \Sigma$：**空白符号**。
+    * $F \subseteq Q$：**接受状态集**。
+  * **组成**：一条无限长的双向**纸带 (tape)**（划分为单元格），一个**读写头 (read/write head)**，一个**有限状态控制器 (finite state control)**。
+  * **工作方式**：根据当前状态和读写头下纸带符号，执行转移函数：改变状态，改写符号，移动读写头。
+  * **接受/拒绝/停机**：
+    * 若 TM 进入接受状态 $q_f \in F$，则接受输入并**停机 (halt)**。
+    * 若 TM 进入某个状态 $q$ 并且当前磁头下符号为 $s$，而 $\delta(q,s)$ 未定义 (或者进入一个特定的拒绝状态 $q_{reject}$)，则拒绝输入并停机。
+    * TM 也可能永不停机（陷入循环）。
+* **丘奇-图灵论题 (Church-Turing Thesis)**：任何直观上能行可计算的函数都可以被图灵机计算。即图灵机抓住了「算法」的本质。
+* **可计算性 (Computability)**：
+  * **图灵可识别语言/递归可枚举语言 (Turing-Recognizable / Recursively Enumerable Language)**：存在一个 TM，当输入属于该语言时停机并接受；当输入不属于该语言时，TM 可能停机并拒绝，也可能永不停机。
+  * **图灵可判定语言/递归语言 (Turing-Decidable / Recursive Language)**：存在一个 TM (称为**判定器 (decider)**)，对任何输入都能在有限时间内停机，并明确接受或拒绝。
+* **停机问题 (Halting Problem)**：
+  * **问题描述**：给定一个图灵机 $M$ 的描述和输入串 $w$，判断 $M$ 在输入 $w$ 上是否会停机。
+    $$
+    H_{TM} = \{ \langle M, w \rangle \mid M \text{ 是一个图灵机且 } M \text{ 在输入 } w \text{ 上停机} \}
+    $$
+  * **不可判定性 (Undecidability)**：停机问题是**不可判定**的。即，不存在一个通用的图灵机 $H$，能对任意给定的 $\langle M, w \rangle$，正确判断 $M$ 在 $w$ 上是否停机。
+  * **证明**：通常使用反证法和对角线方法（类似康托尔对角线法证明实数不可数）。
+  * **意义**：揭示了计算的固有局限性，表明并非所有明确定义的问题都有算法解。这是计算理论中的一个基本结果，引出了许多其他不可判定问题。

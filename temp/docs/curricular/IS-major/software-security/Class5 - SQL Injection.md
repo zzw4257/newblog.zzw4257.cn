@@ -1,0 +1,175 @@
+这份笔记主要基于 SEED Labs 的 Web 安全课程内容，涵盖了 SQL 注入的基础知识、攻击原理、具体攻击手法、核心成因以及防御措施。
+
+## 1. 核心概念
+**SQL 注入 (SQLi)**：Web 应用程序未能正确处理用户输入，导致恶意用户将 SQL 代码注入到原本的查询语句中，诱使数据库执行非授权操作（如窃取数据、篡改记录、删除表等）。它是 Web 应用中最普遍的安全漏洞之一。
+
+---
+
+## 2. SQL 基础 (攻击相关)
+
+理解 SQL 注入需要掌握特定的 SQL 语法特性，特别是**注释**和**逻辑运算**。
+
+### 2.1 常用命令与环境
+*   **登录 MySQL (容器环境)**:
+    ```bash
+    $ docker ps --format "{{.ID}} {{.Names}}"    # 获取容器ID
+    $ docker exec -it d79 /bin/bash              # 进入容器
+    root@d79:/# mysql -u root -pdees             # 登录 (密码: dees)
+    ```
+*   **基础操作**:
+    *   `CREATE DATABASE dbtest;`
+    *   `USE dbtest;`
+    *   `CREATE TABLE employee (...)`
+    *   `SELECT * FROM employee WHERE EID='EID5001';`
+
+### 2.2 SQL 中的注释 (关键点)
+注释符号后的内容会被数据库忽略，这是截断 SQL 语句的关键。
+1.  `#`：从该字符到行尾（MySQL 特有）。
+2.  `-- `：从该字符到行尾（**注意：第二个破折号后必须有一个空格**）。
+3.  `/* ... */`：C 语言风格，可跨行或插在语句中间。
+
+**示例**:
+```sql
+SELECT * FROM employee;   # 注释到行尾
+SELECT * FROM employee;   -- 注释到行尾
+SELECT * FROM /* 内联注释 */ employee;
+```
+
+### 2.3 逻辑运算
+*   `WHERE 1=1`：恒为真 (True)，常用于绕过筛选条件获取所有数据。
+
+---
+
+## 3. Web 应用与数据库交互原理
+
+### 3.1 漏洞成因：字符串拼接
+Web 应用（如 PHP）接收用户输入（GET/POST），直接拼接到 SQL 字符串中。
+
+**脆弱的 PHP 代码示例**:
+```php
+/* getdata.php */
+<?php
+   $eid = $_GET['EID'];
+   $pwd = $_GET['Password'];
+
+   // 建立连接
+   $conn = new mysqli("localhost", "root", "dees", "dbtest");
+   
+   // 🛑 危险：直接将变量嵌入 SQL 字符串
+   $sql = "SELECT Name, Salary, SSN                   
+           FROM employee                             
+           WHERE eid= '$eid' and password='$pwd'";   
+
+   $result = $conn->query($sql);
+   // ... 输出结果 ...
+?>
+```
+如果输入未经过滤，用户即可通过特殊字符闭合引号，修改 SQL 逻辑。
+
+---
+
+## 4. SQL 注入攻击实战
+
+### 4.1 认证绕过与数据窃取
+**目标 SQL**: `SELECT ... WHERE eid='$eid' and password='$pwd'`
+
+*   **场景 1：绕过密码验证**
+    *   **输入 (EID)**: `EID5002' #`
+    *   **输入 (Password)**: `xyz` (任意)
+    *   **结果 SQL**:
+
+        `SELECT ... WHERE eid= 'EID5002' #' and password='xyz'`
+        
+    *   **效果**: `#` 注释掉了后面的密码验证，无需密码即可登录或查询 EID5002 的信息。
+
+*   **场景 2：获取所有记录**
+    *   **输入 (EID)**: `a' OR 1=1 #`
+    *   **结果 SQL**:
+        `SELECT ... WHERE eid= 'a' OR 1=1 #' ...`
+    *   **效果**: `OR 1=1` 恒为真，数据库返回表中所有记录。
+
+### 4.2 使用 cURL 发起攻击
+*   **误区**: 前端 (JavaScript) 过滤无效，攻击者可直接向服务器发送请求。
+*   **URL 编码**: 特殊字符需编码（`'` -> `%27`, `#` -> `%23`, 空格 -> `%20`）。
+    ```bash
+    $ curl 'www.example.com/getdata.php?EID=a%27%20OR%201=1%20%23&Password='
+    ```
+
+### 4.3 篡改数据库 (UPDATE 注入)
+**目标 SQL**: `UPDATE employee SET password='$newpwd' WHERE eid='$eid' ...`
+
+*   **场景：修改密码的同时修改工资**
+    *   利用 `UPDATE` 语句用逗号分隔多个属性的特性。
+    *   **输入 (New Password)**: `paswd456', salary=100000 #`
+    *   **结果 SQL**:
+
+		`UPDATE employee SET password='paswd456', salary=100000 #' WHERE ...`
+
+    *   **效果**: 不仅改了密码，还顺便给自己涨了工资。
+
+### 4.4 多语句执行 (Stacked Queries)
+*   **尝试**: 使用分号 `;` 追加新语句（如 `DROP DATABASE`）。
+    *   输入: `a'; DROP DATABASE dbtest;`
+*   **限制**: PHP 的 `mysqli::query()` API 默认**禁止**执行多条语句，这在一定程度上限制了此类攻击。但若使用 `mysqli::multi_query()` 则会产生漏洞。
+
+---
+
+## 5. 漏洞根本原因：代码与数据混淆
+
+所有代码注入类攻击（SQLi, XSS, Buffer Overflow）的共性：
+1.  **混合**: 不可信的**用户数据**与可信的**程序代码**被拼接在一起。
+2.  **解析**: 解析器（SQL Parser）无法区分哪部分是原始代码，哪部分是数据。当数据中包含语法符号（如 `'`）时，数据的边界被打破，数据变成了代码执行。
+
+*对比 C 语言*：C 语言先编译后运行，数据是在程序编译完成后输入的，因此不会被当做代码编译（除非涉及缓冲区溢出改变指令指针）。SQL 是解释型语言，运行时动态构建语句，风险更高。
+
+---
+
+## 6. 防范措施
+
+### 6.1 方案一：过滤与转义 (Sanitization)
+使用函数对特殊字符进行转义（如将 `'` 转义为 `\'`），告诉解析器将其视为普通字符。
+*   **API**: `mysqli::real_escape_string()`
+*   **代码**:
+    ```php
+    $eid = $mysqli->real_escape_string($_GET['EID']);
+    $sql = "SELECT ... WHERE eid='$eid'";
+    ```
+*   **缺点**: 不是根本解决之道，存在被绕过的可能，不推荐作为唯一防御手段。
+
+### 6.2 方案二：预处理语句 (Prepared Statements) —— **最佳实践**
+**原理**: 将**代码**与**数据**彻底分离。
+1.  **Prepare**: 发送带有占位符 `?` 的 SQL 模板给数据库。数据库预先编译和优化结构，明确了代码逻辑。
+2.  **Bind & Execute**: 将用户数据通过单独的数据通道发送，并绑定到占位符。
+
+**为何安全**: 数据库已经编译了代码结构，后续传入的任何内容（即使包含 `' OR 1=1`）都只会被严格视为**纯数据**，绝不会被解析为 SQL 命令。
+
+**安全代码示例 (PHP)**:
+```php
+$conn = new mysqli("localhost", "root", "dees", "dbtest");
+
+// 1. 预处理：使用 ? 作为占位符
+$sql = "SELECT Name, Salary, SSN FROM employee WHERE eid= ? and password= ?";
+
+if ($stmt = $conn->prepare($sql)) {
+   // 2. 绑定参数： "ss" 表示两个参数都是 String 类型
+   $stmt->bind_param("ss", $eid, $pwd); 
+   
+   // 3. 执行
+   $stmt->execute();
+   
+   // 4. 获取结果
+   $stmt->bind_result($name, $salary, $ssn);
+   while ($stmt->fetch()) {
+      printf ("%s %s %s\n", $name, $salary, $ssn);
+   }
+   $stmt->close();
+}
+```
+
+---
+
+## 总结
+*   **SQL 注入**源于信任用户输入，将数据直接拼接到代码中。
+*   **攻击后果**严重，可导致数据泄露、篡改甚至数据库被毁。
+*   **防御核心**是实现**代码与数据的分离**。
+*   **首选防御**是使用**预处理语句 (Prepared Statements)**，它从底层杜绝了语法解析混淆的可能性。

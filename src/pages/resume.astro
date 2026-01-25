@@ -38,35 +38,6 @@ const headings = [
         <a href="/resume/edit" class="btn btn-primary btn-sm rounded-full">
           编辑
         </a>
-
-        <a href="/resume?print=1" class="btn btn-outline btn-sm rounded-full" target="_blank" rel="noreferrer">
-          导出 PDF（打印）
-        </a>
-
-        <button id="resume-open-latex" class="btn btn-outline btn-sm rounded-full" type="button">
-          LaTeX 预览
-        </button>
-        <a href="/resume.tex" class="btn btn-ghost btn-sm rounded-full" target="_blank" rel="noreferrer">
-          LaTeX 链接
-        </a>
-
-        <button
-          id="resume-open-pdf"
-          class:list={['btn btn-outline btn-sm rounded-full', !pdfExists ? 'btn-disabled opacity-60' : '']}
-          type="button"
-          disabled={!pdfExists}
-        >
-          PDF 预览
-        </button>
-        <a
-          href="/resume.pdf"
-          class:list={['btn btn-ghost btn-sm rounded-full', !pdfExists ? 'btn-disabled opacity-60' : '']}
-          target="_blank"
-          rel="noreferrer"
-          aria-disabled={!pdfExists}
-        >
-          PDF 链接
-        </a>
       </div>
     </div>
   )}
@@ -171,80 +142,5 @@ const headings = [
     </script>
   )}
 
-  {!printMode && (
-  <dialog id="resume_latex_modal" class="modal">
-    <div class="modal-box w-11/12 max-w-5xl bg-base-100 rounded-2xl shadow-2xl border border-base-content/10">
-      <div class="flex items-center justify-between gap-4">
-        <h3 class="font-bold text-lg">LaTeX 预览</h3>
-        <form method="dialog">
-          <button class="btn btn-sm btn-circle btn-ghost" aria-label="Close">✕</button>
-        </form>
-      </div>
-      <div class="mt-4">
-        <div class="flex items-center justify-between gap-2 mb-3">
-          <div class="text-sm text-base-content/60">
-            来源：<a class="link link-primary" href="/resume.tex" target="_blank" rel="noreferrer">/resume.tex</a>
-          </div>
-          <a class="btn btn-sm btn-outline rounded-full" href="/resume.tex" target="_blank" rel="noreferrer">打开</a>
-        </div>
-        <pre class="p-4 rounded-xl bg-base-200/50 border border-base-content/10 overflow-auto text-sm leading-relaxed"><code id="resume-latex-code">加载中…</code></pre>
-      </div>
-    </div>
-    <form method="dialog" class="modal-backdrop"><button>close</button></form>
-  </dialog>
-
-  <dialog id="resume_pdf_modal" class="modal">
-    <div class="modal-box w-11/12 max-w-6xl bg-base-100 rounded-2xl shadow-2xl border border-base-content/10">
-      <div class="flex items-center justify-between gap-4">
-        <h3 class="font-bold text-lg">PDF 预览</h3>
-        <form method="dialog">
-          <button class="btn btn-sm btn-circle btn-ghost" aria-label="Close">✕</button>
-        </form>
-      </div>
-      <div class="mt-4">
-        {
-          pdfExists ? (
-            <iframe
-              title="Resume PDF Preview"
-              src="/resume.pdf#view=FitH"
-              class="w-full h-[75vh] rounded-xl border border-base-content/10 bg-base-200"
-            />
-          ) : (
-            <div class="p-6 rounded-xl bg-base-200/50 border border-base-content/10 text-base-content/70">
-              未检测到 `public/resume.pdf`，请把你的 PDF 放到 `public/resume.pdf` 后刷新。
-            </div>
-          )
-        }
-      </div>
-    </div>
-    <form method="dialog" class="modal-backdrop"><button>close</button></form>
-  </dialog>
-
-  <script is:inline>
-    document.addEventListener('astro:page-load', () => {
-      const btnLatex = document.getElementById('resume-open-latex')
-      const btnPdf = document.getElementById('resume-open-pdf')
-      const latexModal = document.getElementById('resume_latex_modal')
-      const pdfModal = document.getElementById('resume_pdf_modal')
-      const codeEl = document.getElementById('resume-latex-code')
-
-      btnLatex?.addEventListener('click', async () => {
-        try {
-          if (codeEl) codeEl.textContent = '加载中…'
-          latexModal?.showModal()
-          const res = await fetch('/resume.tex', { cache: 'no-store' })
-          const text = await res.text()
-          if (codeEl) codeEl.textContent = text
-        } catch (e) {
-          if (codeEl) codeEl.textContent = '加载失败，请刷新重试。'
-        }
-      })
-
-      btnPdf?.addEventListener('click', () => {
-        pdfModal?.showModal()
-      })
-    })
-  </script>
-  )}
 </BaseLayout>
 

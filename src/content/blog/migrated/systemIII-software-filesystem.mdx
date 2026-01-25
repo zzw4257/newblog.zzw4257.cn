@@ -1280,7 +1280,7 @@ VFS通过函数指针表（如 `struct file_operations`）实现操作的分派�
 * 当进程打开一个ext4文件时，其 `file`对象的 `f_op`指针会指向ext4定义的 `file_operations`结构。
 * 当调用 `write()`时，VFS通过 `file->f_op->write`最终调用到 `ext4_file_write_iter`。
 
-??? question "file->f_op 的值是谁设置的？"
+> **❓ file->f_op 的值是谁设置的？**
     `file->f_op` 的赋值通常发生在文件被打开（open）时。具体来说，是由对应文件系统实现的 `open` 方法（如 `ext4_file_open`、`nfs_file_open` 等）根据 inode 类型和文件属性，将 `file->f_op` 指向该文件系统定义的 `file_operations` 结构体实例。这样，后续对该文件的读写等操作就会通过对应文件系统的实现进行分派。
 
     具体到代码当VFS尝试打开一个文件（通常通过 dentry_open() 或其内部调用的函数如 finish_open()）时，会执行以下类似逻辑：
@@ -1364,7 +1364,7 @@ graph TD
     DirDataBlock --> DirDataBlockContent
 ```
 
-![文件系统示意图](images/uploads/systemIII-software-filesystem/1747019714095.png)
+![文件系统示意图](/images/uploads/systemIII-software-filesystem/1747019714095.png)
 
 #### 2.6.1. 目录与文件的数据块差异
 
@@ -1660,7 +1660,7 @@ $$
 
     约等于 4TB。
     
-    ![文件系统结构图](images/uploads/systemIII-software-filesystem/1747211705040.png)
+    ![文件系统结构图](/images/uploads/systemIII-software-filesystem/1747211705040.png)
 
 #### 2.7.4. 不同分配方法的比较 (Comparison of Allocation Methods - PPT P2-S45)
 
@@ -1680,7 +1680,7 @@ $$
 | APFS                     | 索引分配 |
 | 这里在mkdocs折叠块里面用 |          |
 
-???+ note "常见文件系统格式对比（exFAT、APFS、NTFS、FAT32、ext2/3/4）"
+> **📝 常见文件系统格式对比（exFAT、APFS、NTFS、FAT32、ext2/3/4）**
 
   - FAT32、exFAT 采用链式分配（FAT表），结构简单，兼容性强，适合移动存储。
   - NTFS 采用索引分配（MFT），支持高级功能，适合桌面/服务器。
@@ -1979,7 +1979,7 @@ write(2, "Hello, stderr!\n", 15); // 输出到标准错误
 
 这里需要进行一个鉴别，虽然 `ln 目标 起点` 能够进行一个链接的增补，但是不会生成新的inode，因为inode是对inode structrue 生效的，或者说直白点，产生新的link，只是新增了名字，而不动底层的inode item
 
-??? question "一些对于hardlink的刁钻提问"
+> **❓ 一些对于hardlink的刁钻提问**
 
     1. ​硬链接能否跨文件系统创建？为什么？​​
     ​刁钻点​：考察对文件系统底层（inode）的理解。
@@ -2016,7 +2016,7 @@ write(2, "Hello, stderr!\n", 15); // 输出到标准错误
     find / -inum <inode号>
     ```
 
-??? question "软链接（符号链接）能否跨文件系统？其解析过程与硬链接有何根本不同？"
+> **❓ 软链接（符号链接）能否跨文件系统？其解析过程与硬链接有何根本不同？**
     **答案**：软链接（符号链接）可以跨文件系统，因为它仅存储目标路径的字符串，不依赖于目标文件的inode号。解析软链接时，操作系统会将其内容作为路径重新解析，查找目标文件，可能跨越不同的挂载点。而硬链接只能在同一文件系统内，因为它直接指向目标文件的inode。软链接解析依赖路径名，硬链接解析依赖inode号，这也是两者根本的实现差异。
 
 

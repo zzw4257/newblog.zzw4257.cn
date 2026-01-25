@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>交互式密码学与安全多方计算术语表</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Visualization & Content Choices: 
+    - 分类导航 (安全多方计算等): 目标: 组织内容，方便导航。呈现方式: 侧边栏中的可点击列表项。交互: 点击分类项后，在主内容区域筛选并显示对应分类下的术语。理由: 标准且直观的术语表/文档导航方式。实现库/方法: HTML, Tailwind CSS, Vanilla JS.
+    - 术语条目 (例如: 安全多方计算 - 术语本身): 目标: 提供信息，展示详细定义和层级关系。呈现方式: 结构化的列表项 (HTML/CSS/Tailwind)，显示中文术语、英文术语及基本解释。对于特定分类（如“协议与技术”），增加“详细技术刻画”的可展开区域。层级关系通过缩进和可展开/折叠的Unicode图标表示。数学公式使用LaTeX渲染。交互: 点击展开/折叠图标显示或隐藏子术语；点击“详细技术刻画”按钮展开/折叠详细内容。理由: 清晰、详细且结构化地呈现技术术语，同时提供按需深入的选项。LaTeX确保数学公式的准确渲染。实现库/方法: HTML, Tailwind CSS, Vanilla JS, MathJax.
+    - 数学公式: 目标: 准确传达信息。呈现方式: 使用MathJax渲染LaTeX代码。交互: 无特定交互，标准数学公式显示。理由: 专业地显示技术内容中的数学符号和表达式。实现库/方法: MathJax.
+    - 搜索功能: 目标: 辅助探索，快速定位。呈现方式: 文本输入框。交互: 根据用户输入的关键词（匹配术语名称或解释内容）实时筛选并更新主内容区域显示的术语列表。理由: 显著提升在大型术语表中查找特定条目的用户体验。实现库/方法: HTML, Tailwind CSS, Vanilla JS.
+    CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script>
+      MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']],
+          processEscapes: true
+        },
+        options: {
+          skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+        },
+        startup: {
+          ready: () => {
+            console.log('MathJax is ready to go!');
+            MathJax.startup.defaultReady();
+          }
+        }
+      };
+    </script>
+    <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .mathjax-loader {
+            display: none; 
+            text-align: center;
+            padding: 20px;
+            font-size: 1.2em;
+            color: #4A5568; 
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FFFAF0; 
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D1D5DB; /* gray-300, a subtle accent */
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9CA3AF; /* gray-400 */
+        }
+        .term-item ul { margin-left: 1.5rem; }
+        .explanation, .detailed-explanation {
+            background-color: #FDFBF5; /* Slightly off-white, warmer than gray-50 */
+            border-left: 3px solid #059669; /* emerald-600 accent */
+            padding: 0.75rem;
+            margin-top: 0.5rem;
+            border-radius: 0.25rem;
+        }
+        .detailed-explanation {
+            border-left-color: #065f46; /* emerald-800 for detailed */
+            background-color: #F0FFF4; /* emerald-50, very light green */
+        }
+        .explanation p:last-child, .detailed-explanation p:last-child { margin-bottom: 0; }
+        .MJXc-display { text-align: left !important; } 
+        mjx-container[jax="CHTML"][display="true"] { text-align: left !important; overflow-x: auto; }
+
+        .bg-beige-50 { background-color: #FFFAF0; } 
+        .bg-beige-100 { background-color: #F5F5DC; } 
+        .text-neutral-700 { color: #4A5568; }
+        .text-neutral-800 { color: #2D3748; }
+        .text-neutral-900 { color: #1A202C; }
+        .text-emerald-600 { color: #059669; }
+        .hover\:bg-emerald-100:hover { background-color: #D1FAE5; }
+        .active-category {
+            background-color: #A7F3D0; 
+            color: #047857; 
+            font-weight: 600;
+        }
+        mark {
+          background-color: #A7F3D0; /* emerald-200 for highlighting */
+          color: #065f46; /* emerald-800 for highlighted text */
+          padding: 0.1em 0.2em;
+          border-radius: 0.2em;
+        }
+        .toggle-details-btn {
+            background-color: #ECFDF5; /* emerald-50 */
+            color: #059669; /* emerald-600 */
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border: 1px solid #6EE7B7; /* emerald-300 */
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 0.5rem;
+        }
+        .toggle-details-btn:hover {
+            background-color: #D1FAE5; /* emerald-100 */
+        }
+    </style>
+</head>
+<body class="bg-beige-50 text-neutral-700 antialiased">
+    <div class="flex flex-col md:flex-row min-h-screen">
+        <aside id="sidebar" class="w-full md:w-72 bg-beige-100 p-6 shadow-lg md:min-h-screen md:sticky md:top-0 md:overflow-y-auto">
+            <h1 class="text-2xl font-bold text-neutral-900 mb-6">术语表导航</h1>
+            <div class="mb-4">
+                <input type="text" id="search-input" placeholder="搜索术语..." class="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 transition-colors">
+            </div>
+            <nav id="category-nav">
+            </nav>
+        </aside>
+
+        <main class="flex-1 p-6 md:p-10 overflow-y-auto">
+            <div id="glossary-content">
+                <div class="text-center p-10">
+                    <h2 class="text-2xl font-semibold text-neutral-800">欢迎使用交互式密码学与安全多方计算术语表</h2>
+                    <p class="mt-4 text-neutral-600">请从左侧选择一个分类或使用搜索功能来浏览术语。</p>
+                </div>
+            </div>
+            <div id="mathjax-loading-indicator" class="mathjax-loader">正在加载数学公式...</div>
+        </main>
+    </div>
+
+    <script>
+        const glossaryData = [
+            {
+                name_cn: "安全多方计算 (Secure Multi-Party Computation, MPC)",
+                intro_cn: "本节介绍安全多方计算 (MPC) 的核心概念及其相关术语。MPC 旨在允许多个互不信任的参与方协同计算一个函数，同时保护各自输入的隐私。",
+                terms: [
+                    { id: "mpc", term_cn: "安全多方计算", term_en: "Secure Multi-Party Computation (MPC)", explanation_cn: "一种密码学分支，允许多个参与方在不泄露各自私有输入的情况下，共同计算一个约定函数的结果。计算过程需保证**正确性**（输出结果正确）和**隐私性**（除计算结果外，不泄露任何额外信息）。", level: 0, children: [] },
+                    { id: "privacy_computing", term_cn: "隐私计算", term_en: "Privacy Computing", explanation_cn: "一个更广泛的领域，包含MPC在内的多种技术和方法，旨在数据处理和使用过程中保护数据隐私。", level: 0, children: [] },
+                    { id: "universal_solution", term_cn: "通用解决方案", term_en: "Universal Solution / General Protocol", explanation_cn: "指能够安全计算*任何*函数的MPC协议，通常通过将函数表示为算术电路或布尔电路来实现。", level: 0, children: [] }
+                ]
+            },
+            {
+                name_cn: "基础数学概念 (Foundational Mathematics)",
+                intro_cn: "本节涵盖了支撑现代密码学和安全多方计算的基础数学理论和结构，如数论、群、环、域等。",
+                terms: [
+                    { id: "foundational_math", term_cn: "数论基础", term_en: "Number Theory Foundations", explanation_cn: "构成许多密码协议基础的数论基本概念。", level: 0, children: [
+                        { id: "modulus", term_cn: "模", term_en: "Modulus", explanation_cn: "在模运算中（例如 $a \\pmod n$），模 $n$ 是指用一个整数去除另一个整数以求余数时的除数。", level: 1, children: [] },
+                        { id: "group", term_cn: "群 ($G$)", term_en: "Group", explanation_cn: "一个集合 $G$ 配备一个二元运算（例如 $\\cdot$），满足四个公理：闭包性（对所有 $a,b \\in G$，有 $a \\cdot b \\in G$）、结合性（$(a \\cdot b) \\cdot c = a \\cdot (b \\cdot c)$）、单位元（存在 $e \\in G$ 使得 $a \\cdot e = e \\cdot a = a$）和逆元（对每个 $a \\in G$，存在 $a^{-1} \\in G$ 使得 $a \\cdot a^{-1} = a^{-1} \\cdot a = e$）。", level: 1, children: [] },
+                        { id: "ring", term_cn: "环", term_en: "Ring", explanation_cn: "一种代数结构 $(R, +, \\cdot)$，具有加法和乘法两种二元运算，使得 $(R, +)$ 是一个阿贝尔群，乘法具有结合性，且乘法对加法满足分配律。", level: 1, children: [] },
+                        { id: "field", term_cn: "域 ($\\mathbb{F}$)", term_en: "Field", explanation_cn: "一种环，其中加法和乘法均满足交换律，存在乘法单位元，并且每个非零元素都有乘法逆元。", level: 1, children: [] }
+                    ]},
+                    { id: "finite_field", term_cn: "有限域 ($\\mathbb{F}_p$ 或 $\\mathbb{Z}_p$)", term_en: "Finite Field", explanation_cn: "包含有限个元素的域。常见的例子是整数模素数 $p$ 的集合，记为 $\\mathbb{Z}_p = \\{0, 1, \\dots, p-1\\}$。", level: 0, children: [] },
+                    { id: "cyclic_group", term_cn: "循环群", term_en: "Cyclic Group", explanation_cn: "可以由单个元素（称为生成元）生成的群。群中的所有元素都是该生成元的幂（或在加法表示法中的倍数）。", level: 0, children: [] },
+                    { id: "generator", term_cn: "生成元 ($g$)", term_en: "Generator", explanation_cn: "循环群 $G$ 中的一个元素 $g$，使得 $G$ 中的每个元素都可以表示为某个整数 $k$ 的 $g^k$（对于乘法群）或 $kg$（对于加法群）。", level: 0, children: [] },
+                    { id: "lagrange_interpolation", term_cn: "拉格朗日插值法", term_en: "Lagrange Interpolation", explanation_cn: "一种寻找通过给定一组不同点的最低可能次数的唯一多项式的方法。对于 $l+1$ 个点 $(\\alpha_1, q(\\alpha_1)), \\dots, (\\alpha_{l+1}, q(\\alpha_{l+1}))$，次数最多为 $l$ 的多项式 $q(x)$ 由 $q(x) = \\sum_{i=1}^{l+1} q(\\alpha_i) \\delta_i(x)$ 给出，其中 $\\delta_i(x) = \\prod_{1\\le j\\le l+1, j\ne i} \\frac{x-\\alpha_j}{\\alpha_i-\\alpha_j}$。", level: 0, children: [] }
+                ]
+            },
+            {
+                name_cn: "现代密码学基础 (Modern Cryptography Foundations)",
+                intro_cn: "本节探讨现代密码学的核心原则，包括可证明安全性的概念、安全规约方法以及相关的理论工具。",
+                terms: [
+                    { id: "provable_security", term_cn: "可证明安全", term_en: "Provable Security", explanation_cn: "一种严格的密码学方法，其中方案的安全性被形式化定义，基于精确的假设（例如，数学问题的难度），并通过严格的数学论证（通常是规约）来证明。", level: 0, children: [] },
+                    { id: "reduction", term_cn: "规约", term_en: "Reduction", explanation_cn: "可证明安全中常用的一种证明技巧。它表明如果一个敌手 $\\mathcal{A}$ 能够攻破一个密码协议 $\\Pi$，那么可以构造一个算法 $\\mathcal{B}$（使用 $\\mathcal{A}$ 作为子程序）来解决一个被假定为困难的底层硬问题。这意味着只要底层假设成立，$\\Pi$ 就是安全的。", level: 0, children: [] },
+                    { id: "negligible_function", term_cn: "可忽略函数 ($negl(\\kappa)$)", term_en: "Negligible Function", explanation_cn: "安全参数 $\\kappa$ 的一个函数 $negl(\\kappa)$，它比 $\\kappa$ 的任何正多项式的倒数更快地趋近于零。形式上，对于任何正多项式 $poly(\\cdot)$，存在一个 $N$，使得对于所有 $\\kappa > N$，都有 $negl(\\kappa) < \\frac{1}{poly(\\kappa)}$。这些函数用于限制敌手的成功概率。", level: 0, children: [] },
+                    { id: "ppt", term_cn: "概率多项式时间 (PPT)", term_en: "Probabilistic Polynomial Time (PPT)", explanation_cn: "一种算法，其运行时间由其输入大小的多项式界定，并且可能使用随机性。密码安全定义中的敌手通常被建模为PPT算法。", level: 0, children: [] },
+                    { id: "comp_indistinguishable", term_cn: "计算上不可区分 ($X_1 \\stackrel{c}{\\approx} X_2$)", term_en: "Computationally Indistinguishable", explanation_cn: "两个概率分布族 $\\{X_\\kappa\\}_{\\kappa \\in \\mathbb{N}}$ 和 $\\{Y_\\kappa\\}_{\\kappa \\in \\mathbb{N}}$ 是计算上不可区分的，如果没有PPT算法（区分器）$\\mathcal{D}$ 能够以超过可忽略的概率区分从 $X_\\kappa$ 和 $Y_\\kappa$ 中抽取的样本。即，$|Pr[\\mathcal{D}(X_\\kappa)=1] - Pr[\\mathcal{D}(Y_\\kappa)=1]| \\le negl(\\kappa)$。", level: 0, children: [] }
+                ]
+            },
+            {
+                name_cn: "密码学基础原语 (Basic Cryptographic Primitives)",
+                intro_cn: "本节介绍构建复杂密码协议的基础模块，这些原语是实现各种安全功能的核心。",
+                terms: [
+                    { id: "secret_sharing", term_cn: "秘密分享", term_en: "Secret Sharing", explanation_cn: "一种将秘密分成多个片段（称为份额）的方法，这些份额分发给多个参与方。单个份额（或少数份额）不泄露关于秘密的任何信息，但足够数量的份额可以组合起来重建原始秘密。", level: 0, children: [
+                        { id: "threshold_ss", term_cn: "门限秘密分享", term_en: "Threshold Secret Sharing", explanation_cn: "一种秘密分享方案，记为 $(t,n)$-门限秘密分享，其中秘密被分成 $n$ 个份额。任何 $t+1$（或更多）个份额可以重建秘密，但任何 $t$（或更少）个份额不泄露关于秘密的任何信息。", level: 1, children: [] },
+                        { id: "shamir_ss", term_cn: "Shamir 秘密分享", term_en: "Shamir Secret Sharing", explanation_cn: "一种基于有限域上多项式插值的 $(t,n)$-门限秘密分享方案。为了分享秘密 $s$，选择一个次数最多为 $t$ 的随机多项式 $q(x)$，使得 $q(0)=s$。份额是 $s_j = q(\\alpha_j)$，其中 $\\alpha_j$ 是不同的非零元素。", level: 1, children: [] },
+                        { id: "secret_share_piece", term_cn: "秘密份额", term_en: "Secret Share", explanation_cn: "秘密分享方案中秘密的单个片段。", level: 1, children: [] }
+                    ]},
+                    { id: "hash_function", term_cn: "哈希函数 ($H$)", term_en: "Hash Function", explanation_cn: "将任意大小的输入数据映射到固定大小输出（称为哈希值或摘要）的函数。密码学哈希函数被设计为单向的（抗原像性）、抗第二原像性和抗碰撞性。", level: 0, children: [] },
+                    { id: "random_oracle", term_cn: "随机谕示机 (RO)", term_en: "Random Oracle", explanation_cn: "一种理想化的数学函数，对每个唯一的查询都以一个真正随机的输出（从其输出域中均匀选择）进行响应，并对相同的查询始终返回相同的随机输出。它是在安全证明中使用的理论模型。", level: 0, children: [] },
+                    { id: "prg", term_cn: "伪随机数生成器 (PRG) ($\\mathcal{G}$)", term_en: "PseudoRandom Generator (PRG)", explanation_cn: "一种确定性算法 $\\mathcal{G}$，它以一个短的随机种子 $s$ 作为输入，并输出一个更长的字符串 $\\mathcal{G}(s)$，该字符串在计算上与相同长度的真正随机字符串不可区分。形式上，对于任何PPT区分器 $\\mathcal{A}$，$|Pr[\\mathcal{A}(\\mathcal{G}(s)) = 1] - Pr[\\mathcal{A}(r) = 1]| \\le negl(\\kappa)$，其中 $s \\leftarrow_S \\{0,1\\}^\\kappa$ 且 $r \\leftarrow_S \\{0,1\\}^{l(\\kappa)}$，$l(\\kappa) > \\kappa$。", level: 0, children: [] },
+                    { id: "symmetric_encryption", term_cn: "对称加密", term_en: "Symmetric Encryption", explanation_cn: "一种加密类型，其中加密和解密使用相同的密钥。它包括三个算法：密钥生成 ($\\text{Gen}$)、加密 ($\\text{Enc}_k(m)$) 和解密 ($\\text{Dec}_k(c)$)。必须满足 $Dec_k(Enc_k(m))=m$。", level: 0, children: [] },
+                    { id: "mac", term_cn: "消息认证码 (MAC)", term_en: "Message Authentication Code (MAC)", explanation_cn: "用于验证消息并确保其完整性和真实性的一小段信息。它涉及参与方之间共享的密钥。包括算法：密钥生成 ($\\text{Gen}$)、MAC生成 ($\\text{Mac}_k(m)$) 和验证 ($\\text{Ver}_k(m,t)$)。", level: 0, children: [
+                        { id: "info_theoretic_mac", term_cn: "信息论一次性消息认证码", term_en: "Information-Theoretic One-Time MAC", explanation_cn: "一种MAC方案，其安全性（不可伪造性）即使对于具有无限计算能力的敌手也成立，但通常密钥只能用于验证单个消息。例如：$Mac_{a,b}(m) = a \\cdot m + b \\pmod p$。", level: 1, children: [] }
+                    ]},
+                    { id: "commitment_scheme", term_cn: "承诺方案", term_en: "Commitment Scheme", explanation_cn: "一种密码学协议，允许一方（承诺者）承诺一个选定的值（或陈述），同时对另一方（接收者）隐藏该值，并能在以后揭示承诺的值。它具有两个主要属性：**隐藏性**（接收者在打开之前对值一无所知）和**绑定性**（承诺者在承诺后不能更改值）。算法：($\\text{Gen}$、$\\text{Com}$、$\\text{Ver}$)。", level: 0, children: [
+                         { id: "commitment_val", term_cn: "承诺", term_en: "Commitment", explanation_cn: "$\\text{Com}$ 算法输出的值。", level: 1, children: [] },
+                         { id: "hiding_prop", term_cn: "隐藏性", term_en: "Hiding", explanation_cn: "承诺 $c$ 不泄露消息 $m$ 的属性。", level: 1, children: [] },
+                         { id: "binding_prop", term_cn: "绑定性", term_en: "Binding", explanation_cn: "承诺者找不到 $m \\neq m'$ 和打开信息 $d, d'$ 使得承诺 $c$ 可以有效地打开为 $m$ 和 $m'$ 的属性。", level: 1, children: [] }
+                    ]},
+                    { id: "oblivious_transfer", term_cn: "茫然传输 (OT)", term_en: "Oblivious Transfer (OT)", explanation_cn: "发送者和接收者之间的两方协议。", level: 0, children: [
+                        { id: "ot_1_2", term_cn: "1-out-of-2 OT", term_en: "1-out-of-2 OT", explanation_cn: "发送者有两个消息 $(x_0, x_1)$，接收者有一个选择位 $b \\in \\{0,1\\}$。接收者学习到 $x_b$ 但对 $x_{1-b}$ 一无所知。发送者对 $b$ 一无所知。", level: 1, children: [] },
+                        { id: "fot_ideal", term_cn: "理想功能 $\\mathcal{F}_{OT}$", term_en: "Ideal Functionality $\\mathcal{F}_{OT}$", explanation_cn: "一个理想化的可信第三方，它从发送者处获取 $(x_0, x_1)$，从接收者处获取 $b$，并私下将 $x_b$ 交给接收者。", level: 1, children: [] },
+                        { id: "rabin_ot", term_cn: "Rabin OT", term_en: "Rabin OT", explanation_cn: "一种变体，发送者有一个消息 $x$，接收者以 $1/2$ 的概率接收到 $x$，或以 $1/2$ 的概率接收到一个虚拟值。发送者不知道接收者是否得到了 $x$。", level: 1, children: [] },
+                        { id: "random_ot", term_cn: "随机 OT", term_en: "Random OT", explanation_cn: "发送者和接收者获得随机相关输出：发送者获得 $(x_0, x_1)$，接收者获得 $(b, x_b)$，其中 $x_0, x_1$ 是随机消息，$b$ 是随机位。", level: 1, children: [] },
+                        { id: "ot_1_n", term_cn: "1-out-of-N OT", term_en: "1-out-of-N OT", explanation_cn: "发送者有 $N$ 个消息 $(x_0, \\dots, x_{N-1})$，接收者有一个索引 $b \\in \\{0, \\dots, N-1\\}$。接收者只学习到 $x_b$。发送者对 $b$ 一无所知。", level: 1, children: [] },
+                        { id: "ot_k_n", term_cn: "k-out-of-N OT", term_en: "k-out-of-N OT", explanation_cn: "发送者有 $N$ 个消息，接收者有 $k$ 个索引。接收者只学习到 $k$ 个选定的消息。发送者对这 $k$ 个索引一无所知。", level: 1, children: [] },
+                        { id: "ot_extension", term_cn: "茫然传输扩展 (OT Extension)", term_en: "Oblivious Transfer Extension (OT Extension)", explanation_cn: "从少量“基础”OT高效生成大量OT的技术，通常使用对称密钥密码学。", level: 1, children: [] },
+                        { id: "ccot", term_cn: "切分选择 OT (CCOT)", term_en: "Cut-and-Choose OT (CCOT)", explanation_cn: "一种OT变体，用于切分选择协议，其中接收者除了获得选定的消息外，还可以检查发送者输入的一个子集的一致性。", level: 1, children: [] },
+                        { id: "sccot", term_cn: "单一选择切分选择 OT ($\\mathcal{F}^{S}_{CCOT}$)", term_en: "Single-Choice Cut-and-Choose OT ($\\mathcal{F}^{S}_{CCOT}$)", explanation_cn: "一种CCOT，其中接收者对所有不在“检查”集中的OT实例使用相同的选择位。", level: 1, children: [] },
+                        { id: "bsccot", term_cn: "批处理单一选择切分选择 OT ($\\mathcal{F}^{S,B}_{CCOT}$)", term_en: "Batch Single-Choice Cut-and-Choose OT ($\\mathcal{F}^{S,B}_{CCOT}$)", explanation_cn: "将单一选择CCOT扩展到高效处理多组消息（批处理），通常用于电路中的不同输入线，同时使用相同的“检查”索引集。", level: 1, children: [] }
+                    ]},
+                    { id: "zkp", term_cn: "零知识证明 (ZKP)", term_en: "Zero-Knowledge Proof (ZKP)", explanation_cn: "一种协议，其中一方（证明者）可以向另一方（验证者）证明一个陈述是真实的，而不泄露除陈述有效性之外的任何信息。关键属性是**完备性**、**可靠性**和**零知识性**。", level: 0, children: [
+                        { id: "sigma_protocol", term_cn: "Sigma 协议", term_en: "Sigma Protocol", explanation_cn: "一种特定的三步（承诺、挑战、响应）公共硬币零知识证明协议，用于关系证明。", level: 1, children: [] },
+                        { id: "completeness", term_cn: "完备性", term_en: "Completeness", explanation_cn: "如果陈述是真实的并且双方都是诚实的，验证者将以概率1（或压倒性的高概率）接受证明。", level: 1, children: [] },
+                        { id: "soundness", term_cn: "可靠性", term_en: "Soundness", explanation_cn: "如果陈述是错误的，没有作弊的证明者能够说服诚实的验证者它是真实的，除非概率可忽略。（2-特殊可靠性意味着如果证明者可以回答同一第一消息的两个不同挑战，则可以提取见证）。", level: 1, children: [] },
+                        { id: "zero_knowledge_prop", term_cn: "零知识性", term_en: "Zero-Knowledge", explanation_cn: "验证者除了陈述的真实性之外什么也学不到。（特殊诚实验证者零知识性意味着模拟器可以为诚实验证者生成与真实交互不可区分的记录）。", level: 1, children: [] }
+                    ]},
+                    { id: "he", term_cn: "同态加密 (HE)", term_en: "Homomorphic Encryption (HE)", explanation_cn: "一种加密方案，允许直接对密文进行计算，使得解密计算结果与对明文执行操作的结果相同。例如，对于加法同态加密：$Enc(m_1) \\boxplus Enc(m_2) = Enc(m_1+m_2)$。", level: 0, children: [] }
+                ]
+            },
+            {
+                name_cn: "安全模型与框架 (Security Models & Frameworks)",
+                intro_cn: "本节阐述用于定义和分析密码协议安全性的形式化框架，包括通用可组合性 (UC) 框架、不同类型的敌手模型和核心安全属性。",
+                terms: [
+                    { id: "security_model", term_cn: "安全模型", term_en: "Security Model", explanation_cn: "用于定义和分析密码协议安全性的形式化框架，规定了敌手的能力和安全目标。", level: 0, children: [] },
+                    { id: "threat_model", term_cn: "威胁模型", term_en: "Threat Model", explanation_cn: "安全定义的一部分，规定了敌手的能力，例如他们可以看到哪些信息以及可以执行哪些操作。", level: 0, children: [] },
+                    { id: "ideal_functionality", term_cn: "理想功能 ($\\mathcal{F}$)", term_en: "Ideal Functionality", explanation_cn: "对密码任务或协议预期实现的功能的理想化描述。它通常涉及一个“可信第三方”，完美地执行所需的计算和信息揭示。通过证明真实协议“模拟”其理想功能来证明其安全性。", level: 0, children: [] },
+                    { id: "uc_framework", term_cn: "通用可组合框架 (UC Framework)", term_en: "Universal Composability (UC) Framework", explanation_cn: "一种强大的密码协议安全框架，保证协议即使在与其他任意协议并发运行或在复杂系统中使用时也保持安全。通过证明真实协议的执行与涉及理想功能和模拟器的理想执行不可区分来证明安全性。", level: 0, children: [
+                        { id: "real_world", term_cn: "真实世界", term_en: "Real World", explanation_cn: "实际协议参与方相互交互以及与敌手交互的执行环境。", level: 1, children: [] },
+                        { id: "ideal_world", term_cn: "理想世界", term_en: "Ideal World", explanation_cn: "参与方与理想功能交互，并且敌手（模拟器）试图模仿真实世界敌手交互的执行环境。", level: 1, children: [] },
+                        { id: "environment_z", term_cn: "环境 ($\\mathcal{Z}$)", term_en: "Environment ($\\mathcal{Z}$)", explanation_cn: "UC框架中的一个实体，它向协议参与方提供输入，接收他们的输出，并与敌手交互以试图区分真实世界和理想世界。", level: 1, children: [] },
+                        { id: "adversary_a", term_cn: "敌手 ($\\mathcal{A}$)", term_en: "Adversary ($\\mathcal{A}$)", explanation_cn: "试图破坏协议安全性的真实世界中的恶意实体。", level: 1, children: [] },
+                        { id: "simulator_s", term_cn: "模拟器 ($\\mathcal{S}$)", term_en: "Simulator ($\\mathcal{S}$)", explanation_cn: "理想世界中的一个实体，它与理想功能和环境（通常还有一个真实世界敌手的内部副本）交互，以产生与真实世界执行不可区分的交互。", level: 1, children: [] },
+                        { id: "uc_secure_realization", term_cn: "UC-安全实现", term_en: "UC-Secure Realization", explanation_cn: "如果对于每个真实世界的敌手 $\\mathcal{A}$，都存在一个理想世界的模拟器 $\\mathcal{S}$，使得没有环境 $\\mathcal{Z}$ 能够区分在真实世界中与 $\\Pi$ 和 $\\mathcal{A}$ 交互，以及在理想世界中与 $\\mathcal{F}$ 和 $\\mathcal{S}$ 交互，则协议 $\\Pi$ UC安全地实现了理想功能 $\\mathcal{F}$。", level: 1, children: [] },
+                        { id: "concurrent_composition_security", term_cn: "并发组合的安全性", term_en: "Concurrent Composition Security", explanation_cn: "协议即使在其多个实例或其他协议并发运行时也保持安全的属性。UC安全意味着这一点。", level: 1, children: [] },
+                        { id: "subprotocol_composition_security", term_cn: "子协议组合的安全性", term_en: "Subprotocol Composition Security", explanation_cn: "如果协议 $\\Pi$ 使用子协议 $\\Pi^*$（它安全地实现了理想功能 $\\mathcal{F}^*$），并且当使用 $\\mathcal{F}^*$ 作为黑盒时 $\\Pi$ 是安全的，那么当 $\\mathcal{F}^*$ 被 $\\Pi^*$ 替换时 $\\Pi$ 仍然安全的属性。UC安全提供了这一点（UC组合定理）。", level: 1, children: [] }
+                    ]},
+                    { id: "standalone_model", term_cn: "独立模型", term_en: "Stand-Alone Model", explanation_cn: "一种安全模型，其中协议的单个实例被孤立地考虑，没有其他协议的并发执行。它通常是比UC安全更弱的安全保证。", level: 0, children: [] },
+                    { id: "corruption_types", term_cn: "攻陷方式", term_en: "Corruption Types", explanation_cn: "敌手危害协议参与者的不同方式。", level: 0, children: [
+                        { id: "static_corruption", term_cn: "静态攻陷", term_en: "Static Corruption", explanation_cn: "在协议执行开始前就固定了被攻陷方的集合。", level: 1, children: [] },
+                        { id: "adaptive_corruption", term_cn: "适应性攻陷", term_en: "Adaptive Corruption", explanation_cn: "敌手可以在协议执行期间根据观察到的信息动态地选择攻陷参与方。", level: 1, children: [] },
+                        { id: "mobile_corruption", term_cn: "可移动攻陷", term_en: "Mobile Corruption", explanation_cn: "敌手可以攻陷参与方，也可以“解除攻陷”（恢复其诚实状态），可能在参与方之间移动攻陷。", level: 1, children: [] },
+                        { id: "proactive_security", term_cn: "主动安全", term_en: "Proactive Security", explanation_cn: "即使面对可移动敌手也成立的安全性，其中参与方可以刷新其状态以减轻长期攻陷的影响。", level: 1, children: [] }
+                    ]},
+                    { id: "privacy_prop", term_cn: "隐私性", term_en: "Privacy", explanation_cn: "协议不泄露参与方私有输入的任何信息，除非这些信息可以从其自身输入和协议输出中推断出来。在模拟范式中，这意味着可以模拟被攻陷方的视图，前提是给定他们的输入和输出。", level: 0, children: [] },
+                    { id: "malicious_security", term_cn: "恶意安全性", term_en: "Malicious Security", explanation_cn: "针对可以任意偏离协议规范的敌手的安全性。协议仍应保证诚实参与方的正确性和隐私性，或检测作弊行为。", level: 0, children: [] },
+                    { id: "semihonest_security", term_cn: "半诚实安全 / 被动安全", term_en: "Semi-Honest Security / Passive Security", explanation_cn: "针对遵循协议规范但试图通过分析其接收到的消息（其记录或视图）来学习额外信息的敌手的安全性。", level: 0, children: [] }
+                ]
+            },
+            {
+                name_cn: "协议与技术 (Protocols & Techniques)",
+                intro_cn: "本节将深入探讨各种具体的安全多方计算协议和关键技术。每个术语都包含简明扼要的解释，并为核心协议提供了可展开的“详细技术刻画”部分，其中包含更深入的技术细节和专业的数学表达，以帮助用户全面理解其工作原理和安全特性。",
+                terms: [
+                    { id: "elgamal", term_cn: "ElGamal 加密方案", term_en: "ElGamal Encryption Scheme", 
+                      explanation_cn: "一种基于Diffie-Hellman问题的非对称密钥加密算法，广泛用于各类密码协议中。", 
+                      detailed_explanation_cn: `
+                        **密钥生成 (Key Generation)**:
+                        <ol class="list-decimal ml-5">
+                          <li>选择一个大素数 $p$ 和一个循环群 $\\mathbb{Z}_p^*$ 的生成元 $g$。</li>
+                          <li>选择一个随机整数 $x \\in \\{1, \\dots, p-2\\}$ 作为私钥 $sk = x$。</li>
+                          <li>计算公钥 $pk = y = g^x \\pmod p$。公钥为 $(p, g, y)$。</li>
+                        </ol>
+                        **加密 (Encryption)**: 对消息 $M \\in \\mathbb{Z}_p^*$：
+                        <ol class="list-decimal ml-5">
+                          <li>选择一个随机整数 $k \\in \\{1, \\dots, p-2\\}$ (临时密钥)。</li>
+                          <li>计算 $c_1 = g^k \\pmod p$。</li>
+                          <li>计算 $c_2 = M \\cdot y^k \\pmod p$。</li>
+                          <li>密文为 $(c_1, c_2)$。</li>
+                        </ol>
+                        **解密 (Decryption)**: 对密文 $(c_1, c_2)$：
+                        <ol class="list-decimal ml-5">
+                          <li>计算 $M = c_2 \\cdot (c_1^x)^{-1} \\pmod p = c_2 \\cdot c_1^{-x} \\pmod p = c_2 \\cdot c_1^{p-1-x} \\pmod p$。</li>
+                        </ol>
+                        **安全性**: 基于离散对数问题 (DLP) 的困难性。其 IND-CPA 安全性可以规约到判定性 Diffie-Hellman (DDH) 假设的困难性。
+                      `,
+                      level: 0, children: [] },
+                    { id: "bgw_protocol", term_cn: "BGW 协议", term_en: "BGW Protocol", 
+                      explanation_cn: "由Ben-Or, Goldwasser和Wigderson提出的经典MPC协议，通常基于Shamir秘密分享，用于计算算术电路。",
+                      detailed_explanation_cn: `
+                        **核心思想**: 基于 Shamir 秘密分享方案，将函数表示为算术电路，并在秘密分享的份额上进行同态运算。<br>
+                        **输入分享**: 每个参与方 $P_i$ 将其输入 $x_i$ 通过一个 $t$ 次随机多项式 $q_i(z)$ 进行分享，使得 $q_i(0) = x_i$。$P_j$ 获得份额 $q_i(\\alpha_j)$。<br>
+                        **加法门**: 若输入为 $a, b$，其份额为 $[a]_j, [b]_j$。输出 $c=a+b$ 的份额为 $[c]_j = [a]_j + [b]_j$。这是本地计算。<br>
+                        **乘法门**: 若输入为 $a, b$，其份额为 $[a]_j, [b]_j$。输出 $c=ab$。
+                        <ol class="list-decimal ml-5">
+                          <li>每个 $P_j$ 计算 $d_j = [a]_j \\cdot [b]_j$。这些 $d_j$ 位于一个 $2t$ 次多项式 $D(z)$ 上，且 $D(0)=ab$。</li>
+                          <li>由于 $D(z)$ 的次数为 $2t > t$，需要进行**降次 (degree reduction)**。每个 $P_j$ 将 $d_j$ 再次通过一个 $t$ 次随机多项式 $q'_j(z)$ 进行分享，使得 $q'_j(0)=d_j$。</li>
+                          <li>参与方通过线性组合（使用拉格朗日系数 $\\lambda_j$）重构 $ab$ 的 $t$ 次分享。具体地， $ab = \\sum_{j=1}^{2t+1} \\lambda_j D(\\alpha_j) = \\sum_{j=1}^{2t+1} \\lambda_j d_j$。新的 $t$ 次分享 $[c]_k = \\sum_{j=1}^{2t+1} \\lambda_j q'_j(\\alpha_k)$。</li>
+                        </ol>
+                        **安全性**: 在半诚实模型下，若 $t < n/2$，则协议是完美安全的。在恶意模型下，若 $t < n/3$，通过可验证秘密分享 (VSS) 和纠错码可以实现完美安全。
+                      `,
+                      level: 0, children: [] },
+                    { id: "gmw_protocol", term_cn: "GMW 协议", term_en: "GMW Protocol", 
+                      explanation_cn: "由Goldreich, Micali和Wigderson提出的MPC协议，布尔版本使用OT，算术版本使用OLE。",
+                      detailed_explanation_cn: `
+                        **核心思想**: 基于加法秘密分享（通常在 $\\mathbb{Z}_2$ 上用于布尔电路，或在 $\\mathbb{F}_p$ 上用于算术电路），并使用 OT (或 OLE) 实现非线性门。<br>
+                        **输入分享 (布尔)**: 对每个输入比特 $x_i$，参与方 $P_k$ 持有份额 $x_{i,k}$，使得 $\\bigoplus_{k=1}^n x_{i,k} = x_i$。<br>
+                        **XOR 门 (布尔)**: 若输入为 $a, b$，份额为 $[a]_k, [b]_k$。输出 $c=a \\oplus b$ 的份额为 $[c]_k = [a]_k \\oplus [b]_k$ (本地计算)。<br>
+                        **AND 门 (布尔, 两方)**: $P_1$ 持有 $a_1, b_1$，$P_2$ 持有 $a_2, b_2$。$a=a_1 \\oplus a_2, b=b_1 \\oplus b_2$。目标计算 $c=ab$。
+                        $ab = (a_1 \\oplus a_2)(b_1 \\oplus b_2) = a_1b_1 \\oplus a_1b_2 \\oplus a_2b_1 \\oplus a_2b_2$。
+                        $P_1$ 可以计算 $a_1b_1$。项 $a_1b_2, a_2b_1, a_2b_2$ 需要交互。通常使用 1-out-of-4 OT。$P_1$ 准备4个值对应 $a_2, b_2$ 的四种可能 $(00,01,10,11)$。$P_2$ 根据自己的 $a_2, b_2$ 选择一个。<br>
+                        **AND 门 (布尔, 多方)**: 对每对参与方 $(P_i, P_j)$，他们需要计算 $a_ib_j \\oplus a_jb_i$。这可以通过两两执行GMW的AND门（或OT）来实现。<br>
+                        **乘法门 (算术)**: 使用茫然线性计算 (OLE)。若 $P_i$ 持有 $a_i, b_i$，则 $a=\\sum a_i, b=\\sum b_i$。$ab = (\\sum a_i)(\\sum b_i) = \\sum a_ib_i + \\sum_{i \\neq j} a_ib_j$。$P_i$ 本地计算 $a_ib_i$。对于 $a_ib_j$， $P_i$ 和 $P_j$ 执行 OLE。或者更常用的是使用Beaver三元组。<br>
+                        **安全性**: 计算安全，依赖于OT/OLE的安全性。对半诚实敌手，若敌手数 $t < n$，则安全。
+                      `,
+                      level: 0, children: [] },
+                    { id: "arithmetic_circuit", term_cn: "算术电路", term_en: "Arithmetic Circuit", explanation_cn: "使用有限域上的加法和乘法门表示函数的方法。用于MPC中计算函数。", level: 0, children: [] },
+                    { id: "boolean_circuit", term_cn: "布尔电路", term_en: "Boolean Circuit", explanation_cn: "使用与、或、异或、非等布尔门表示函数的方法。用于MPC，特别是姚氏协议。", level: 0, children: [] },
+                    { id: "yao_gc", term_cn: "姚氏混淆电路协议 (Yao's GC)", term_en: "Yao's Garbled Circuits Protocol (Yao's GC)", 
+                      explanation_cn: "经典的双方安全计算协议，一方混淆电路，另一方在OT协助下计算电路。",
+                      detailed_explanation_cn: `
+                        **核心思想**: 一方（Garbler, $P_1$）将函数（表示为布尔电路）进行“混淆”，另一方（Evaluator, $P_2$）在不知道电路具体逻辑和中间值的情况下计算该混淆电路。<br>
+                        **混淆 (Garbling)**:
+                        <ol class="list-decimal ml-5">
+                          <li>对电路的每条线 (wire) $w_i$，Garbler $P_1$ 选择两个随机密钥（标签）$k_{i,0}, k_{i,1}$，分别对应线 $w_i$ 的值为0和1。</li>
+                          <li>对电路中的每个门 $g$（例如AND门），输入线为 $w_a, w_b$，输出线为 $w_c$。$P_1$ 创建一个**混淆表 (Garbled Table)**。对于输入标签的每种组合 $(k_{a,v_a}, k_{b,v_b})$，$P_1$ 计算门 $g$ 的输出值 $v_c = g(v_a, v_b)$，然后用 $k_{a,v_a}$ 和 $k_{b,v_b}$ 双重加密对应的输出标签 $k_{c,v_c}$：$Enc_{k_{a,v_a}}(Enc_{k_{b,v_b}}(k_{c,v_c}))$。混淆表包含4个这样的密文，并随机打乱顺序。</li>
+                        </ol>
+                        **传输与计算 (Transfer & Evaluation)**:
+                        <ol class="list-decimal ml-5">
+                          <li>$P_1$ 将所有混淆表发送给 $P_2$。</li>
+                          <li>对于 $P_1$ 的输入 $x$ 的每一位 $x_j$，设对应输入线为 $w_j$。$P_1$ 将其输入对应的标签 $k_{j,x_j}$ 发送给 $P_2$。</li>
+                          <li>对于 $P_2$ 的输入 $y$ 的每一位 $y_j$，设对应输入线为 $w'_j$。双方执行 1-out-of-2 OT，$P_1$ 的OT输入为 $(k'_{j,0}, k'_{j,1})$，$P_2$ 的OT输入为其选择位 $y_j$。$P_2$ 获得其输入对应的标签 $k'_{j,y_j}$。</li>
+                          <li>$P_2$ 拥有所有输入线的标签后，按拓扑顺序逐个门进行计算：使用输入线的标签尝试解密混淆表的4个条目，只有一个能成功解密出下一条线的标签。</li>
+                          <li>最终输出线的标签可以映射回0或1 (例如 $P_1$ 提供解密表)。</li>
+                        </ol>
+                        **优化**: Point-and-Permute, Free-XOR, GRR, Half-Gates 等技术用于提高效率和减小混淆电路大小。<br>
+                        **安全性**: 半诚实安全。依赖于对称加密的安全性 (e.g., IND-CPA) 和OT的安全性。
+                      `,
+                      level: 0, children: [
+                        { id: "garbled_circuit", term_cn: "混淆电路", term_en: "Garbled Circuit", explanation_cn: "布尔电路的加密版本，允许在不泄露中间值或电路结构（超出输出所暗示的范围）的情况下进行计算。", level: 1, children: [] },
+                        { id: "garbled_table", term_cn: "混淆表", term_en: "Garbled Table", explanation_cn: "对于混淆电路中的每个门，一个包含密文的表，这些密文加密输出线的混淆标签，对应于输入线的可能混淆标签。", level: 1, children: [] },
+                        { id: "point_permute", term_cn: "标识置换", term_en: "Point-and-Permute", explanation_cn: "混淆电路的一种优化，其中每个混淆线标签都有一个关联的“选择位”，用于确定要解密混淆表中的哪个条目，从而避免尝试性解密。", level: 1, children: [] },
+                        { id: "grr", term_cn: "混淆表行缩减 (GRR)", term_en: "Garbled Row Reduction (GRR)", explanation_cn: "减少混淆表中密文数量的技术（如GRR3、GRR2）（例如，从4行减少到3行或2行）。", level: 1, children: [] },
+                        { id: "half_gates", term_cn: "半门", term_en: "Half-Gates", explanation_cn: "混淆电路的一种优化技术，将与门（和其他奇数门）的混淆表大小减少到两个密文，同时与free-XOR兼容。", level: 1, children: [] },
+                        { id: "free_xor", term_cn: "Free XOR", term_en: "Free XOR", explanation_cn: "混淆电路的一种优化，通过为每条线定义两个混淆标签之间的全局差异 $\\Delta$，允许以零密码操作（基本上是免费的）计算异或门。", level: 1, children: [] }
+                    ]},
+                    { id: "bmr_protocol", term_cn: "BMR 协议", term_en: "BMR Protocol", explanation_cn: "由Beaver, Micali和Rogaway提出的多方计算协议，将姚氏混淆电路的思想扩展到多方场景。", detailed_explanation_cn: "（详细技术刻画待补充）", level: 0, children: [] },
+                    { id: "bdoz_protocol", term_cn: "BDOZ 协议", term_en: "BDOZ Protocol", explanation_cn: "一种针对恶意敌手的MPC协议，使用Beaver三元组和MAC进行认证。", detailed_explanation_cn: "（详细技术刻画待补充）", level: 0, children: [] },
+                    { id: "spdz_protocol", term_cn: "SPDZ 协议", term_en: "SPDZ Protocol", explanation_cn: "一种高效的针对恶意敌手的MPC协议，同样使用Beaver三元组和MAC。", detailed_explanation_cn: "（详细技术刻画待补充）", level: 0, children: [] },
+                    { id: "cut_choose", term_cn: "切分选择", term_en: "Cut-and-Choose", explanation_cn: "一种实现针对恶意敌手安全性的技术，尤其是在混淆电路协议中。", detailed_explanation_cn: "（详细技术刻画待补充）", level: 0, children: [] },
+                    { id: "beaver_triples", term_cn: "Beaver 三元组", term_en: "Beaver Triples", explanation_cn: "预计算的相关随机三元组 $([a], [b], [c])$，其中 $a, b$ 是随机的且 $c=ab$。用于高效计算MPC协议中的乘法门。", detailed_explanation_cn: "（详细技术刻画待补充）", level: 0, children: [] },
+                    { id: "vss", term_cn: "可验证秘密分享 (VSS)", term_en: "Verifiable Secret Sharing (VSS)", explanation_cn: "一种秘密分享方案，接收方可以验证其份额的有效性，即使分发者是恶意的。", detailed_explanation_cn: "（详细技术刻画待补充）", level: 0, children: [] },
+                    { id: "reed_solomon", term_cn: "Reed-Solomon 码", term_en: "Reed-Solomon Code", explanation_cn: "一种基于在有限域上求值多项式的纠错码，与Shamir秘密分享密切相关。", detailed_explanation_cn: "（详细技术刻画待补充）", level: 0, children: [] },
+                    { id: "error_correcting_code", term_cn: "纠错码", term_en: "Error-Correcting Code", explanation_cn: "用于检测和纠正数据传输或存储过程中可能发生的错误的代码。", detailed_explanation_cn: "（详细技术刻画待补充）", level: 0, children: [] },
+                    { id: "auth_ss", term_cn: "认证秘密分享", term_en: "Authenticated Secret Sharing", explanation_cn: "份额附带认证信息（例如MAC）以确保其完整性并防止恶意修改的秘密分享方案。", detailed_explanation_cn: "（详细技术刻画待补充）", level: 0, children: [] },
+                    { id: "ole", term_cn: "茫然线性计算 (OLE)", term_en: "Oblivious Linear Evaluation (OLE)", explanation_cn: "一种两方协议，接收者学习到 $\\gamma = \\alpha x + \\beta$，发送者对 $x$ 一无所知，接收者对 $\\alpha, \\beta$ 也学不到更多信息。", detailed_explanation_cn: "（详细技术刻画待补充）", level: 0, children: [] },
+                    { id: "zkpopk", term_cn: "零知识明文知识证明", term_en: "Zero-Knowledge Proof of Plaintext Knowledge", explanation_cn: "一种ZKP，证明者证明他们知道与给定密文 $c$ 对应的明文 $m$。", detailed_explanation_cn: "（详细技术刻画待补充）", level: 0, children: [] },
+                    { id: "psi", term_cn: "PSI (Private Set Intersection)", term_en: "Private Set Intersection (PSI)", explanation_cn: "一种安全多方计算任务，用于计算多个参与方集合的交集而不泄露非交集元素。", detailed_explanation_cn: "（详细技术刻画待补充）", level: 0, children: [] },
+                    { id: "pir", term_cn: "PIR (Private Information Retrieval)", term_en: "Private Information Retrieval (PIR)", explanation_cn: "一种协议，允许用户从服务器检索项目，而服务器不知道检索了哪个项目。", detailed_explanation_cn: "（详细技术刻画待补充）", level: 0, children: [] }
+                ]
+            }
+        ];
+
+        const categoryNav = document.getElementById('category-nav');
+        const glossaryContent = document.getElementById('glossary-content');
+        const searchInput = document.getElementById('search-input');
+        const mathJaxLoadingIndicator = document.getElementById('mathjax-loading-indicator');
+        let activeCategoryButton = null;
+
+        function renderTerm(term, categoryName) {
+            let childrenHtml = '';
+            if (term.children && term.children.length > 0) {
+                childrenHtml = `<ul class="ml-6 border-l border-neutral-300 pl-4 ${term.is_expanded ? '' : 'hidden'}">
+                                ${term.children.map(child => renderTerm(child, categoryName)).join('')}
+                              </ul>`;
+            }
+            const explanationHtml = term.explanation_cn ? `<div class="explanation text-sm text-neutral-700">${term.explanation_cn.replace(/\n/g, "<br>")}</div>` : '';
+            
+            let detailedExplanationButtonHtml = '';
+            let detailedExplanationHtml = '';
+            if (term.detailed_explanation_cn) {
+                detailedExplanationButtonHtml = `<button class="toggle-details-btn" data-termid-details="${term.id}">展开详细技术刻画 ▼</button>`;
+                detailedExplanationHtml = `<div class="detailed-explanation text-sm text-neutral-800 mt-2 hidden" id="details-${term.id}">${term.detailed_explanation_cn.replace(/\n/g, "<br>")}</div>`;
+            }
+
+            const toggleIcon = term.children && term.children.length > 0 
+                ? `<span class="toggle-icon cursor-pointer select-none mr-2 text-emerald-600" data-termid="${term.id}">${term.is_expanded ? '▼' : '▶'}</span>` 
+                : '<span class="mr-2 w-4 inline-block"></span>';
+
+            return `
+                <li class="term-item mb-4" data-level="${term.level}" data-id="${term.id}">
+                    <div class="flex items-start">
+                        ${toggleIcon}
+                        <div>
+                            <h3 class="text-lg font-semibold text-neutral-800">${term.term_cn}</h3>
+                            <p class="text-sm text-neutral-600 italic">${term.term_en}</p>
+                        </div>
+                    </div>
+                    ${explanationHtml}
+                    ${detailedExplanationButtonHtml}
+                    ${detailedExplanationHtml}
+                    ${childrenHtml}
+                </li>
+            `;
+        }
+        
+        function renderCategory(category, index) {
+            const categoryIntro = category.intro_cn ? `<p class="text-sm text-neutral-600 mb-6">${category.intro_cn}</p>` : '';
+            glossaryContent.innerHTML = `
+                <section>
+                    <h2 class="text-3xl font-bold text-neutral-900 mb-2">${category.name_cn}</h2>
+                    ${categoryIntro}
+                    <ul class="list-none p-0">
+                        ${category.terms.map(term => renderTerm(term, category.name_cn)).join('')}
+                    </ul>
+                </section>
+            `;
+            requestMathJaxTypeset();
+        }
+
+        function requestMathJaxTypeset() {
+            if (window.MathJax && typeof window.MathJax.typesetPromise === 'function') {
+                mathJaxLoadingIndicator.style.display = 'block';
+                window.MathJax.typesetPromise([glossaryContent])
+                    .catch((err) => console.error('MathJax typesetting error:', err))
+                    .finally(() => {
+                        mathJaxLoadingIndicator.style.display = 'none';
+                    });
+            } else if (window.MathJax && typeof window.MathJax.Hub !== 'undefined' && typeof window.MathJax.Hub.Queue === 'function') {
+                mathJaxLoadingIndicator.style.display = 'block';
+                window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, glossaryContent], () => {
+                    mathJaxLoadingIndicator.style.display = 'none';
+                });
+            } else {
+                 console.warn('MathJax not fully loaded or typesetting function not available.');
+                 mathJaxLoadingIndicator.style.display = 'none';
+            }
+        }
+
+        function highlightSearchTerm(text, searchTerm) {
+            if (!searchTerm || typeof text !== 'string') return text;
+            const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+            return text.replace(regex, '<mark>$1</mark>');
+        }
+
+        function renderSearchResults(query) {
+            if (!query) {
+                glossaryContent.innerHTML = `<div class="text-center p-10"><p class="text-neutral-600">请输入搜索词。</p></div>`;
+                 if (activeCategoryButton) {
+                    activeCategoryButton.classList.remove('active-category');
+                    activeCategoryButton = null;
+                }
+                return;
+            }
+
+            const lowerCaseQuery = query.toLowerCase();
+            let resultsHtml = '';
+            let count = 0;
+
+            glossaryData.forEach(category => {
+                category.terms.forEach(function searchRecursive(term) {
+                    let match = false;
+                    let termCnHighlighted = term.term_cn;
+                    let termEnHighlighted = term.term_en;
+                    let explanationHighlighted = term.explanation_cn || '';
+                    let detailedExplanationHighlighted = term.detailed_explanation_cn || '';
+
+                    if (term.term_cn && term.term_cn.toLowerCase().includes(lowerCaseQuery)) {
+                        match = true;
+                        termCnHighlighted = highlightSearchTerm(term.term_cn, query);
+                    }
+                    if (term.term_en && term.term_en.toLowerCase().includes(lowerCaseQuery)) {
+                        match = true;
+                        termEnHighlighted = highlightSearchTerm(term.term_en, query);
+                    }
+                    if (term.explanation_cn && term.explanation_cn.toLowerCase().includes(lowerCaseQuery)) {
+                        match = true;
+                        explanationHighlighted = highlightSearchTerm(term.explanation_cn, query);
+                    }
+                     if (term.detailed_explanation_cn && term.detailed_explanation_cn.toLowerCase().includes(lowerCaseQuery)) {
+                        match = true;
+                        detailedExplanationHighlighted = highlightSearchTerm(term.detailed_explanation_cn, query);
+                    }
+                    
+                    if (match) {
+                        count++;
+                        const explanationHtml = term.explanation_cn ? `<div class="explanation text-sm text-neutral-700">${explanationHighlighted.replace(/\n/g, "<br>")}</div>` : '';
+                        let detailedPart = '';
+                        if (term.detailed_explanation_cn) {
+                            detailedPart = `
+                                <button class="toggle-details-btn" data-termid-details="${term.id}">展开详细技术刻画 ▼</button>
+                                <div class="detailed-explanation text-sm text-neutral-800 mt-2 hidden" id="details-${term.id}">${detailedExplanationHighlighted.replace(/\n/g, "<br>")}</div>
+                            `;
+                        }
+                        resultsHtml += `
+                            <li class="term-item mb-4" data-level="0">
+                                <h3 class="text-lg font-semibold text-neutral-800">${termCnHighlighted}</h3>
+                                <p class="text-sm text-neutral-600 italic">${termEnHighlighted}</p>
+                                ${explanationHtml}
+                                ${detailedPart}
+                                <p class="text-xs text-neutral-500 mt-1">分类: ${category.name_cn}</p>
+                            </li>`;
+                    }
+                    if (term.children) {
+                        term.children.forEach(searchRecursive);
+                    }
+                });
+            });
+
+            if (count > 0) {
+                glossaryContent.innerHTML = `
+                    <section>
+                        <h2 class="text-3xl font-bold text-neutral-900 mb-6">搜索结果 "${query}" (${count}条)</h2>
+                        <ul class="list-none p-0">${resultsHtml}</ul>
+                    </section>`;
+            } else {
+                glossaryContent.innerHTML = `<div class="text-center p-10"><p class="text-neutral-600">未找到与 "${query}" 相关的术语。</p></div>`;
+            }
+            requestMathJaxTypeset();
+        }
+
+
+        glossaryData.forEach((category, index) => {
+            const button = document.createElement('button');
+            button.className = 'block w-full text-left px-4 py-3 mb-2 rounded-lg hover:bg-emerald-100 hover:text-emerald-700 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500';
+            button.textContent = category.name_cn;
+            button.onclick = () => {
+                if (activeCategoryButton) {
+                    activeCategoryButton.classList.remove('active-category');
+                }
+                renderCategory(category, index);
+                button.classList.add('active-category');
+                activeCategoryButton = button;
+            };
+            categoryNav.appendChild(button);
+        });
+
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value;
+            if (query.trim() === "") {
+                 if (activeCategoryButton) { 
+                    const activeCategoryIndex = Array.from(categoryNav.children).indexOf(activeCategoryButton);
+                    if (activeCategoryIndex > -1 && glossaryData[activeCategoryIndex]) {
+                         renderCategory(glossaryData[activeCategoryIndex], activeCategoryIndex);
+                    } else {
+                         glossaryContent.innerHTML = `<div class="text-center p-10"><p class="text-neutral-600">请从左侧选择一个分类或使用搜索功能来浏览术语。</p></div>`;
+                         if(activeCategoryButton) activeCategoryButton.classList.remove('active-category');
+                         activeCategoryButton = null;
+                    }
+                } else { 
+                     glossaryContent.innerHTML = `<div class="text-center p-10"><p class="text-neutral-600">请从左侧选择一个分类或使用搜索功能来浏览术语。</p></div>`;
+                }
+            } else {
+                renderSearchResults(query);
+                 if (activeCategoryButton) {
+                    activeCategoryButton.classList.remove('active-category');
+                    activeCategoryButton = null; 
+                }
+            }
+        });
+        
+        glossaryContent.addEventListener('click', (e) => {
+            if (e.target.classList.contains('toggle-icon')) {
+                const termId = e.target.dataset.termid;
+                
+                function findAndToggleTerm(terms) {
+                    for (let term of terms) {
+                        if (term.id === termId) {
+                            term.is_expanded = !term.is_expanded;
+                            return true;
+                        }
+                        if (term.children && findAndToggleTerm(term.children)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+
+                let currentCategory = null;
+                let currentCategoryIndex = -1;
+                if (activeCategoryButton) {
+                    currentCategoryIndex = Array.from(categoryNav.children).indexOf(activeCategoryButton);
+                     if (currentCategoryIndex > -1 && glossaryData[currentCategoryIndex]) {
+                        currentCategory = glossaryData[currentCategoryIndex];
+                     }
+                }
+                
+                if(currentCategory && findAndToggleTerm(currentCategory.terms)) {
+                     renderCategory(glossaryData[currentCategoryIndex], currentCategoryIndex);
+                }
+            } else if (e.target.classList.contains('toggle-details-btn')) {
+                const termId = e.target.dataset.termidDetails;
+                const detailsDiv = document.getElementById(`details-${termId}`);
+                if (detailsDiv) {
+                    const isHidden = detailsDiv.classList.toggle('hidden');
+                    e.target.textContent = isHidden ? '展开详细技术刻画 ▼' : '收起详细技术刻画 ▲';
+                    if(!isHidden) { // If showing, re-typeset for this specific div
+                         if (window.MathJax && typeof window.MathJax.typesetPromise === 'function') {
+                            mathJaxLoadingIndicator.style.display = 'block';
+                            window.MathJax.typesetPromise([detailsDiv])
+                                .catch((err) => console.error('MathJax typesetting error for details:', err))
+                                .finally(() => {
+                                    mathJaxLoadingIndicator.style.display = 'none';
+                                });
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

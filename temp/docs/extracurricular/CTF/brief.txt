@@ -1,0 +1,119 @@
+1. 逆向工程概念及作用
+概念：逆向工程是指在缺乏源代码或文档情况下，通过静态分析（反汇编）和动态分析（调试）来理解程序功能的过程​
+metactf.com
+。其目标通常是修改或重现程序功能。
+作用：在CTF竞赛中，逆向工程可用于分析未知二进制程序以提取flag；在信息安全领域，可用于漏洞挖掘、恶意代码分析等​
+metactf.com
+。例如，攻击者通过逆向软件可发现隐藏的接口或未被预期的功能，从而进行攻击​
+metactf.com
+。
+2. 常用逆向工具（x86/ARM & macOS 重点）
+反汇编器：IDA Pro（行业标准反汇编器，用于静态分析和恶意软件分析​
+en.wikipedia.org
+）、Ghidra（NSA开源工具，支持Java/Python脚本​
+en.wikipedia.org
+​
+en.wikipedia.org
+）、Hopper（macOS平台常用的反汇编工具）。这些工具能将二进制代码转换为汇编或伪代码。
+调试器：GDB（Linux/ARM常用）、LLDB（macOS默认调试器）、x64dbg（Windows调试器）等，用于动态单步执行和断点分析。使用调试器可以观察程序运行时寄存器和内存变化，绕过保护机制等。
+十六进制编辑器：如HxD、010 Editor等，可用于直接查看和修改二进制文件内容。
+自动化脚本：IDA Pro支持IDAPython脚本，可以自动化标注、批量重命名、解混淆等任务​
+blog.securitybreak.io
+；Ghidra支持Java和Jython脚本​
+en.wikipedia.org
+；Binary Ninja提供Python/C++ API​
+binary.ninja
+等，便于扩展功能和自动化分析。
+3. 常见程序保护机制及对抗方法
+代码混淆：如字符串加密、控制流扁平化等，使静态分析困难。对策可采用动态调试或自动化脚本还原字符串和结构。
+反调试：程序通过检测调试器存在来阻止分析，例如调用 IsDebuggerPresent()（Windows）等​
+medium.com
+。反调试会导致程序检测到调试环境时崩溃或退出。对抗方法包括使用调试器修改返回值（例如将 IsDebuggerPresent() 返回值置为0）​
+medium.com
+，或通过脱壳工具/反反调试技术绕过检测。
+加壳/加密：使用UPX、Packers等对可执行文件进行压缩或加密​
+hackmd.io
+。这会使程序入口处代码混乱。对策是使用相应解压工具（如 upx -d）还原原始二进制​
+hackmd.io
+，然后再进行分析。
+签名/完整性校验：如macOS的Mach-O文件签名、CRC校验等，一旦修改程序会导致签名失效。对抗方法可在分析环境中关闭签名验证，或直接在内存中修改程序而非磁盘文件。
+综合对策：对于上述保护技术，可结合静态和动态分析。例如先使用自动化脚本和特征库（如IDA的Lumina/FLIRT插件）识别常见库函数，再用调试器观察程序运行流程、内存和寄存器变化，一步步逆向核心逻辑。必要时还可使用IDAPython或二进制替换脚本自动化重复操作​
+hackmd.io
+​
+apriorit.com
+​
+medium.com
+。
+4. macOS ARM平台逆向特点
+Mach-O格式：macOS下原生可执行文件采用Mach-O格式，包含头部、Load Commands、多个Segment（节）和Signature（签名）等结构。需了解Mach-O的基本结构以提取代码段和符号。
+Objective-C/Swift特性：macOS/iOS常用Objective-C和Swift语言开发。Objective-C使用动态消息机制，方法调用编译成对 objc_msgSend() 的调用，运行时根据Selector（字符串）查找具体实现​
+duo.com
+。这意味着静态反汇编时，普通函数调用可能看不到真实的目标函数，需要借助Objective-C分析插件（如REobjc）或工具识别类名和方法。Swift则有自己的名称修饰（demangle）和运行时，可能需要使用swift-demangle等工具分析。
+寄存器与调用约定：ARM64架构寄存器命名（如X0,X1…）和调用约定与x86不同，函数参数一般通过寄存器传递，掌握这一点有助于理解反汇编代码。
+系统API和库：常见的系统框架有Foundation、AppKit/UIKit、CoreFoundation等，通过dyld加载Mach-O动态库。分析时可使用otool -L查看依赖库，使用class-dump或IDA插件导入Objective-C类信息，快速定位关键API调用。
+差异：与x86平台相比，macOS上需要关注代码签名（代码修改后可能无法运行）和ASLR随机化机制，通常需要关闭系统签名验证或在安全模式下调试。此外，新版macOS和iOS在M1/M2芯片上使用ARM指令集，调试时若使用x86版本工具需通过Rosetta转换。
+5. mrexodia/ida-pro-mcp项目与脚本编写
+ida-pro-mcp项目：这是一个基于MCP（Model Context Protocol）的IDA Pro插件，可将IDA连接到大语言模型（如Claude等AI助手），实现自动化逆向辅助​
+playbooks.com
+。它提供了丰富的函数接口（获取当前函数、反编译函数、列出字符串等），通过AI自动添加注释、重命名变量函数等，大大提高分析效率​
+playbooks.com
+。
+脚本编写：传统上，IDA支持用IDAPython写脚本来自动化任务，如批量着色、导出数据、修改调用关系等​
+blog.securitybreak.io
+。Ghidra支持Java或Jython脚本​
+en.wikipedia.org
+，Binary Ninja支持Python/C++ API​
+binary.ninja
+，Radare2有r2pipe等接口。使用脚本可以在分析时快速完成重复性工作（如批量搜索模式、解密字符串、图像分析等），是提高逆向效率的关键手段。
+6. 逆向CTF题目示例
+Taylor’s First Swift (macOS)：一个用Swift编写的Mac二进制程序。题目名称暗示Swift语言，程序从用户获取输入，在函数 flagcheck 中先对预置字符串做Base64解码，然后用值为 "swifties!" 的字节数组对解码结果进行异或运算。分析可发现关键数据和“swifties!”字符串​
+medium.com
+，使用CyberChef或脚本先Base64解码，再XOR即可获得flag。
+题目链接：Google Drive 下载
+IPromise (macOS)：题目名称暗示iPhone，但实为Mac ARM程序。运行程序可见其打印将执行AES解密，但主函数并未调用解密函数。分析时在IDA中找到 decryptIPromise 函数（AES解密算法），发现它未被执行​
+medium.com
+。对策是用IDA的远程调试功能，在主函数断点处手动修改程序计数器（EIP）跳转到解密函数入口，使其执行并打印出flag​
+medium.com
+。
+题目链接：Google Drive 下载
+PicoCTF 2024 “Packer” (100 分)：这是一个被UPX加壳的可执行文件。分析发现strings out | tail可见提示“packed with UPX”，使用 upx -d out -o original 解压后得到原始二进制​
+hackmd.io
+。对解压后的程序再查看字符串或用二进制分析器（如rabin2）提取flag字符串。该流程演示了遇到常见加壳时的通用处理方法​
+hackmd.io
+。
+7. 讲座时间规划（示例：50分钟总计）
+5分钟：介绍逆向工程基本概念和意义，概述静态/动态分析方法和CTF中的应用要点（引用定义​
+metactf.com
+）。
+10分钟：讲解常用逆向工具，比较IDA Pro、Ghidra、Hopper等反汇编器特点；演示GDB/LLDB调试基本使用；提及脚本自动化（IDAPython等）​
+blog.securitybreak.io
+​
+en.wikipedia.org
+​
+binary.ninja
+。
+10分钟：分析程序保护技术及应对策略，包括反调试（如IsDebuggerPresent检测​
+apriorit.com
+​
+medium.com
+）、加壳（UPX解包​
+hackmd.io
+）、代码混淆等，并讨论常用的绕过技巧。
+10分钟：macOS ARM平台特点：简要介绍Mach-O文件结构、Objective-C动态调用机制​
+duo.com
+、Swift代码分析要点，以及与x86平台的差异（寄存器、签名验证等），并介绍macOS专用工具（otool、class-dump等）。
+5分钟：讲解IDA脚本化与AI辅助：演示IDAPython脚本示例​
+blog.securitybreak.io
+，介绍mrexodia的IDA-MCP项目及其通过Model Context Protocol实现的AI辅助自动化功能​
+playbooks.com
+；提及Ghidra/BN等脚本接口。
+10分钟：通过示例题目（上述列举的CTF题目）讲解实战流程，每题重点分析思路和工具使用，并演示关键步骤。
+5分钟：总结并推荐后续学习资源，解答学生问题。
+8. 参考资料与学习平台
+工具文档：IDA Pro（Hex-Rays官网和用户指南）、IDA Python官方文档、Ghidra 官方网站及Wiki、Hopper官网、Binary Ninja 用户文档、LLDB文档等。
+教程文章：CTF Wiki（逆向工程基础知识）、各种IDA/Ghidra脚本入门教程、反调试/脱壳技术讲解博客（如Apriorit反调试指南​
+apriorit.com
+）。
+在线平台：HackTheBox、PicoCTF、试客联盟等CTF平台的Reverse分类练习题，以及GitHub上的开源CTF题目仓库。
+示例源码和脚本：IDAPython和Binary Ninja的示例脚本合集、开源逆向项目（如 mrexodia/ida-pro-mcp）、常见算法实现库（Crypto++等）等，可帮助学习者进行实践和参考。
+参考文献：文中所有引用均已标注【...†L-L】，相关工具和理论介绍参考官方文档和社区资源。

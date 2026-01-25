@@ -55,7 +55,7 @@ Shamir 秘密分享方案由 Adi Shamir 于1979年提出，它是一种基于有
 1.  **公共参数**: 所有参与方约定 $n$ 个公开的、各不相同且均不为零的元素 $(\alpha_1, \dots, \alpha_n)$，其中 $\alpha_i \in \mathbb{F} \setminus \{0\}$。这些 $\alpha_i$ 通常是参与方 $P_i$ 的公开标识。
 2.  **秘密分享**: 要分享秘密 $s \in \mathbb{F}$，秘密持有者（或指定的 Dealer）执行以下操作：
     *   随机选择一个阶数最多为 $t$ 的多项式 $q_s(x) \in \mathbb{F}[x]$，使得 $q_s(0) = s$。
-        即 $q_s(x) = s + a_1 x + a_2 x^2 + \dots + a_t x^t$，其中 $a_1, \dots, a_t \leftarrow_{\$} \mathbb{F}$ 是随机选择的系数。
+        即 $q_s(x) = s + a_1 x + a_2 x^2 + \dots + a_t x^t$，其中 $a_1, \dots, a_t \leftarrow_{\text{\textdollar}} \mathbb{F}$ 是随机选择的系数。
     *   秘密地将份额 $s_j = q_s(\alpha_j)$ 发送给参与方 $P_j$。
 
 **关键性质 (基于拉格朗日插值法)**:

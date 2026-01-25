@@ -194,13 +194,13 @@ graph TD
     **协议流程**:
 
     1.  **$P_R$ (接收者) - 密钥生成与选择**:
-        *   随机选择一个私钥 $sk \leftarrow_{\$} \mathbb{Z}_q$。
+        *   随机选择一个私钥 $sk \leftarrow_{\text{\textdollar}} \mathbb{Z}_q$。
         *   计算其选择的公钥 $pk_b = g^{sk}$。
-        *   为未选择的那条消息生成一个“伪”公钥：随机选择 $pk_{1-b} \leftarrow_{\$} \mathbb{G}$。
+        *   为未选择的那条消息生成一个"伪"公钥：随机选择 $pk_{1-b} \leftarrow_{\text{\textdollar}} \mathbb{G}$。
         *   $P_R$ 将公钥对 $(pk_0, pk_1)$ （按标准顺序，例如 $pk_0$ 在前）发送给 $P_S$。
 
     2.  **$P_S$ (发送者) - 消息加密**:
-        *   当收到 $(pk_0, pk_1)$ 后，随机选择一个临时密钥 $r \leftarrow_{\$} \mathbb{Z}_q$。
+        *   当收到 $(pk_0, pk_1)$ 后，随机选择一个临时密钥 $r \leftarrow_{\text{\textdollar}} \mathbb{Z}_q$。
         *   计算一个公共的随机化因子 $v = g^r$。
         *   使用收到的公钥和临时密钥 $r$ 分别加密两条消息（类似 ElGamal 加密）：
             *   $c_0 = x_0 \cdot (pk_0)^r$
@@ -238,7 +238,7 @@ graph TD
         现在考虑未被选择的密文 $c_{1-b} = x_{1-b} \cdot (pk_{1-b})^r$。$P_R$ 要想从中恢复出 $x_{1-b}$，就需要计算出 $(pk_{1-b})^r$。
         $P_R$ 知道 $v=g^r$ (来自 $P_S$) 和 $pk_{1-b}$ (是它自己生成的随机群元素，其对应的“私钥” $log_g pk_{1-b}$ 是 $P_R$ 不知道的)。
         从 $g^r$ 和 $pk_{1-b}$ 计算 $(pk_{1-b})^r$ 是一个计算性 Diffie-Hellman (CDH) 问题。
-        更进一步，DDH 假设表明，对于 $P_R$ 来说，元组 $(v=g^r, pk_{1-b}, (pk_{1-b})^r)$ 与元组 $(v=g^r, pk_{1-b}, e)$ (其中 $e \leftarrow_{\$} \mathbb{G}$ 是一个随机群元素) 在计算上是不可区分的。
+        更进一步，DDH 假设表明，对于 $P_R$ 来说，元组 $(v=g^r, pk_{1-b}, (pk_{1-b})^r)$ 与元组 $(v=g^r, pk_{1-b}, e)$ (其中 $e \leftarrow_{\text{\textdollar}} \mathbb{G}$ 是一个随机群元素) 在计算上是不可区分的。
         这意味着，项 $(pk_{1-b})^r$ 在 $P_R$ 看来就像一个随机的群元素（因为它不知道 $r$ 也不能从 $pk_{1-b}$ 中轻易得到其与 $g$ 的关系）。
         因此，$c_{1-b} = x_{1-b} \cdot (pk_{1-b})^r$ 在 $P_R$ 看来与 $x_{1-b} \cdot (\text{随机元素})$ 是不可区分的。由于群的性质，一个元素乘以一个随机元素的结果仍然是一个随机元素（除非 $x_{1-b}$ 是单位元）。所以 $P_R$ 无法从 $c_{1-b}$ 中分离出 $x_{1-b}$ 的任何信息。
 
@@ -277,13 +277,13 @@ graph TD
 根据 UC 框架的平凡敌手完备性定理 (Thm 4.1)，我们只需为平凡敌手 $\mathcal{A}_{\text{triv}}$ (它仅在环境 $\mathcal{Z}$ 的指示下转发消息) 构造一个模拟器 $\mathcal{S}$。 $\mathcal{S}$ 在其内部运行 $\mathcal{A}_{\text{triv}}$ 的代码，并模拟与 $\mathcal{F}_{OT}$ 的交互，使得 $\mathcal{Z}$ 无法区分其是在与真实协议 $(\Pi_{OT}, \mathcal{A}_{\text{triv}})$ 交互还是在与理想系统 $(\mathcal{F}_{OT}, \mathcal{S})$ 交互。
 我们将分两种情况（发送方被攻陷或接收方被攻陷）来描述 $\mathcal{S}$ 的行为。
 
-*   ???+ case "情况 1: 发送者 $P_S$ 被攻陷 (由 $\mathcal{Z}$ 通过 $\mathcal{A}_{\text{triv}}$ 控制)"
+*   **情况 1: 发送者 $P_S$ 被攻陷 (由 $\mathcal{Z}$ 通过 $\mathcal{A}_{\text{triv}}$ 控制)**
 
         $\mathcal{S}$ 的行为如下：
 
         1.  **$P_S$ 输入阶段**: 当环境 $\mathcal{Z}$ 通过 $\mathcal{A}_{\text{triv}}$ 向被攻陷的 $P_S$ 提供输入 `(Input, sid, (x0, x1))` 时，$\mathcal{S}$ 截获此输入，并将其同样转发给理想功能 $\mathcal{F}_{OT}$。$\mathcal{S}$ 模拟 $P_S$ 等待来自 $P_R$ 的消息。
         2.  **模拟 $P_R$ 的消息**: 在理想世界中，当诚实的 $P_R$ (由 $\mathcal{Z}$ 控制) 提供了它的输入 $b$ 给 $\mathcal{F}_{OT}$ 后，$\mathcal{F}_{OT}$ 会通知 $\mathcal{S}$ `(Input, sid, P_R)`。此时，$\mathcal{S}$ 仍然不知道 $P_R$ 的真实选择 $b$。然而，$\mathcal{S}$ 需要模拟 $P_R$ 在真实协议中发送给 $P_S$ 的消息 $(pk_0, pk_1)$。
-            $\mathcal{S}$ 随机选择两个独立的群元素 $pk'_0 \leftarrow_{\$} \mathbb{G}$ 和 $pk'_1 \leftarrow_{\$} \mathbb{G}$。
+            $\mathcal{S}$ 随机选择两个独立的群元素 $pk'_0 \leftarrow_{\text{\textdollar}} \mathbb{G}$ 和 $pk'_1 \leftarrow_{\text{\textdollar}} \mathbb{G}$。
             $\mathcal{S}$ 将这对 $(pk'_0, pk'_1)$ 作为模拟的 $P_R$ 消息发送给其内部运行的 $\mathcal{A}_{\text{triv}}$ (即被攻陷的 $P_S$)。
         3.  **$P_S$ 的后续行为**: 被攻陷的 $P_S$ (由 $\mathcal{A}_{\text{triv}}$ 模拟) 会根据收到的 $(pk'_0, pk'_1)$ 和其输入 $(x_0, x_1)$ 计算出 $(v', c'_0, c'_1)$ 并试图发送。$\mathcal{S}$ 截获此消息，并不做任何处理（因为在理想世界中，$P_R$ 的输出由 $\mathcal{F}_{OT}$ 直接提供，与此消息无关）。
         4.  **$P_R$ 的输出**: $P_R$ 是诚实方，它将直接从 $\mathcal{F}_{OT}$ 获得其输出 $x_b$ (当环境 $\mathcal{Z}$ 指示 $\mathcal{F}_{OT}$ 输出给 $P_R$ 时，或通过 $S$ 的 `(Output, sid, P_R)` 指令触发)。$\mathcal{S}$ 在此无需介入。
@@ -294,18 +294,18 @@ graph TD
         由于 $g^{sk}$ (当 $sk$ 随机时) 在计算上与一个直接从 $\mathbb{G}$ 中随机选择的元素是不可区分的（这是 DDH 假设的一个弱形式，或者说基于群的随机自可约性），因此，真实世界中 $(pk_0, pk_1)$ 的分布与理想世界中 $(pk'_0, pk'_1)$ 的分布是计算上不可区分的。
         因此，环境 $\mathcal{Z}$ 无法区分它是在与真实协议交互还是在与理想系统交互。
 
-*   ???+ case "情况 2: 接收者 $P_R$ 被攻陷 (由 $\mathcal{Z}$ 通过 $\mathcal{A}_{\text{triv}}$ 控制)"
+*   **情况 2: 接收者 $P_R$ 被攻陷 (由 $\mathcal{Z}$ 通过 $\mathcal{A}_{\text{triv}}$ 控制)**
 
         $\mathcal{S}$ 的行为如下：
 
         1.  **$P_R$ 输入与密钥生成阶段**: 当环境 $\mathcal{Z}$ 通过 $\mathcal{A}_{\text{triv}}$ 向被攻陷的 $P_R$ 提供输入 `(Input, sid, b)` 时，$\mathcal{S}$ 截获此输入 $b$，并将其同样转发给理想功能 $\mathcal{F}_{OT}$。
-            $\mathcal{S}$ 模拟被攻陷的 $P_R$ (由 $\mathcal{A}_{\text{triv}}$ 控制) 执行协议的第1步：选择 $sk \leftarrow_{\$} \mathbb{Z}_q$，计算 $pk_b = g^{sk}$，选择 $pk_{1-b} \leftarrow_{\$} \mathbb{G}$，并“发送” $(pk_0, pk_1)$。$\mathcal{S}$ 记录下这些值，特别是 $sk$ 和 $pk_b$。
+            $\mathcal{S}$ 模拟被攻陷的 $P_R$ (由 $\mathcal{A}_{\text{triv}}$ 控制) 执行协议的第1步：选择 $sk \leftarrow_{\text{\textdollar}} \mathbb{Z}_q$，计算 $pk_b = g^{sk}$，选择 $pk_{1-b} \leftarrow_{\text{\textdollar}} \mathbb{G}$，并“发送” $(pk_0, pk_1)$。$\mathcal{S}$ 记录下这些值，特别是 $sk$ 和 $pk_b$。
         2.  **模拟 $P_S$ 的消息**: 在理想世界中，当诚实的 $P_S$ (由 $\mathcal{Z}$ 控制) 提供了它的输入 $(x_0, x_1)$ 给 $\mathcal{F}_{OT}$ 后，$\mathcal{F}_{OT}$ 会通知 $\mathcal{S}$ `(Input, sid, P_S)`。此时，$\mathcal{S}$ 仍然不知道 $P_S$ 的真实输入 $(x_0, x_1)$。然而，$\mathcal{S}$ 需要模拟 $P_S$ 在真实协议中发送给 $P_R$ 的消息 $(v, c_0, c_1)$。
             *   **获取 $P_R$ 应得的输出**: $\mathcal{S}$ 首先需要知道被攻陷的 $P_R$ 应该得到什么输出。它向 $\mathcal{F}_{OT}$ 发送指令 `(Output, sid, P_R)`。由于 $P_R$ 被攻陷，$\mathcal{F}_{OT}$ 会将计算出的 $x_b$ (基于 $P_R$ 的输入 $b$ 和 $P_S$ 的真实输入 $x_0, x_1$) 发送给 $\mathcal{S}$。令 $\mathcal{S}$ 收到的这个值为 $x^*_b$。
             *   **构造模拟消息**: $\mathcal{S}$ 构造 $(v', c'_0, c'_1)$ 如下：
-                *   $v' \leftarrow_{\$} \mathbb{G}$ (选择一个随机的群元素作为 $v$)。
+                *   $v' \leftarrow_{\text{\textdollar}} \mathbb{G}$ (选择一个随机的群元素作为 $v$)。
                 *   $c'_b = x^*_b \cdot (pk_b)^{\log_g v'}$ (即 $x^*_b \cdot (v')^{sk}$)。这里 $pk_b$ 和 $sk$ 是 $\mathcal{S}$ 在步骤1中代表 $P_R$ 生成并记录的。
-                *   $c'_{1-b} \leftarrow_{\$} \mathbb{G}$ (为未选择的消息生成一个随机的密文部分)。
+                *   $c'_{1-b} \leftarrow_{\text{\textdollar}} \mathbb{G}$ (为未选择的消息生成一个随机的密文部分)。
             $\mathcal{S}$ 将 $(v', c'_0, c'_1)$ 作为模拟的 $P_S$ 消息发送给其内部运行的 $\mathcal{A}_{\text{triv}}$ (即被攻陷的 $P_R$)。
         3.  **$P_R$ 的后续行为**: 被攻陷的 $P_R$ (由 $\mathcal{A}_{\text{triv}}$ 模拟) 会根据收到的 $(v', c'_0, c'_1)$ 和它自己生成的 $sk$ 计算 $c'_b / (v')^{sk}$ 得到 $x^*_b$，并将其作为输出（通过 $\mathcal{A}_{\text{triv}}$ 传递给 $\mathcal{Z}$）。
 

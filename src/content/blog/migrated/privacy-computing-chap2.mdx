@@ -104,7 +104,7 @@ graph LR
     
     1.  **密钥生成 (Key Generation)**: 挑战者运行 $(pk, sk) \leftarrow \text{Gen}(1^\lambda)$，并将公钥 $pk$ 发送给敌手 $\mathcal{A}$。
     2.  **挑战查询 (Challenge Query)**: 敌手 $\mathcal{A}$ 选择两条等长的消息 $m_0, m_1$，并发送给挑战者。
-    3.  **挑战密文生成 (Challenge Ciphertext Generation)**: 挑战者随机选择一个比特 $b \leftarrow_{\$} \{0, 1\}$，计算挑战密文 $c^* \leftarrow \text{Enc}_{pk}(m_b)$，并将 $c^*$ 发送给 $\mathcal{A}$。
+    3.  **挑战密文生成 (Challenge Ciphertext Generation)**: 挑战者随机选择一个比特 $b \leftarrow_{\text{\textdollar}} \{0, 1\}$，计算挑战密文 $c^* \leftarrow \text{Enc}_{pk}(m_b)$，并将 $c^*$ 发送给 $\mathcal{A}$。
     4.  **猜测 (Guess)**: 敌手 $\mathcal{A}$ (可以继续进行加密查询，但对于公钥加密，$\mathcal{A}$ 已有公钥，可自行加密) 输出一个猜测比特 $b'$。
     5.  **游戏结果**: 如果 $b' = b$，则敌手 $\mathcal{A}$ 获胜，游戏输出 1；否则输出 0。
     
@@ -184,7 +184,7 @@ $$
     -   密钥长度更短
     -   应用: 比特币地址生成
 
-???+ definition "判定性 Diffie-Hellman (DDH) 假设"
+> **📖 判定性 Diffie-Hellman (DDH) 假设**
 
     令 $\mathbb{G}$ 是一个阶为素数 $q$ 的循环群， $g$ 是其生成元。
     DDH 假设声称，对于随机选择的 $x, y, z \in \mathbb{Z}_q$，以下两个分布是计算上不可区分的：
@@ -197,7 +197,7 @@ $$
     $$
     \left| \Pr[\mathcal{A}(\mathbb{G}, q, g, g^x, g^y, g^{xy}) = 1] - \Pr[\mathcal{A}(\mathbb{G}, q, g, g^x, g^y, g^z) = 1] \right| \le \text{negl}(\lambda)
     $$
-    其中，群参数 $(\mathbb{G}, q, g)$ 由群生成算法 $\mathcal{G}(1^\lambda)$ 生成，$x,y,z \leftarrow_{\$} \mathbb{Z}_q$。则称 DDH 问题在群 $\mathbb{G}$ 中是困难的。
+    其中，群参数 $(\mathbb{G}, q, g)$ 由群生成算法 $\mathcal{G}(1^\lambda)$ 生成，$x,y,z \leftarrow_{\text{\textdollar}} \mathbb{Z}_q$。则称 DDH 问题在群 $\mathbb{G}$ 中是困难的。
 
 #### 🏗️ 假设层次结构
 
@@ -226,8 +226,8 @@ graph BT
     **ElGamal 加密方案**:
     设 $\mathbb{G}$ 为阶为素数 $q$ 的循环群， $g$ 为生成元。
     
-    *   $\text{Gen}(1^\lambda)$: 随机选择私钥 $sk \leftarrow_{\$} \mathbb{Z}_q$，计算公钥 $pk = g^{sk}$。输出 $(pk, sk)$。
-    *   $\text{Enc}_{pk}(m)$: 对于消息 $m \in \mathbb{G}$，随机选择 $r \leftarrow_{\$} \mathbb{Z}_q$，计算密文 $c = (c_1, c_2) = (g^r, m \cdot pk^r)$。
+    *   $\text{Gen}(1^\lambda)$: 随机选择私钥 $sk \leftarrow_{\text{\textdollar}} \mathbb{Z}_q$，计算公钥 $pk = g^{sk}$。输出 $(pk, sk)$。
+    *   $\text{Enc}_{pk}(m)$: 对于消息 $m \in \mathbb{G}$，随机选择 $r \leftarrow_{\text{\textdollar}} \mathbb{Z}_q$，计算密文 $c = (c_1, c_2) = (g^r, m \cdot pk^r)$。
     *   $\text{Dec}_{sk}(c_1, c_2)$: 计算 $\hat{m} = c_2 / (c_1^{sk})$。
     
     **正确性**: $c_2 / (c_1^{sk}) = (m \cdot (g^{sk})^r) / ((g^r)^{sk}) = (m \cdot g^{sk \cdot r}) / g^{r \cdot sk} = m$。
@@ -241,7 +241,7 @@ graph BT
     2.  $\mathcal{B}$ 模拟 ElGamal 的 IND-CPA 游戏与 $\mathcal{A}$ 交互：
         *   $\mathcal{B}$ 将 ElGamal 公钥设置为 $pk = A (=g^x)$。（这里 $\mathcal{B}$ 不知道对应的私钥 $x$）。
         *   $\mathcal{A}$ 选择两条消息 $m_0, m_1$。
-        *   $\mathcal{B}$ 随机选择比特 $b \leftarrow_{\$} \{0, 1\}$。
+        *   $\mathcal{B}$ 随机选择比特 $b \leftarrow_{\text{\textdollar}} \{0, 1\}$。
         *   $\mathcal{B}$ 构造挑战密文 $c^* = (c_1^*, c_2^*) = (B, m_b \cdot Z)$。
         *   $\mathcal{B}$ 将 $c^*$ 发送给 $\mathcal{A}$。
         *   $\mathcal{A}$ 输出其猜测 $b'$。
@@ -270,7 +270,7 @@ graph BT
 > *   **MPC**: Secure Multi-Party Computation。
     *   **PPT**: Probabilistic Polynomial Time (概率多项式时间)，描述算法或敌手的计算能力。
     *   **$[n]$**: 集合 $\{1, 2, \dots, n\}$。
-    *   **$\leftarrow_{\$}$**: 从某个集合或分布中均匀随机选取。
+    *   **$\leftarrow_{\text{\textdollar}}$**: 从某个集合或分布中均匀随机选取。
     *   **$|X|$**: 集合 $X$ 的大小（基数）。
     *   **可忽略函数 (Negligible Function) $\text{negl}(\lambda)$**: 一个函数 $\nu: \mathbb{N} \to \mathbb{R}_{\ge 0}$ 是可忽略的，如果对于任意正多项式 $\text{poly}(\cdot)$，存在一个 $N_0 \in \mathbb{N}$，使得对于所有 $\lambda > N_0$，都有 $\nu(\lambda) < \frac{1}{\text{poly}(\lambda)}$。直观上，它比任何多项式的倒数都更快地趋近于0。
     *   **安全参数 (Security Parameter) $\lambda$ (或 $\kappa, n$)**: 一个正整数，用于衡量密码学方案的安全性。通常，协议的运行时间是 $\lambda$ 的多项式，而敌手成功攻破协议的概率是 $\lambda$ 的可忽略函数。
@@ -405,7 +405,7 @@ graph BT
     \begin{array}{l}
     k \leftarrow \text{Gen}(1^\lambda); \\
     (m_0, m_1) \leftarrow \mathcal{A}^{\text{Enc}_k(\cdot)}(1^\lambda) \text{ s.t. } |m_0| = |m_1|; \\
-    b \leftarrow_{\$} \{0, 1\}; \\
+    b \leftarrow_{\text{\textdollar}} \{0, 1\}; \\
     c^* \leftarrow \text{Enc}_k(m_b); \\
     b' \leftarrow \mathcal{A}^{\text{Enc}_k(\cdot)}(1^\lambda, c^*, m_0, m_1)
     \end{array}
@@ -438,7 +438,7 @@ graph BT
         \begin{array}{l}
         ck \leftarrow \text{KeyGen}(1^\lambda); \\
         (m_0, m_1) \leftarrow \mathcal{A}(ck) \text{ s.t. } |m_0|=|m_1|; \\
-        b \leftarrow_{\$} \{0, 1\}; \\
+        b \leftarrow_{\text{\textdollar}} \{0, 1\}; \\
         (c, d) \leftarrow \text{Commit}_{ck}(m_b); \\
         b' \leftarrow \mathcal{A}(c, ck, m_0, m_1)
         \end{array}
@@ -503,7 +503,7 @@ OT 是一个基础的两方协议，在 MPC 中有广泛应用，许多更复杂
     *   $P_S$ 对 $P_R$ 的选择比特 $b$ 一无所知。
     *   $P_R$ 对另一条消息 $x_{1-b}$ 一无所知。
 
-???+ info "OT 的理想功能 $F_{OT}$ (图 2.1)"
+> **ℹ️ OT 的理想功能 $F_{OT}$ (图 2.1)**
 
     $F_{OT}$ 刻画了 OT 协议期望达到的理想安全效果，扮演一个可信第三方的角色。
     
