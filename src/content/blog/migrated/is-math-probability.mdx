@@ -1,0 +1,1194 @@
+---
+title: 概率论笔记：从基础概念到随机变量与分布
+description: 本文系统梳理概率论的核心内容，包括随机实验、样本空间、事件、概率公理化定义、条件概率、全概率公式、贝叶斯公式、随机变量、分布函数、常见分布等内容，是信息安全专业数学基础课程的重要笔记。
+pubDate: 2025-09-12T12:00:00.000Z
+image: /images/uploads/curricular-is-math-probability-cover.jpg
+badge: Course
+draft: false
+categories:
+  - Mathematics
+  - Course Notes
+tags:
+  - 概率论
+  - 随机变量
+  - 概率分布
+  - 课程笔记
+---
+
+> **[迁移说明]** 本文最初发布于 `blog.zzw4257.cn`，现已迁移并在本站进行结构化整理与增强。
+
+# 概率论笔记
+
+---
+
+## 第一部分：概率论基础
+
+### 第1讲：概率论的基本概念
+
+#### 随机实验、样本空间、事件的定义
+
+*   **随机实验 (Random Experiment)**：满足以下三个条件的实验：
+    1.  可以在相同条件下重复进行。
+    2.  每次实验的可能结果不止一个，并且所有可能结果都预先明确。
+    3.  进行一次实验之前不能确定哪一个结果会出现。
+    *   *示例*：抛掷一枚硬币，观察正面（H）还是反面（T）出现。
+
+*   **样本空间 (Sample Space, $\Omega$)**：随机实验所有可能结果组成的集合。集合中的元素称为**样本点 (Sample Point, $\omega$)**。
+    *   *示例*：抛掷一枚硬币的样本空间 $\Omega = \{H, T\}$。
+    *   *示例*：抛掷一颗骰子的样本空间 $\Omega = \{1, 2, 3, 4, 5, 6\}$。
+
+*   **事件 (Event, $A, B, C, \dots$)**：样本空间的子集。
+    *   **基本事件 (Elementary Event)**：由一个样本点组成的单点集。
+    *   **必然事件 (Certain Event)**：整个样本空间 $\Omega$。
+    *   **不可能事件 (Impossible Event)**：空集 $\emptyset$。
+    *   **事件的关系与运算**：
+        *   **包含 ($\subset$)**：若事件 $A$ 发生必然导致事件 $B$ 发生，则称 $B$ 包含 $A$，$A \subset B$。
+        *   **相等 ($=$)**：若 $A \subset B$ 且 $B \subset A$，则 $A = B$。
+        *   **并 (Union, $\cup$) 或 和事件 ($A+B$)**：$A \cup B = \{\omega \in \Omega \mid \omega \in A \text{ or } \omega \in B\}$。表示事件 $A$ 或事件 $B$ 至少有一个发生。
+        *   **交 (Intersection, $\cap$) 或 积事件 ($AB$)**：$A \cap B = \{\omega \in \Omega \mid \omega \in A \text{ and } \omega \in B\}$。表示事件 $A$ 和事件 $B$ 同时发生。
+        *   **差 ($A-B$)**：$A - B = \{\omega \in \Omega \mid \omega \in A \text{ and } \omega \notin B\}$。表示事件 $A$ 发生而事件 $B$ 不发生。
+        *   **互斥 (Mutually Exclusive) 或 不相容 (Incompatible)**：若 $A \cap B = \emptyset$，则称事件 $A$ 与 $B$ 互斥。它们不能同时发生。
+        *   **对立事件 (Complementary Event, $\bar{A}$ 或 $A^c$)**：$\bar{A} = \Omega - A$。表示事件 $A$ 不发生。
+
+#### 概率的公理化定义及基本性质
+
+**概率的公理化定义 (Kolmogorov Axioms)**：
+设 $E$ 是随机实验，$\Omega$ 是其样本空间。对于 $E$ 的每一个事件 $A$，赋予一个实数，称为事件 $A$ 的概率，记为 $P(A)$。函数 $P(\cdot)$ 满足：
+1.  **非负性公理**：对于任意事件 $A$，有 $P(A) \ge 0$。
+2.  **规范性公理**：$P(\Omega) = 1$。
+3.  **可列可加性公理**：若事件 $A_1, A_2, \dots, A_n, \dots$ 两两互斥 (即 $A_i \cap A_j = \emptyset$，$i \neq j$)，则
+    $$ P\left(\bigcup_{i=1}^{\infty} A_i\right) = \sum_{i=1}^{\infty} P(A_i) $$
+    对于有限个互斥事件，也有 $P\left(\bigcup_{i=1}^{n} A_i\right) = \sum_{i=1}^{n} P(A_i)$。
+
+**基本性质**：
+1.  **不可能事件的概率**：$P(\emptyset) = 0$。
+2.  **有限可加性**：若 $A_1, \dots, A_n$ 两两互斥，则 $P(\bigcup_{i=1}^n A_i) = \sum_{i=1}^n P(A_i)$。
+3.  **概率的界**：对于任意事件 $A$，$0 \le P(A) \le 1$。
+4.  **对立事件的概率**：$P(\bar{A}) = 1 - P(A)$。
+5.  **减法公式**：若 $A \supset B$，则 $P(A-B) = P(A) - P(B)$。更一般地，$P(A-B) = P(A) - P(AB)$。
+6.  **加法公式**：对于任意两个事件 $A, B$，
+    $$ P(A \cup B) = P(A) + P(B) - P(A \cap B) $$
+    对于三个事件 $A, B, C$：
+    $$ P(A \cup B \cup C) = P(A) + P(B) + P(C) - P(AB) - P(AC) - P(BC) + P(ABC) $$
+
+#### 条件概率与全概率公式
+
+*   **条件概率 (Conditional Probability)**：
+    设 $A, B$ 是两个事件，且 $P(B) > 0$，则在事件 $B$ 发生的条件下事件 $A$ 发生的条件概率定义为：
+    $$ P(A|B) = \frac{P(A \cap B)}{P(B)} $$
+    性质：
+    1.  $P(A|B) \ge 0$
+    2.  $P(\Omega|B) = 1$
+    3.  若 $A_1, A_2, \dots$ 互斥，则 $P(\bigcup_{i=1}^\infty A_i | B) = \sum_{i=1}^\infty P(A_i|B)$
+
+*   **乘法公式 (Multiplication Rule)**：
+    由条件概率定义可得：
+    $$ P(A \cap B) = P(B)P(A|B) \quad (\text{若 } P(B)>0) $$
+    $$ P(A \cap B) = P(A)P(B|A) \quad (\text{若 } P(A)>0) $$
+    推广到 $n$ 个事件 $A_1, A_2, \dots, A_n$：
+    $$ P(A_1 A_2 \dots A_n) = P(A_1)P(A_2|A_1)P(A_3|A_1 A_2)\dots P(A_n|A_1 A_2 \dots A_{n-1}) $$
+
+*   **全概率公式 (Law of Total Probability)**：
+    设 $B_1, B_2, \dots, B_n$ 是样本空间 $\Omega$ 的一个划分 (即 $B_i \cap B_j = \emptyset$ for $i \neq j$，且 $\bigcup_{i=1}^n B_i = \Omega$)，并且 $P(B_i) > 0$ 对所有 $i$ 成立。则对任意事件 $A$：
+    $$ P(A) = \sum_{i=1}^n P(A|B_i)P(B_i) $$
+    如果划分是可列无穷的 $B_1, B_2, \dots$，则 $P(A) = \sum_{i=1}^\infty P(A|B_i)P(B_i)$。
+
+#### 独立性与互斥性的区别
+
+*   **事件的独立性 (Independence)**：
+    事件 $A$ 和 $B$ 相互独立，如果其中一个事件的发生不影响另一个事件发生的概率。数学定义：
+    $$ P(A \cap B) = P(A)P(B) $$
+    若 $P(A)>0, P(B)>0$，则 $A, B$ 相互独立等价于 $P(A|B) = P(A)$ 且 $P(B|A) = P(B)$。
+    三个事件 $A, B, C$ 相互独立，需满足：
+    1.  $P(AB) = P(A)P(B)$
+    2.  $P(AC) = P(A)P(C)$
+    3.  $P(BC) = P(B)P(C)$
+    4.  $P(ABC) = P(A)P(B)P(C)$
+    （注意：两两独立不一定能推出三者相互独立）
+
+*   **事件的互斥性 (Mutually Exclusive)**：
+    事件 $A$ 和 $B$ 互斥，如果它们不能同时发生，即 $A \cap B = \emptyset$。
+    若 $A, B$ 互斥，则 $P(A \cup B) = P(A) + P(B)$。
+
+*   **区别**：
+    *   **定义层面**：独立性关注概率关系 ($P(AB)=P(A)P(B)$)，互斥性关注集合关系 ($A \cap B = \emptyset$)。
+    *   **直观意义**：独立性意味着一事件的发生对另一事件的发生概率无影响。互斥性意味着一事件的发生使得另一事件不可能发生。
+    *   **概率关系**：
+        *   若 $A, B$ 互斥且 $P(A)>0, P(B)>0$，则 $P(AB)=P(\emptyset)=0$。但 $P(A)P(B) > 0$，所以 $P(AB) \neq P(A)P(B)$。因此，**非空事件的互斥性意味着它们不独立**。
+        *   若 $A, B$ 独立且 $P(A)>0, P(B)>0$，则 $P(AB)=P(A)P(B)>0$，所以 $AB \neq \emptyset$。因此，**非空事件的独立性意味着它们不互斥**。
+    *   **总结**：对于两个概率不为0的事件，独立性和互斥性不能同时成立。
+
+---
+
+## 第2讲：离散随机变量
+
+#### 离散随机变量的定义与概率质量函数（PMF）
+
+*   **随机变量 (Random Variable, RV)**：定义在样本空间 $\Omega$ 上的实值函数 $X(\omega)$，其中 $\omega \in \Omega$。通常用大写字母 $X, Y, Z$ 表示。
+*   **离散随机变量 (Discrete Random Variable)**：一个随机变量，如果它所有可能的取值是有限个或可列无限多个。
+    *   *示例*：抛掷硬币两次，令 $X$ 为出现正面的次数。$X$ 的可能取值为 $0, 1, 2$。
+
+*   **概率质量函数 (Probability Mass Function, PMF)**：
+    对于离散随机变量 $X$，其 PMF 定义为 $p_X(x_i) = P(X=x_i)$，其中 $x_i$ 是 $X$ 的一个可能取值。
+    PMF 必须满足：
+    1.  $p_X(x_i) \ge 0$ 对所有 $x_i$ 成立。
+    2.  $\sum_i p_X(x_i) = 1$ (对所有可能的 $x_i$ 求和)。
+
+#### 常见离散分布
+
+1.  **伯努利分布 (Bernoulli Distribution)**: $X \sim \text{Bernoulli}(p)$
+    一次实验，结果只有两种：“成功”（$X=1$）或“失败”（$X=0$）。
+    *   PMF: $P(X=1) = p$, $P(X=0) = 1-p = q$.
+    *   参数: $p$ (成功的概率)，$0 \le p \le 1$.
+
+2.  **二项分布 (Binomial Distribution)**: $X \sim B(n, p)$ or $\text{Binomial}(n, p)$
+    $n$ 次独立的伯努利试验中，“成功”的次数。
+    *   PMF: $P(X=k) = \binom{n}{k} p^k (1-p)^{n-k}$, for $k=0, 1, \dots, n$.
+        其中 $\binom{n}{k} = \frac{n!}{k!(n-k)!}$ 是组合数。
+    *   参数: $n$ (试验次数, $n \ge 1$ 整数)，$p$ (单次试验成功概率, $0 \le p \le 1$).
+
+3.  **几何分布 (Geometric Distribution)**: $X \sim \text{Geometric}(p)$
+    在一系列独立的伯努利试验中，首次“成功”所需的试验次数。
+    *   PMF: $P(X=k) = (1-p)^{k-1} p$, for $k=1, 2, 3, \dots$.
+    *   参数: $p$ (单次试验成功概率, $0 < p \le 1$).
+    *   *注意*：有时几何分布定义为首次成功前失败的次数 $Y=X-1$，此时 $P(Y=k) = (1-p)^k p$, for $k=0, 1, 2, \dots$.
+
+4.  **泊松分布 (Poisson Distribution)**: $X \sim \text{Poisson}(\lambda)$
+    表示单位时间（或单位面积/体积等）内某事件发生的次数。
+    *   PMF: $P(X=k) = \frac{e^{-\lambda} \lambda^k}{k!}$, for $k=0, 1, 2, \dots$.
+    *   参数: $\lambda$ (单位时间/空间内事件发生的平均次数, $\lambda > 0$).
+    *   泊松分布可作为二项分布的近似：当 $n$ 很大，$p$ 很小，而 $np = \lambda$ 适中时，$B(n,p)$ 近似于 $\text{Poisson}(\lambda)$。
+
+#### 离散随机变量的期望值与方差
+
+*   **期望值 (Expected Value or Mean, $E[X]$ or $\mu_X$)**:
+    离散随机变量 $X$ 的期望值是其所有可能取值 $x_i$ 以其对应概率 $p_X(x_i)$ 为权重的加权平均。
+    $$ E[X] = \sum_i x_i P(X=x_i) = \sum_i x_i p_X(x_i) $$
+    期望值表示随机变量取值的平均水平。
+
+*   **方差 (Variance, $Var(X)$ or $\sigma_X^2$)**:
+    衡量随机变量取值与其期望值的偏离程度。
+    $$ Var(X) = E[(X - E[X])^2] = E[(X - \mu_X)^2] $$
+    计算公式：
+    $$ Var(X) = E[X^2] - (E[X])^2 $$
+    其中 $E[X^2] = \sum_i x_i^2 p_X(x_i)$ 是 $X^2$ 的期望值（二阶原点矩）。
+
+*   **标准差 (Standard Deviation, $\sigma_X$)**:
+    $$ \sigma_X = \sqrt{Var(X)} $$
+    标准差与随机变量具有相同的单位。
+
+**常见离散分布的期望和方差**：
+| 分布             | 参数       | $E[X]$        | $Var(X)$          |
+| :--------------- | :--------- | :------------ | :---------------- |
+| 伯努利($p$)     | $p$        | $p$           | $p(1-p)$          |
+| 二项($n,p$)      | $n, p$     | $np$          | $np(1-p)$         |
+| 几何($p$)       | $p$        | $1/p$         | $(1-p)/p^2$       |
+| 泊松($\lambda$)  | $\lambda$  | $\lambda$     | $\lambda$         |
+
+#### 离散随机变量的函数及其期望值
+
+设 $Y = g(X)$ 是离散随机变量 $X$ 的函数。则 $Y$ 也是一个离散随机变量。
+其期望值 $E[Y] = E[g(X)]$ 可以通过以下公式计算，而无需先求出 $Y$ 的 PMF：
+$$ E[g(X)] = \sum_i g(x_i) P(X=x_i) = \sum_i g(x_i) p_X(x_i) $$
+**期望的线性性质**：
+*   $E[c] = c$ (c 是常数)
+*   $E[cX] = cE[X]$
+*   $E[X+Y] = E[X] + E[Y]$ (无论 $X, Y$ 是否独立)
+*   $E[aX+b] = aE[X] + b$
+
+---
+
+## 第3讲：连续随机变量
+
+#### 连续随机变量的定义与概率密度函数（PDF）
+
+*   **连续随机变量 (Continuous Random Variable)**：一个随机变量，如果它的所有可能取值充满一个区间（有限或无限）。
+    *   *示例*：某城市中午12点的气温；一个灯泡的寿命。
+
+*   **概率密度函数 (Probability Density Function, PDF)**：
+    对于连续随机变量 $X$，其 PDF $f_X(x)$ 描述了 $X$ 在某一点 $x$ 附近取值的相对可能性。它满足：
+    1.  $f_X(x) \ge 0$ 对所有 $x$ 成立。
+    2.  $\int_{-\infty}^{\infty} f_X(x) dx = 1$ (PDF曲线下的总面积为1)。
+    3.  对于任意 $a < b$，事件 $\{a \le X \le b\}$ 的概率为：
+        $$ P(a \le X \le b) = \int_a^b f_X(x) dx $$
+    *   **重要提示**：对于连续随机变量，$P(X=x_0) = \int_{x_0}^{x_0} f_X(x) dx = 0$。即，连续随机变量取任何特定单个值的概率为0。因此，$P(a \le X \le b) = P(a < X \le b) = P(a \le X < b) = P(a < X < b)$。
+
+#### 累积分布函数（CDF）的性质
+
+*   **累积分布函数 (Cumulative Distribution Function, CDF)**：
+    对于任意随机变量 $X$ (离散或连续)，其 CDF $F_X(x)$ 定义为：
+    $$ F_X(x) = P(X \le x) $$
+    *   对于离散随机变量 $X$，$F_X(x) = \sum_{x_i \le x} p_X(x_i)$。
+    *   对于连续随机变量 $X$，$F_X(x) = \int_{-\infty}^x f_X(t) dt$。
+
+*   **CDF 的性质**：
+    1.  **单调非减**：若 $x_1 < x_2$，则 $F_X(x_1) \le F_X(x_2)$。
+    2.  **有界性**：$0 \le F_X(x) \le 1$。
+        $$ \lim_{x \to -\infty} F_X(x) = 0 $$
+        $$ \lim_{x \to +\infty} F_X(x) = 1 $$
+    3.  **右连续性**：$\lim_{h \to 0^+} F_X(x+h) = F_X(x)$。
+    4.  对于连续随机变量，$F_X(x)$ 是连续函数，且 $f_X(x) = \frac{dF_X(x)}{dx}$ (在 $F_X(x)$ 可导的点)。
+    5.  $P(a < X \le b) = F_X(b) - F_X(a)$。
+
+#### 常见连续分布
+
+1.  **均匀分布 (Uniform Distribution)**: $X \sim U(a, b)$ or $\text{Uniform}(a, b)$
+    随机变量 $X$ 在区间 $[a, b]$ 内任何一点取值的概率密度相同。
+    *   PDF:
+        $$ f_X(x) = \begin{cases} \frac{1}{b-a} & \text{if } a \le x \le b \\ 0 & \text{otherwise} \end{cases} $$
+    *   CDF:
+        $$ F_X(x) = \begin{cases} 0 & \text{if } x < a \\ \frac{x-a}{b-a} & \text{if } a \le x \le b \\ 1 & \text{if } x > b \end{cases} $$
+    *   参数: $a, b$ (区间的下限和上限, $a < b$).
+
+2.  **高斯（正态）分布 (Gaussian/Normal Distribution)**: $X \sim N(\mu, \sigma^2)$
+    自然界和工程中应用最广泛的分布。
+    *   PDF:
+        $$ f_X(x) = \frac{1}{\sqrt{2\pi\sigma^2}} e^{-\frac{(x-\mu)^2}{2\sigma^2}} $$
+        其中 $-\infty < x < \infty$。
+    *   参数: $\mu$ (均值, $-\infty < \mu < \infty$)，$\sigma^2$ (方差, $\sigma^2 > 0$) 或 $\sigma$ (标准差, $\sigma > 0$)。
+    *   **标准正态分布**: 当 $\mu=0, \sigma^2=1$ 时，称为标准正态分布，记为 $Z \sim N(0,1)$。其 PDF 通常用 $\phi(z)$ 表示，CDF 用 $\Phi(z)$ 表示。
+        $$ \phi(z) = \frac{1}{\sqrt{2\pi}} e^{-\frac{z^2}{2}} $$
+        $$ \Phi(z) = P(Z \le z) = \int_{-\infty}^z \frac{1}{\sqrt{2\pi}} e^{-\frac{t^2}{2}} dt $$
+    *   若 $X \sim N(\mu, \sigma^2)$，则 $Z = \frac{X-\mu}{\sigma} \sim N(0,1)$ (标准化)。
+
+#### 连续随机变量的期望值与方差
+
+*   **期望值 (Expected Value or Mean, $E[X]$ or $\mu_X$)**:
+    $$ E[X] = \int_{-\infty}^{\infty} x f_X(x) dx $$
+
+*   **方差 (Variance, $Var(X)$ or $\sigma_X^2$)**:
+    $$ Var(X) = E[(X - E[X])^2] = \int_{-\infty}^{\infty} (x - \mu_X)^2 f_X(x) dx $$
+    计算公式：
+    $$ Var(X) = E[X^2] - (E[X])^2 $$
+    其中 $E[X^2] = \int_{-\infty}^{\infty} x^2 f_X(x) dx$。
+
+*   **标准差 (Standard Deviation, $\sigma_X$)**:
+    $$ \sigma_X = \sqrt{Var(X)} $$
+
+**常见连续分布的期望和方差**：
+| 分布             | 参数          | $E[X]$        | $Var(X)$              |
+| :--------------- | :------------ | :------------ | :-------------------- |
+| 均匀($a,b$)      | $a, b$        | $\frac{a+b}{2}$ | $\frac{(b-a)^2}{12}$  |
+| 正态($\mu,\sigma^2$) | $\mu, \sigma^2$ | $\mu$         | $\sigma^2$            |
+| 指数($\lambda$)   | $\lambda > 0$ | $1/\lambda$   | $1/\lambda^2$         |
+    *(指数分布 PDF: $f_X(x) = \lambda e^{-\lambda x}$ for $x \ge 0$, and $0$ for $x < 0$)*
+
+---
+
+## 第4讲：随机变量的函数
+
+#### 随机变量函数的期望值公式
+
+设 $Y = g(X)$ 是随机变量 $X$ 的函数。
+*   若 $X$ 是**离散随机变量**，其 PMF 为 $p_X(x_i)$：
+    $$ E[Y] = E[g(X)] = \sum_i g(x_i) p_X(x_i) $$
+*   若 $X$ 是**连续随机变量**，其 PDF 为 $f_X(x)$：
+    $$ E[Y] = E[g(X)] = \int_{-\infty}^{\infty} g(x) f_X(x) dx $$
+    这个公式被称为**期望运算法则 (Law of the Unconscious Statistician, LOTUS)**。
+
+**期望的线性性质 (对离散和连续都适用)**：
+*   $E[c] = c$ (c 是常数)
+*   $E[cX] = cE[X]$
+*   $E[aX+b] = aE[X] + b$
+*   $E[g_1(X) + g_2(X)] = E[g_1(X)] + E[g_2(X)]$
+
+#### 随机变量函数的方差计算
+
+设 $Y = g(X)$。
+根据方差定义：
+$$ Var(Y) = Var(g(X)) = E[(g(X) - E[g(X)])^2] $$
+或者使用公式：
+$$ Var(g(X)) = E[(g(X))^2] - (E[g(X)])^2 $$
+其中 $E[(g(X))^2]$ 可以用 LOTUS 计算：
+*   离散: $E[(g(X))^2] = \sum_i (g(x_i))^2 p_X(x_i)$
+*   连续: $E[(g(X))^2] = \int_{-\infty}^{\infty} (g(x))^2 f_X(x) dx$
+
+**方差的性质**：
+*   $Var(c) = 0$ (c 是常数)
+*   $Var(X+c) = Var(X)$
+*   $Var(cX) = c^2 Var(X)$
+*   $Var(aX+b) = a^2 Var(X)$
+
+#### 离散与连续随机变量函数的期望值与方差的计算方法
+
+**离散随机变量函数的计算方法**：
+1.  **求 $Y=g(X)$ 的 PMF $p_Y(y_j)$**：
+    *   找出 $Y$ 的所有可能取值 $y_j$。
+    *   对每个 $y_j$，计算 $P(Y=y_j) = P(g(X)=y_j) = \sum_{x_i: g(x_i)=y_j} P(X=x_i)$。
+2.  **用 $p_Y(y_j)$ 计算期望和方差**：
+    *   $E[Y] = \sum_j y_j p_Y(y_j)$
+    *   $Var(Y) = \sum_j (y_j - E[Y])^2 p_Y(y_j) = E[Y^2] - (E[Y])^2$
+3.  **直接使用 LOTUS (更常用)**：
+    *   $E[g(X)] = \sum_i g(x_i) p_X(x_i)$
+    *   $Var(g(X)) = E[(g(X))^2] - (E[g(X)])^2 = \left(\sum_i (g(x_i))^2 p_X(x_i)\right) - \left(\sum_i g(x_i) p_X(x_i)\right)^2$
+
+**连续随机变量函数的计算方法**：
+1.  **求 $Y=g(X)$ 的 PDF $f_Y(y)$ (可能较复杂)**：
+    *   先求 $Y$ 的 CDF: $F_Y(y) = P(Y \le y) = P(g(X) \le y) = \int_{\{x: g(x) \le y\}} f_X(x) dx$。
+    *   然后求导: $f_Y(y) = \frac{dF_Y(y)}{dy}$。
+    *   **特殊情况：若 $g(x)$ 单调**
+        如果 $y=g(x)$ 是严格单调函数，且其反函数 $x=h(y)$ 存在且可导，则
+        $$ f_Y(y) = f_X(h(y)) \left| \frac{dh(y)}{dy} \right| $$
+        在 $y$ 的取值范围内。
+2.  **用 $f_Y(y)$ 计算期望和方差**：
+    *   $E[Y] = \int_{-\infty}^{\infty} y f_Y(y) dy$
+    *   $Var(Y) = \int_{-\infty}^{\infty} (y - E[Y])^2 f_Y(y) dy = E[Y^2] - (E[Y])^2$
+3.  **直接使用 LOTUS (更常用)**：
+    *   $E[g(X)] = \int_{-\infty}^{\infty} g(x) f_X(x) dx$
+    *   $Var(g(X)) = E[(g(X))^2] - (E[g(X)])^2 = \left(\int_{-\infty}^{\infty} (g(x))^2 f_X(x) dx\right) - \left(\int_{-\infty}^{\infty} g(x) f_X(x) dx\right)^2$
+
+---
+
+## 第二部分：随机变量的联合分布
+
+### 第5讲：联合概率分布
+
+#### 联合概率质量函数（PMF）与联合概率密度函数（PDF）
+
+考虑两个随机变量 $X$ 和 $Y$。
+
+*   **联合概率质量函数 (Joint PMF)**：
+    如果 $X$ 和 $Y$ 都是**离散随机变量**，它们的联合 PMF $p_{X,Y}(x_i, y_j)$ 定义为：
+    $$ p_{X,Y}(x_i, y_j) = P(X=x_i, Y=y_j) $$
+    其中 $(x_i, y_j)$ 是 $(X,Y)$ 可能取的一对值。
+    性质：
+    1.  $p_{X,Y}(x_i, y_j) \ge 0$
+    2.  $\sum_i \sum_j p_{X,Y}(x_i, y_j) = 1$
+
+*   **联合概率密度函数 (Joint PDF)**：
+    如果 $X$ 和 $Y$ 都是**连续随机变量**，它们的联合 PDF $f_{X,Y}(x, y)$ 满足：
+    1.  $f_{X,Y}(x, y) \ge 0$
+    2.  $\int_{-\infty}^{\infty} \int_{-\infty}^{\infty} f_{X,Y}(x, y) dx dy = 1$
+    3.  对于平面上的任意区域 $D$，
+        $$ P((X,Y) \in D) = \iint_D f_{X,Y}(x, y) dx dy $$
+
+*   **联合累积分布函数 (Joint CDF)**：
+    对于任意随机变量 $X, Y$ (离散或连续)，联合 CDF $F_{X,Y}(x,y)$ 定义为：
+    $$ F_{X,Y}(x,y) = P(X \le x, Y \le y) $$
+    *   离散: $F_{X,Y}(x,y) = \sum_{x_i \le x} \sum_{y_j \le y} p_{X,Y}(x_i, y_j)$
+    *   连续: $F_{X,Y}(x,y) = \int_{-\infty}^x \int_{-\infty}^y f_{X,Y}(u, v) dv du$
+    *   关系: $f_{X,Y}(x,y) = \frac{\partial^2 F_{X,Y}(x,y)}{\partial x \partial y}$ (若偏导存在)。
+
+#### 边缘分布的计算
+
+从联合分布中得到单个随机变量的分布，称为**边缘分布 (Marginal Distribution)**。
+
+*   **边缘 PMF** (对于离散 $X,Y$):
+    $$ p_X(x_i) = P(X=x_i) = \sum_j p_{X,Y}(x_i, y_j) \quad (\text{对所有可能的 } y_j \text{ 求和}) $$
+    $$ p_Y(y_j) = P(Y=y_j) = \sum_i p_{X,Y}(x_i, y_j) \quad (\text{对所有可能的 } x_i \text{ 求和}) $$
+
+*   **边缘 PDF** (对于连续 $X,Y$):
+    $$ f_X(x) = \int_{-\infty}^{\infty} f_{X,Y}(x, y) dy $$
+    $$ f_Y(y) = \int_{-\infty}^{\infty} f_{X,Y}(x, y) dx $$
+
+#### 独立随机变量的定义与性质
+
+*   **随机变量的独立性 (Independence of Random Variables)**：
+    随机变量 $X$ 和 $Y$ 相互独立，如果对于任意集合 $A$ 和 $B$，事件 $\{X \in A\}$ 和 $\{Y \in B\}$ 是相互独立的。
+    这等价于：
+    *   它们的联合 CDF 等于边缘 CDF 的乘积：
+        $$ F_{X,Y}(x,y) = F_X(x) F_Y(y) \quad \text{对所有 } x, y $$
+    *   **离散情况**：它们的联合 PMF 等于边缘 PMF 的乘积：
+        $$ p_{X,Y}(x_i, y_j) = p_X(x_i) p_Y(y_j) \quad \text{对所有 } x_i, y_j $$
+    *   **连续情况**：它们的联合 PDF 等于边缘 PDF 的乘积：
+        $$ f_{X,Y}(x, y) = f_X(x) f_Y(y) \quad \text{对所有 } x, y $$
+
+*   **独立性的性质**：
+    1.  如果 $X$ 和 $Y$ 独立，则 $g(X)$ 和 $h(Y)$ 也独立，其中 $g, h$ 是任意函数。
+    2.  **期望的乘积性质**：如果 $X$ 和 $Y$ 独立，则
+        $$ E[XY] = E[X]E[Y] $$
+        更一般地，$E[g(X)h(Y)] = E[g(X)]E[h(Y)]$。
+    3.  **方差的可加性**：如果 $X$ 和 $Y$ 独立，则
+        $$ Var(X+Y) = Var(X) + Var(Y) $$
+        $$ Var(X-Y) = Var(X) + Var(Y) $$
+        注意：$Var(X+Y) = Var(X) + Var(Y) + 2Cov(X,Y)$。独立时 $Cov(X,Y)=0$。
+
+---
+
+### 第6讲：随机变量的独立性与相关性
+
+#### 协方差与相关系数的定义与性质
+
+*   **协方差 (Covariance)**：
+    衡量两个随机变量 $X, Y$ 之间线性关系的度量。
+    $$ Cov(X,Y) = E[(X - E[X])(Y - E[Y])] $$
+    计算公式：
+    $$ Cov(X,Y) = E[XY] - E[X]E[Y] $$
+    性质：
+    1.  $Cov(X,X) = Var(X)$
+    2.  $Cov(X,Y) = Cov(Y,X)$ (对称性)
+    3.  $Cov(aX+b, cY+d) = ac \cdot Cov(X,Y)$ ( $a,b,c,d$ 是常数)
+    4.  $Cov(X+Z, Y) = Cov(X,Y) + Cov(Z,Y)$ (双线性)
+    5.  $Var(X+Y) = Var(X) + Var(Y) + 2Cov(X,Y)$
+    6.  $Var(X-Y) = Var(X) + Var(Y) - 2Cov(X,Y)$
+    7.  若 $X, Y$ 独立，则 $Cov(X,Y) = 0$。
+
+*   **相关系数 (Correlation Coefficient)**：
+    协方差的归一化版本，度量 $X, Y$ 之间线性相关程度和方向。
+    $$ \rho_{XY} = \frac{Cov(X,Y)}{\sigma_X \sigma_Y} = \frac{Cov(X,Y)}{\sqrt{Var(X)Var(Y)}} $$
+    假设 $Var(X) > 0$ 和 $Var(Y) > 0$。
+    性质：
+    1.  $-1 \le \rho_{XY} \le 1$。
+    2.  $|\rho_{XY}| = 1$ 当且仅当 $Y = aX+b$ 概率为1，其中 $a \neq 0$。
+        *   若 $\rho_{XY} = 1$，则 $X, Y$ 完全正线性相关 ($a>0$)。
+        *   若 $\rho_{XY} = -1$，则 $X, Y$ 完全负线性相关 ($a<0$)。
+    3.  若 $\rho_{XY} = 0$，则 $X, Y$ **不相关 (uncorrelated)**。
+    4.  $\rho_{aX+b, cY+d} = \text{sgn}(ac) \rho_{XY}$ (其中 $\text{sgn}$ 是符号函数)。
+
+#### 独立性与不相关性的关系
+
+*   **独立 $\implies$ 不相关**：
+    若 $X, Y$ 相互独立，则 $E[XY] = E[X]E[Y]$，因此 $Cov(X,Y) = E[XY] - E[X]E[Y] = 0$。
+    所以，$\rho_{XY} = 0$。
+
+*   **不相关 $\not\implies$ 独立** (一般情况下)：
+    若 $Cov(X,Y)=0$（即 $\rho_{XY}=0$），$X, Y$ 不一定相互独立。不相关只意味着没有线性关系，但可能存在非线性关系。
+    *   *反例*：设 $X \sim N(0,1)$，$Y=X^2$。
+        $E[X]=0$，$E[XY] = E[X^3] = 0$ (因为 $X^3$ 是奇函数，对称分布)。
+        $Cov(X,Y) = E[XY] - E[X]E[Y] = 0 - 0 \cdot E[Y] = 0$。
+        所以 $X, Y$ 不相关。但 $Y$ 完全由 $X$ 决定，所以它们显然不独立。
+
+*   **特殊情况：二元正态分布**
+    如果 $(X,Y)$ 服从二元正态分布（见下文），则 $X, Y$ 不相关 ($\rho=0$) **当且仅当** $X, Y$ 相互独立。
+    （注意：对于一般的非正态分布，独立性和不相关性是不同的概念）
+
+#### 二元高斯分布的性质
+
+*   **二元高斯（正态）分布 (Bivariate Normal Distribution)**：
+    $(X,Y)$ 服从二元正态分布，如果其联合 PDF 为：
+    $$ f_{X,Y}(x,y) = \frac{1}{2\pi\sigma_X\sigma_Y\sqrt{1-\rho^2}} \exp\left(-\frac{1}{2(1-\rho^2)}\left[\frac{(x-\mu_X)^2}{\sigma_X^2} - \frac{2\rho(x-\mu_X)(y-\mu_Y)}{\sigma_X\sigma_Y} + \frac{(y-\mu_Y)^2}{\sigma_Y^2}\right]\right) $$
+    参数：$\mu_X, \mu_Y, \sigma_X^2, \sigma_Y^2, \rho$ (相关系数)。
+
+*   **性质**：
+    1.  **边缘分布是正态的**：
+        $X \sim N(\mu_X, \sigma_X^2)$
+        $Y \sim N(\mu_Y, \sigma_Y^2)$
+    2.  **条件分布是正态的**：
+        给定 $X=x$ 时 $Y$ 的条件分布是正态的：
+        $Y | (X=x) \sim N(\mu_{Y|X}, \sigma_{Y|X}^2)$，其中
+        $$ E[Y|X=x] = \mu_{Y|X} = \mu_Y + \rho \frac{\sigma_Y}{\sigma_X}(x - \mu_X) $$
+        $$ Var(Y|X=x) = \sigma_{Y|X}^2 = \sigma_Y^2(1-\rho^2) $$
+        (对称地，给定 $Y=y$ 时 $X$ 的条件分布也是正态的)
+    3.  **不相关等价于独立**：
+        若 $(X,Y)$ 服从二元正态分布，则 $X, Y$ 不相关 ($\rho=0$) **当且仅当** $X, Y$ 相互独立。
+        当 $\rho=0$ 时，联合 PDF 变为 $f_X(x)f_Y(y)$。
+    4.  $X$ 和 $Y$ 的线性组合也是正态分布的：$aX+bY \sim N(\cdot, \cdot)$。
+
+---
+
+### 第7讲：条件概率分布
+
+#### 条件概率分布的定义与计算
+
+*   **条件 PMF** (对于离散 $X,Y$):
+    给定 $X=x_i$ (且 $p_X(x_i)>0$) 的条件下，$Y$ 的条件 PMF 定义为：
+    $$ p_{Y|X}(y_j|x_i) = P(Y=y_j | X=x_i) = \frac{P(X=x_i, Y=y_j)}{P(X=x_i)} = \frac{p_{X,Y}(x_i, y_j)}{p_X(x_i)} $$
+    对于固定的 $x_i$，$\sum_j p_{Y|X}(y_j|x_i) = 1$。
+
+*   **条件 PDF** (对于连续 $X,Y$):
+    给定 $X=x$ (且 $f_X(x)>0$) 的条件下，$Y$ 的条件 PDF 定义为：
+    $$ f_{Y|X}(y|x) = \frac{f_{X,Y}(x,y)}{f_X(x)} $$
+    对于固定的 $x$，$\int_{-\infty}^{\infty} f_{Y|X}(y|x) dy = 1$。
+
+#### 条件期望与条件方差
+
+*   **条件期望 (Conditional Expectation)** $E[Y|X=x]$:
+    给定 $X=x$，$Y$ 的期望值。
+    *   **离散情况**:
+        $$ E[Y|X=x_i] = \sum_j y_j p_{Y|X}(y_j|x_i) $$
+    *   **连续情况**:
+        $$ E[Y|X=x] = \int_{-\infty}^{\infty} y f_{Y|X}(y|x) dy $$
+    $E[Y|X=x]$ 是 $x$ 的函数。将其视为 $X$ 的函数，记为 $E[Y|X]$，它本身是一个随机变量。
+
+*   **全期望定律 (Law of Total Expectation / Iterated Expectation)**:
+    $$ E[Y] = E[E[Y|X]] $$
+    计算方法：
+    *   离散 $X$: $E[Y] = \sum_i E[Y|X=x_i] P(X=x_i)$
+    *   连续 $X$: $E[Y] = \int_{-\infty}^{\infty} E[Y|X=x] f_X(x) dx$
+
+*   **条件方差
+    $$ Var(Y|X=x) = E[(Y - E[Y|X=x])^2 | X=x] $$
+    计算公式：
+    $$ Var(Y|X=x) = E[Y^2|X=x] - (E[Y|X=x])^2 $$
+    $Var(Y|X=x)$ 是 $x$ 的函数。将其视为 $X$ 的函数，记为 $Var(Y|X)$，它本身是一个随机变量。
+
+*   **全方差定律 (Law of Total Variance)**:
+    $$ Var(Y) = E[Var(Y|X)] + Var(E[Y|X]) $$
+    这表示 $Y$ 的总方差等于 $Y$ 在给定 $X$ 下的平均条件方差，加上 $Y$ 的条件均值的方差。
+
+### 贝叶斯定理及其应用
+
+*   **贝叶斯定理 (Bayes' Theorem)**：
+    对于事件 $A$ 和划分 $B_1, \dots, B_n$ (且 $P(B_i)>0, P(A)>0$)：
+    $$ P(B_k|A) = \frac{P(A|B_k)P(B_k)}{P(A)} = \frac{P(A|B_k)P(B_k)}{\sum_{i=1}^n P(A|B_i)P(B_i)} $$
+    *   $P(B_k)$：先验概率 (prior probability of $B_k$)
+    *   $P(B_k|A)$：后验概率 (posterior probability of $B_k$ given $A$)
+    *   $P(A|B_k)$：似然 (likelihood of $A$ given $B_k$)
+    *   $P(A)$：证据 (evidence or marginal likelihood of $A$)
+
+*   **对于随机变量的贝叶斯定理**：
+    *   **离散情况**:
+        $$ p_{X|Y}(x|y) = \frac{p_{Y|X}(y|x) p_X(x)}{p_Y(y)} = \frac{p_{Y|X}(y|x) p_X(x)}{\sum_{x'} p_{Y|X}(y|x') p_X(x')} $$
+    *   **连续情况**:
+        $$ f_{X|Y}(x|y) = \frac{f_{Y|X}(y|x) f_X(x)}{f_Y(y)} = \frac{f_{Y|X}(y|x) f_X(x)}{\int_{-\infty}^{\infty} f_{Y|X}(y|x') f_X(x') dx'} $$
+
+*   **应用**：
+    *   **统计推断**：从观测数据（证据）更新对参数或假设的信念。
+    *   **医学诊断**：根据症状（证据）判断患某种疾病的概率。
+    *   **垃圾邮件过滤**：根据邮件内容（证据）判断是否为垃圾邮件的概率。
+    *   **机器学习**：贝叶斯分类器，贝叶斯网络。
+
+---
+
+# 第三部分：随机变量的估计与收敛
+
+## 第8讲：样本均值与大数定律
+
+### 样本均值的定义与性质
+
+*   **随机样本 (Random Sample)**：
+    设 $X_1, X_2, \dots, X_n$ 是一组来自同一总体分布的随机变量。如果它们是**独立同分布 (i.i.d.)** 的，则称它们构成一个容量为 $n$ 的随机样本。
+    *   独立：$P(X_1 \le x_1, \dots, X_n \le x_n) = P(X_1 \le x_1) \dots P(X_n \le x_n)$。
+    *   同分布：所有 $X_i$ 具有相同的 CDF (因此有相同的 PMF/PDF，相同的均值 $\mu$ 和方差 $\sigma^2$)。
+
+*   **样本均值 (Sample Mean)** $\bar{X}_n$:
+    $$ \bar{X}_n = \frac{1}{n} \sum_{i=1}^n X_i = \frac{X_1 + X_2 + \dots + X_n}{n} $$
+    样本均值本身是一个随机变量，其值随样本的不同而变化。
+
+*   **样本均值的性质** (假设 $X_i$ i.i.d.，均值为 $\mu$，方差为 $\sigma^2$):
+    1.  **期望**:
+        $$ E[\bar{X}_n] = E\left[\frac{1}{n}\sum_{i=1}^n X_i\right] = \frac{1}{n}\sum_{i=1}^n E[X_i] = \frac{1}{n}\sum_{i=1}^n \mu = \frac{n\mu}{n} = \mu $$
+        样本均值是总体均值 $\mu$ 的无偏估计。
+    2.  **方差**:
+        $$ Var(\bar{X}_n) = Var\left(\frac{1}{n}\sum_{i=1}^n X_i\right) = \frac{1}{n^2} Var\left(\sum_{i=1}^n X_i\right) $$
+        由于 $X_i$ 相互独立，
+        $$ Var\left(\sum_{i=1}^n X_i\right) = \sum_{i=1}^n Var(X_i) = \sum_{i=1}^n \sigma^2 = n\sigma^2 $$
+        所以，
+        $$ Var(\bar{X}_n) = \frac{1}{n^2} (n\sigma^2) = \frac{\sigma^2}{n} $$
+        随着样本容量 $n$ 的增大，样本均值的方差减小，表明 $\bar{X}_n$ 越来越集中在总体均值 $\mu$ 附近。
+
+### 大数定律的定义与证明
+
+*   **大数定律 (Law of Large Numbers, LLN)**：
+    描述了当样本容量 $n$ 足够大时，样本均值 $\bar{X}_n$ 会趋近于总体均值 $\mu$。
+    LLN 有两种主要形式：弱大数定律 (WLLN) 和强大数定律 (SLLN)。
+
+*   **弱大数定律 (Weak Law of Large Numbers, WLLN)**：
+    设 $X_1, X_2, \dots, X_n$ 是 i.i.d. 的随机变量，具有有限均值 $E[X_i]=\mu$。则对于任意 $\epsilon > 0$，
+    $$ \lim_{n \to \infty} P(|\bar{X}_n - \mu| \ge \epsilon) = 0 $$
+    或等价地，
+    $$ \lim_{n \to \infty} P(|\bar{X}_n - \mu| < \epsilon) = 1 $$
+    这表示 $\bar{X}_n$ **依概率收敛 (converges in probability)** 于 $\mu$，记为 $\bar{X}_n \xrightarrow{p} \mu$。
+
+    *   **切比雪夫不等式证明 WLLN (当方差 $\sigma^2$ 有限时)**：
+        切比雪夫不等式：对于任意随机变量 $Y$ (均值 $E[Y]$，方差 $Var(Y)$ 有限)，和任意 $k>0$，
+        $$ P(|Y - E[Y]| \ge k) \le \frac{Var(Y)}{k^2} $$
+        令 $Y = \bar{X}_n$，则 $E[Y]=\mu$，$Var(Y)=\sigma^2/n$。取 $k=\epsilon$：
+        $$ P(|\bar{X}_n - \mu| \ge \epsilon) \le \frac{Var(\bar{X}_n)}{\epsilon^2} = \frac{\sigma^2/n}{\epsilon^2} = \frac{\sigma^2}{n\epsilon^2} $$
+        当 $n \to \infty$ 时，$\frac{\sigma^2}{n\epsilon^2} \to 0$。因此 $\lim_{n \to \infty} P(|\bar{X}_n - \mu| \ge \epsilon) = 0$。
+        (注意：WLLN 也适用于方差无限但均值有限的情况，但证明更复杂)。
+
+*   **强大数定律 (Strong Law of Large Numbers, SLLN)**：
+    设 $X_1, X_2, \dots, X_n$ 是 i.i.d. 的随机变量，具有有限均值 $E[X_i]=\mu$。则
+    $$ P\left(\lim_{n \to \infty} \bar{X}_n = \mu\right) = 1 $$
+    这表示 $\bar{X}_n$ **几乎必然收敛 (converges almost surely / with probability 1)** 于 $\mu$，记为 $\bar{X}_n \xrightarrow{a.s.} \mu$。
+
+### 弱大数定律与强大数定律的区别
+
+*   **收敛类型**：
+    *   WLLN: 依概率收敛 ($\xrightarrow{p}$)。它描述的是当 $n$ 很大时，$\bar{X}_n$ 偏离 $\mu$ 超过任意小量 $\epsilon$ 的概率趋于0。
+    *   SLLN: 几乎必然收敛 ($\xrightarrow{a.s.}$)。它描述的是对于几乎所有的样本序列 (概率为1的样本点集合)，当 $n \to \infty$ 时，$\bar{X}_n(\omega)$ 的极限就是 $\mu$。
+
+*   **强度**：
+    SLLN $\implies$ WLLN。几乎必然收敛是一种比依概率收敛更强的收敛模式。
+    SLLN 意味着 $\bar{X}_n$ 最终会稳定在 $\mu$ 附近并且不再大幅偏离。
+    WLLN 允许 $\bar{X}_n$ 偶尔大幅偏离 $\mu$，只要这些偏离的概率随着 $n$ 增大而趋于0。
+
+*   **条件**：
+    SLLN 成立的条件（例如，Kolmogorov SLLN 要求 $E[|X_i|] < \infty$）通常比 WLLN 的某些版本（例如，Khinchin's WLLN 要求 $E[X_i]=\mu$ 存在）要严格或略有不同。上述描述中均假设 i.i.d. 且均值有限。
+
+*   **含义**：
+    SLLN 提供了频率学派解释概率的基础：一个事件的相对频率在大量重复试验中会收敛到该事件的概率。例如，令 $X_i$ 是第 $i$ 次伯努利试验的结果 ($1$ 代表成功，$0$ 代表失败，$P(X_i=1)=p$)。则 $\bar{X}_n$ 是 $n$ 次试验中成功的相对频率，SLLN 表明 $\bar{X}_n \xrightarrow{a.s.} p$。
+
+---
+
+## 第9讲：中心极限定理
+
+### 中心极限定理的定义与证明
+
+*   **中心极限定理 (Central Limit Theorem, CLT)**：
+    描述了当独立同分布的随机变量的样本容量 $n$ 足够大时，它们的和或均值的分布近似于正态分布，**无论原始随机变量的分布是什么** (只要均值和方差有限)。
+
+*   **林德伯格-莱维 CLT (Lindeberg-Lévy CLT)**：
+    设 $X_1, X_2, \dots, X_n$ 是一列独立同分布 (i.i.d.) 的随机变量，具有有限均值 $E[X_i] = \mu$ 和有限非零方差 $Var(X_i) = \sigma^2$。
+    令 $S_n = \sum_{i=1}^n X_i$ 为样本和，$\bar{X}_n = \frac{S_n}{n}$ 为样本均值。
+    则标准化后的样本均值（或样本和）依分布收敛于标准正态分布：
+    $$ Z_n = \frac{\bar{X}_n - \mu}{\sigma/\sqrt{n}} = \frac{S_n - n\mu}{\sigma\sqrt{n}} \xrightarrow{d} N(0,1) \quad \text{as } n \to \infty $$
+    $\xrightarrow{d}$ 表示**依分布收敛 (converges in distribution)**。这意味着 $Z_n$ 的 CDF 收敛于标准正态分布的 CDF $\Phi(z)$：
+    $$ \lim_{n \to \infty} P(Z_n \le z) = \Phi(z) = \int_{-\infty}^z \frac{1}{\sqrt{2\pi}} e^{-t^2/2} dt \quad \text{对所有 } z $$
+
+    *   **证明概要**：
+        证明通常涉及特征函数 (Characteristic Function)。随机变量 $X$ 的特征函数定义为 $\phi_X(t) = E[e^{itX}]$。
+        1.  对 $X_i$ 进行标准化：令 $Y_i = \frac{X_i - \mu}{\sigma}$。则 $E[Y_i]=0, Var(Y_i)=1$。
+        2.  $Z_n = \frac{1}{\sqrt{n}} \sum_{i=1}^n Y_i$。
+        3.  计算 $Y_i$ 的特征函数 $\phi_Y(t)$。由于 $E[Y_i]=0, E[Y_i^2]=1$，$\phi_Y(t)$ 在 $t=0$ 附近泰勒展开为 $1 - \frac{t^2}{2} + o(t^2)$。
+        4.  $Z_n$ 的特征函数 $\phi_{Z_n}(t) = E[e^{it \frac{1}{\sqrt{n}} \sum Y_i}] = E[\prod e^{it \frac{Y_i}{\sqrt{n}}}] = \prod E[e^{it \frac{Y_i}{\sqrt{n}}}] = [\phi_Y(t/\sqrt{n})]^n$ (由于 i.i.d.)。
+        5.  代入 $\phi_Y(t/\sqrt{n}) \approx 1 - \frac{(t/\sqrt{n})^2}{2} = 1 - \frac{t^2}{2n}$。
+        6.  $\phi_{Z_n}(t) \approx \left(1 - \frac{t^2}{2n}\right)^n$。
+        7.  当 $n \to \infty$ 时，$\left(1 - \frac{t^2}{2n}\right)^n \to e^{-t^2/2}$。
+        8.  $e^{-t^2/2}$ 是标准正态分布 $N(0,1)$ 的特征函数。
+        9.  根据 Lévy's continuity theorem，若特征函数收敛，则随机变量依分布收敛。
+
+### 中心极限定理的应用
+
+CLT 是概率论和统计学中最重要的定理之一，因为它：
+1.  **解释了正态分布的普遍性**：许多自然现象是大量微小、独立随机因素累积作用的结果，CLT 解释了为何这些现象的测量值往往服从正态分布。
+2.  **为统计推断提供了基础**：即使总体分布未知，只要样本量足够大，样本均值的抽样分布就可以用正态分布来近似。这使得我们可以进行假设检验和构造置信区间。
+    *   例如，构造关于总体均值 $\mu$ 的置信区间：
+        $\bar{X}_n \pm z_{\alpha/2} \frac{\sigma}{\sqrt{n}}$ (若 $\sigma$ 已知)
+        $\bar{X}_n \pm t_{\alpha/2, n-1} \frac{S}{\sqrt{n}}$ (若 $\sigma$ 未知，用样本标准差 $S$ 代替，使用 t-分布)
+3.  **近似计算复杂分布的概率**：如果一个随机变量可以看作是许多独立随机变量的和，即使其精确分布难以计算，也可以用正态分布来近似其概率。
+
+### 正态分布的近似方法
+
+CLT 提供了用正态分布近似其他分布的基础。
+*   **近似规则**：
+    如果 $S_n = X_1 + \dots + X_n$ (i.i.d. $X_i$ עם $E[X_i]=\mu, Var(X_i)=\sigma^2$)，则当 $n$ 足够大时：
+    $$ S_n \approx N(n\mu, n\sigma^2) $$
+    $$ \bar{X}_n \approx N(\mu, \sigma^2/n) $$
+    "足够大" 通常指 $n \ge 30$，但这取决于原始分布的偏斜程度。如果原始分布对称，较小的 $n$ 也可以。
+
+*   **对二项分布的正态近似 (De Moivre-Laplace Theorem)**：
+    若 $X \sim B(n,p)$，则 $X$ 可以看作是 $n$ 个独立 Bernoulli($p$) 随机变量的和。
+    $E[X] = np$, $Var(X) = np(1-p)$。
+    当 $n$ 足够大 (通常要求 $np \ge 5$ 且 $n(1-p) \ge 5$) 时，
+    $$ X \approx N(np, np(1-p)) $$
+    计算 $P(a \le X \le b)$ 时，使用**连续性修正 (continuity correction)**：
+    $$ P(a \le X \le b) \approx P\left( \frac{a-0.5 - np}{\sqrt{np(1-p)}} \le Z \le \frac{b+0.5 - np}{\sqrt{np(1-p)}} \right) $$
+    其中 $Z \sim N(0,1)$。
+
+*   **对泊松分布的正态近似**：
+    若 $X \sim \text{Poisson}(\lambda)$，当 $\lambda$ 足够大时 (通常 $\lambda \ge 10$ 或 $\lambda \ge 20$)，
+    $$ X \approx N(\lambda, \lambda) $$
+    因为 $E[X]=\lambda, Var(X)=\lambda$。
+    同样，计算概率时可以考虑使用连续性修正。
+
+---
+
+## 第10讲：参数估计
+
+参数估计是统计推断的一个主要分支，目的是利用样本数据来估计总体分布中的未知参数。
+
+### 点估计的定义与方法
+
+*   **点估计 (Point Estimation)**：
+    用样本数据计算出一个单一的数值，作为总体未知参数 $\theta$ 的估计值。这个估计值称为**估计量 (estimator)** $\hat{\Theta}$ 的一个具体实现，记为 $\hat{\theta}$。
+    估计量 $\hat{\Theta}$ 是一个基于样本 $X_1, \dots, X_n$ 的函数，因此它是一个随机变量。
+
+*   **常见的点估计方法**：
+    1.  **矩估计法 (Method of Moments, MOM)**：
+        用样本矩来估计总体矩，然后解出参数的估计。
+        *   基本思想：令总体 $k$ 阶矩等于样本 $k$ 阶矩。
+            $E[X^k] = \frac{1}{n} \sum_{i=1}^n X_i^k$
+        *   例如，估计均值 $\mu = E[X]$ 和方差 $\sigma^2 = E[X^2] - (E[X])^2$：
+            $\hat{\mu}_{MOM} = \bar{X}_n = \frac{1}{n}\sum X_i$
+            $E[X^2] = \frac{1}{n}\sum X_i^2$
+            $\hat{\sigma}^2_{MOM} = \left(\frac{1}{n}\sum X_i^2\right) - (\bar{X}_n)^2 = \frac{1}{n}\sum (X_i - \bar{X}_n)^2$ (这是有偏的样本方差)
+    2.  **最大似然估计法 (Maximum Likelihood Estimation, MLE)**：
+        选择使观测到的样本数据出现的“可能性”（似然）最大的参数值作为估计值。
+        *   **似然函数 (Likelihood Function)** $L(\theta | x_1, \dots, x_n)$: 给定样本观测值 $x_1, \dots, x_n$ 时，参数 $\theta$ 的函数。
+            如果 $X_i$ i.i.d.，
+            离散: $L(\theta | x_1, \dots, x_n) = \prod_{i=1}^n p(x_i; \theta)$
+            连续: $L(\theta | x_1, \dots, x_n) = \prod_{i=1}^n f(x_i; \theta)$
+        *   MLE $\hat{\theta}_{MLE}$ 是使 $L(\theta)$ 最大化的 $\theta$ 值。通常通过最大化对数似然函数 $\ln L(\theta)$ 来求解：
+            $\frac{d \ln L(\theta)}{d\theta} = 0$
+
+### 估计量的性质：无偏性、一致性、渐近无偏性
+
+评价一个估计量好坏的标准：
+1.  **无偏性 (Unbiasedness)**：
+    如果估计量 $\hat{\Theta}$ 的期望值等于被估计的参数 $\theta$，则称 $\hat{\Theta}$ 是 $\theta$ 的无偏估计量。
+    $$ E[\hat{\Theta}] = \theta \quad \text{对所有可能的 } \theta $$
+    **偏差 (Bias)**：$Bias(\hat{\Theta}) = E[\hat{\Theta}] - \theta$。无偏估计量的偏差为0。
+    *   $\bar{X}_n$ 是 $\mu$ 的无偏估计量：$E[\bar{X}_n] = \mu$。
+    *   样本方差 $S^2 = \frac{1}{n-1}\sum (X_i - \bar{X}_n)^2$ 是 $\sigma^2$ 的无偏估计量：$E[S^2]=\sigma^2$。
+    *   而 $\hat{\sigma}^2_{MOM} = \frac{1}{n}\sum (X_i - \bar{X}_n)^2$ 是 $\sigma^2$ 的有偏估计量，其期望为 $\frac{n-1}{n}\sigma^2$。
+
+2.  **一致性 (Consistency)**：
+    如果当样本容量 $n \to \infty$ 时，估计量 $\hat{\Theta}_n$ 依概率收敛于参数 $\theta$，则称 $\hat{\Theta}_n$ 是 $\theta$ 的一致估计量。
+    $$ \hat{\Theta}_n \xrightarrow{p} \theta \quad \text{as } n \to \infty $$
+    即，对于任意 $\epsilon > 0$，$\lim_{n \to \infty} P(|\hat{\Theta}_n - \theta| \ge \epsilon) = 0$。
+    *   $\bar{X}_n$ 是 $\mu$ 的一致估计量 (由 WLLN)。
+    *   MLE 通常具有一致性。
+
+3.  **渐近无偏性 (Asymptotic Unbiasedness)**：
+    如果当样本容量 $n \to \infty$ 时，估计量 $\hat{\Theta}_n$ 的期望值趋近于参数 $\theta$，则称 $\hat{\Theta}_n$ 是 $\theta$ 的渐近无偏估计量。
+    $$ \lim_{n \to \infty} E[\hat{\Theta}_n] = \theta $$
+    *   例如，$\hat{\sigma}^2_{MOM} = \frac{1}{n}\sum (X_i - \bar{X}_n)^2$ 是 $\sigma^2$ 的有偏估计量，但 $E[\hat{\sigma}^2_{MOM}] = \frac{n-1}{n}\sigma^2$，当 $n \to \infty$ 时，$E[\hat{\sigma}^2_{MOM}] \to \sigma^2$，所以它是渐近无偏的。
+
+### 均方误差的定义与计算
+
+*   **均方误差 (Mean Squared Error, MSE)**：
+    衡量估计量 $\hat{\Theta}$ 与真实参数 $\theta$ 之间平均平方差异的度量。
+    $$ MSE(\hat{\Theta}) = E[(\hat{\Theta} - \theta)^2] $$
+    MSE 是评价估计量好坏的一个综合指标。
+    **MSE 分解**：
+    $$ MSE(\hat{\Theta}) = Var(\hat{\Theta}) + (Bias(\hat{\Theta}))^2 $$
+    $$ MSE(\hat{\Theta}) = Var(\hat{\Theta}) + (E[\hat{\Theta}] - \theta)^2 $$
+    *   对于无偏估计量，$Bias(\hat{\Theta})=0$，所以 $MSE(\hat{\Theta}) = Var(\hat{\Theta})$。在这种情况下，选择方差最小的无偏估计量（称为最小方差无偏估计量, MVUE）。
+    *   在有偏估计量中，有时一个有偏估计量可能比无偏估计量有更小的 MSE，如果它的方差足够小以弥补偏差的影响（偏差-方差权衡）。
+
+*   **计算**：
+    需要知道 $E[\hat{\Theta}]$ (以计算偏差) 和 $Var(\hat{\Theta})$。
+    *   例如，$\bar{X}_n$ 作为 $\mu$ 的估计量：
+        $Bias(\bar{X}_n) = E[\bar{X}_n] - \mu = \mu - \mu = 0$。
+        $Var(\bar{X}_n) = \sigma^2/n$。
+        $MSE(\bar{X}_n) = Var(\bar{X}_n) + (Bias(\bar{X}_n))^2 = \frac{\sigma^2}{n} + 0^2 = \frac{\sigma^2}{n}$。
+
+---
+
+# 第四部分：随机过程
+
+## 第11讲：随机过程的基本概念
+
+### 随机过程的定义与分类
+
+*   **随机过程 (Random Process or Stochastic Process)**：
+    一个随机过程 $\{X(t), t \in T\}$ 是一个**以时间 $t$ 为参数的随机变量的集合（或族）**。
+    *   $t$：时间参数（也可以是空间参数等）。
+    *   $T$：参数集或索引集。
+    *   对于每一个固定的 $t \in T$，$X(t)$ 是一个随机变量。
+    *   对于每一个固定的样本点 $\omega \in \Omega$ (来自底层的概率空间)，$X(t, \omega)$ 作为 $t$ 的函数，是一个确定的时间函数，称为**样本函数 (Sample Function) 或实现 (Realization)**。
+
+*   **随机过程的分类**：
+    根据**时间参数 $t$** 和 **状态空间 $S_X$** (即 $X(t)$ 的取值范围) 的特性分类：
+
+    1.  **按时间参数 $T$**：
+        *   **离散时间随机过程 (Discrete-Time Random Process)**：时间参数 $t$ 取离散值 (如 $t=0, 1, 2, \dots$ 或 $t=t_0, t_1, \dots$)。常记为 $X_n$ 或 $X(n)$。
+            *   *示例*：每日股票收盘价，数字信号序列。
+        *   **连续时间随机过程 (Continuous-Time Random Process)**：时间参数 $t$ 取连续值 (如 $t \in [0, \infty)$ 或 $t \in (-\infty, \infty)$)。常记为 $X(t)$。
+            *   *示例*：电路中的噪声电压，温度随时间的变化。
+
+    2.  **按状态空间 $S_X$**：
+        *   **离散状态随机过程 (Discrete-State Random Process / Chain)**：$X(t)$ 的取值是离散的 (有限或可列无限)。
+            *   *示例*：一个计数器的状态，一个通信信道的状态 (好/坏)。
+        *   **连续状态随机过程 (Continuous-State Random Process)**：$X(t)$ 的取值是连续的 (一个区间)。
+            *   *示例*：噪声电压，物体温度。
+
+    **四种基本类型**：
+    1.  离散时间，离散状态 (如：马尔可夫链)
+    2.  离散时间，连续状态 (如：离散时间高斯过程)
+    3.  连续时间，离散状态 (如：泊松过程，连续时间马尔可夫链)
+    4.  连续时间，连续状态 (如：布朗运动，高斯过程)
+
+### 样本函数与集合的概念
+
+*   **样本函数 (Sample Function / Realization / Sample Path)**：
+    对于概率空间 $(\Omega, \mathcal{F}, P)$ 中的某个特定结果 $\omega_0 \in \Omega$，随机过程 $X(t, \omega_0)$ 是一个关于时间 $t$ 的确定函数。
+    *   它是随机过程的一次“观测”或“实验结果”。
+    *   例如，如果 $X(t)$ 是某城市每日最高气温，那么过去10年每天的最高气温记录就是该过程的一个样本函数。
+
+*   **集合 (Ensemble)**：
+    随机过程所有可能的样本函数的集合。
+    $\{X(t, \omega) \mid \omega \in \Omega\}$。
+    可以想象成无数条时间函数，每一条对应一个 $\omega$。
+
+### 随机过程的统计特性
+
+随机过程的完整描述需要其任意 $k$ 个时刻 $t_1, \dots, t_k$ 的随机变量 $X(t_1), \dots, X(t_k)$ 的联合分布。这通常很复杂，所以常用一些低阶矩来描述其特性。
+
+1.  **均值函数 (Mean Function)** $\mu_X(t)$:
+    $$ \mu_X(t) = E[X(t)] $$
+    描述了过程在时刻 $t$ 的平均值。一般是 $t$ 的函数。
+
+2.  **自相关函数 (Autocorrelation Function)** $R_X(t_1, t_2)$:
+    $$ R_X(t_1, t_2) = E[X(t_1)X(t_2)] $$
+    描述了过程在两个不同时刻 $t_1, t_2$ 的值的相关性。
+    性质：
+    *   $R_X(t_1, t_2) = R_X(t_2, t_1)$ (对于实过程)
+    *   $|R_X(t_1, t_2)| \le \sqrt{R_X(t_1, t_1)R_X(t_2, t_2)}$ (Cauchy-Schwarz)
+    *   $R_X(t,t) = E[X^2(t)]$ (平均功率)
+
+3.  **自协方差函数 (Autocovariance Function)** $C_X(t_1, t_2)$:
+    $$ C_X(t_1, t_2) = Cov(X(t_1), X(t_2)) = E[(X(t_1) - \mu_X(t_1))(X(t_2) - \mu_X(t_2))] $$
+    $$ C_X(t_1, t_2) = R_X(t_1, t_2) - \mu_X(t_1)\mu_X(t_2) $$
+    性质：
+    *   $C_X(t,t) = Var(X(t))$ (方差函数)
+
+4.  **互相关函数 (Cross-correlation Function)** $R_{XY}(t_1, t_2)$:
+    对于两个随机过程 $X(t)$ 和 $Y(t)$，
+    $$ R_{XY}(t_1, t_2) = E[X(t_1)Y(t_2)] $$
+
+5.  **互协方差函数 (Cross-covariance Function)** $C_{XY}(t_1, t_2)$:
+    $$ C_{XY}(t_1, t_2) = E[(X(t_1) - \mu_X(t_1))(Y(t_2) - \mu_Y(t_2))] = R_{XY}(t_1, t_2) - \mu_X(t_1)\mu_Y(t_2) $$
+
+---
+
+## 第12讲：泊松过程
+
+### 泊松过程的定义与性质
+
+*   **泊松过程 (Poisson Process)** $N(t)$ (或 $\{N(t), t \ge 0\}$)：
+    一个计数过程，表示从时间 $0$ 到时间 $t$ 某事件发生的次数。它是一个连续时间、离散状态的随机过程。
+    参数为 $\lambda > 0$ (称为速率或强度)。
+
+*   **定义 (基于增量特性)**：
+    计数过程 $N(t)$ 是一个速率为 $\lambda$ 的泊松过程，如果满足：
+    1.  **初始条件**: $N(0) = 0$ (时间0时，事件发生次数为0)。
+    2.  **独立增量 (Independent Increments)**: 对于任意 $0 \le t_1 < t_2 < \dots < t_k$，随机变量 $N(t_2)-N(t_1), N(t_3)-N(t_2), \dots, N(t_k)-N(t_{k-1})$ 是相互独立的。即，在不相交时间区间内事件发生的次数是独立的。
+    3.  **平稳增量 (Stationary Increments) / 齐次性**: 对于任意 $s, t > 0$， $N(t+s)-N(s)$ (在长度为 $t$ 的区间 $[s, s+t]$ 内发生的次数) 的分布与 $N(t)$ (在长度为 $t$ 的区间 $[0, t]$ 内发生的次数) 相同。只依赖于区间长度，不依赖于区间起点。
+    4.  **小区间内的概率特性**:
+        *   $P(N(h)=1) = \lambda h + o(h)$ (在足够小的时间间隔 $h$ 内发生1次事件的概率近似 $\lambda h$)
+        *   $P(N(h) \ge 2) = o(h)$ (在足够小的时间间隔 $h$ 内发生2次或更多次事件的概率可忽略)
+        其中 $o(h)$ 表示当 $h \to 0$ 时，$\frac{o(h)}{h} \to 0$ 的高阶无穷小。
+
+*   **等价定义 (基于计数的分布)**：
+    $N(t)$ 是泊松过程，如果它满足上述1、2、3，并且对于任意 $t > 0$，
+    $$ P(N(t)=k) = \frac{e^{-\lambda t}(\lambda t)^k}{k!}, \quad k=0, 1, 2, \dots $$
+    即，$N(t)$ 服从均值为 $\lambda t$ 的泊松分布: $N(t) \sim \text{Poisson}(\lambda t)$。
+
+*   **性质**：
+    1.  $E[N(t)] = \lambda t$
+    2.  $Var(N(t)] = \lambda t$
+    3.  **叠加性**: 若 $N_1(t)$ 和 $N_2(t)$ 是独立的泊松过程，速率分别为 $\lambda_1, \lambda_2$，则 $N(t) = N_1(t) + N_2(t)$ 也是一个泊松过程，速率为 $\lambda_1 + \lambda_2$。
+    4.  **筛选性/稀疏性**: 若 $N(t)$ 是速率为 $\lambda$ 的泊松过程，每次事件以概率 $p$ 被记录（独立于其他事件），则被记录的事件构成的过程 $N_p(t)$ 也是泊松过程，速率为 $\lambda p$。
+
+### 泊松过程的到达时间与间隔时间
+
+设 $T_n$ 是第 $n$ 个事件发生的时刻 (称为第 $n$ 个到达时间)。$T_0=0$。
+设 $W_n = T_n - T_{n-1}$ 是第 $n-1$ 个事件和第 $n$ 个事件之间的间隔时间 (Inter-arrival Time)。$W_1 = T_1$。
+
+*   **间隔时间 $W_n$ 的分布**：
+    $W_1, W_2, \dots, W_n, \dots$ 是一系列独立同分布 (i.i.d.) 的随机变量，它们都服从参数为 $\lambda$ 的**指数分布 (Exponential Distribution)**。
+    $$ P(W_n \le x) = 1 - e^{-\lambda x}, \quad x \ge 0 $$
+    $$ f_{W_n}(x) = \lambda e^{-\lambda x}, \quad x \ge 0 $$
+    $E[W_n] = 1/\lambda$。
+
+*   **到达时间 $T_n$ 的分布**：
+    $T_n = W_1 + W_2 + \dots + W_n$。
+    $T_n$ 服从参数为 $n$ 和 $\lambda$ 的 **Gamma 分布 (Erlang 分布)**。
+    其 PDF 为：
+    $$ f_{T_n}(t) = \frac{\lambda (\lambda t)^{n-1}}{(n-1)!} e^{-\lambda t}, \quad t \ge 0 $$
+    $E[T_n] = n/\lambda$。
+
+*   **关系**：
+    $\{N(t) \ge n\} \iff \{T_n \le t\}$。
+    这是两种描述泊松过程等价方式的核心：计数方式 ($N(t)$) 和到达时间方式 ($T_n$)。
+
+### 泊松过程的应用
+
+*   **排队论**：顾客到达服务系统的模型。
+*   **可靠性工程**：设备故障发生的模型。
+*   **通信工程**：数据包到达网络节点，光子到达检测器。
+*   **物理学**：放射性粒子衰变。
+*   **交通流**：车辆通过某点的模型。
+*   **生物学**：神经元发放脉冲。
+
+---
+
+## 第13讲：布朗运动
+
+### 布朗运动的定义与性质
+
+*   **布朗运动 (Brownian Motion)**，也称**维纳过程 (Wiener Process)**，记为 $W(t)$ 或 $B(t)$。
+    它是一个连续时间、连续状态的随机过程，最初用于描述悬浮在液体中微小颗粒的不规则运动。
+
+*   **标准布朗运动的定义**：
+    一个随机过程 $\{W(t), t \ge 0\}$ 是标准布朗运动，如果满足：
+    1.  **初始条件**: $W(0) = 0$ (概率为1)。
+    2.  **独立增量 (Independent Increments)**: 对于任意 $0 \le t_1 < t_2 < \dots < t_k$，随机变量 $W(t_2)-W(t_1), W(t_3)-W(t_2), \dots, W(t_k)-W(t_{k-1})$ 是相互独立的。
+    3.  **平稳正态增量 (Stationary Normal Increments)**: 对于任意 $s < t$，增量 $W(t)-W(s)$ 服从均值为 $0$，方差为 $t-s$ 的正态分布。
+        $$ W(t) - W(s) \sim N(0, t-s) $$
+        特别地，$W(t) = W(t)-W(0) \sim N(0,t)$。
+    4.  **连续样本路径 (Continuous Sample Paths)**: $W(t)$ 作为 $t$ 的函数几乎必然是连续的。即 $P(\text{path } W(\cdot) \text{ is continuous}) = 1$。
+
+*   **一般布朗运动 (带漂移和尺度参数)**：
+    $X(t) = \mu t + \sigma W(t)$
+    其中 $W(t)$ 是标准布朗运动，$\mu$ 是漂移系数 (drift coefficient)，$\sigma > 0$ 是波动率或扩散系数 (volatility/diffusion coefficient)。
+    *   $X(0)=0$
+    *   $X(t)-X(s) \sim N(\mu(t-s), \sigma^2(t-s))$
+
+*   **性质** (对于标准布朗运动 $W(t)$)：
+    1.  $E[W(t)] = 0$
+    2.  $Var(W(t)] = t$
+    3.  **协方差函数**: $Cov(W(s), W(t)) = E[W(s)W(t)]$ (因为均值为0)。
+        假设 $s \le t$：
+        $E[W(s)W(t)] = E[W(s)(W(t)-W(s)+W(s))] = E[W(s)(W(t)-W(s))] + E[W^2(s)]$
+        由于独立增量，$E[W(s)(W(t)-W(s))] = E[W(s)]E[W(t)-W(s)] = 0 \cdot 0 = 0$。
+        所以，$Cov(W(s), W(t)) = E[W^2(s)] = Var(W(s)) = s$。
+        因此，对于任意 $s,t \ge 0$:
+        $$ Cov(W(s), W(t)) = R_W(s,t) = \min(s,t) $$
+    4.  **非平稳性**: 均值为常数0，但方差 $Var(W(t))=t$ 随时间变化，协方差 $R_W(s,t)=\min(s,t)$ 不仅依赖于 $t-s$。所以布朗运动不是（广义）平稳过程。
+    5.  **马尔可夫性**: $P(W(t_n) \le x | W(t_1), \dots, W(t_{n-1})) = P(W(t_n) \le x | W(t_{n-1}))$ (未来只依赖于现在，不依赖于过去)。
+    6.  **鞅性 (Martingale Property)**: $E[W(t) | \mathcal{F}_s] = W(s)$ for $s < t$, 其中 $\mathcal{F}_s$ 是到时刻 $s$ 的信息。
+    7.  **路径的非可微性**: 布朗运动的样本路径几乎处处不可微。
+    8.  **二次变差 (Quadratic Variation)**: $\lim_{\max(t_i - t_{i-1}) \to 0} \sum [W(t_i) - W(t_{i-1})]^2 = t$ (概率为1)。
+
+### 布朗运动的数学模型
+
+*   **作为随机游走的极限**:
+    考虑一个简单的对称随机游走 $S_n = \sum_{i=1}^n X_i$，其中 $X_i$ i.i.d.，$P(X_i=1)=P(X_i=-1)=1/2$。
+    $E[X_i]=0, Var(X_i)=1$。
+    构造连续时间过程 $W_n(t) = \frac{1}{\sqrt{n}} S_{\lfloor nt \rfloor}$ (Donsker's Theorem)。
+    当 $n \to \infty$ 时，$W_n(t)$ 在分布意义上收敛于标准布朗运动 $W(t)$。
+    这提供了从离散模型到连续模型的桥梁。
+
+### 布朗运动的应用
+
+*   **金融学 (Black-Scholes 模型)**：股票价格的对数被模型化为几何布朗运动 $S(t) = S_0 e^{(\mu - \sigma^2/2)t + \sigma W(t)}$。用于期权定价。
+*   **物理学**：描述微粒的扩散现象、热噪声。
+*   **生物学**：种群动态、分子运动。
+*   **排队论**：作为重载情况下队列长度的近似。
+*   **信号处理**：某些类型的噪声模型。
+
+---
+
+## 第14讲：平稳过程
+
+### 平稳过程的定义与性质
+
+平稳性是随机过程的一个重要特性，意味着过程的统计特性不随时间的推移而改变。
+
+*   **严平稳过程 (Strict-Sense Stationary, SSS Process)**：
+    一个随机过程 $\{X(t), t \in T\}$ 是严平稳的，如果对于任意 $k \ge 1$，任意时间点 $t_1, \dots, t_k \in T$，以及任意时间平移 $\tau$ (使得 $t_i+\tau \in T$)，随机向量 $(X(t_1), \dots, X(t_k))$ 与 $(X(t_1+\tau), \dots, X(t_k+\tau))$ 具有**相同的联合分布函数**。
+    $$ F_{X(t_1), \dots, X(t_k)}(x_1, \dots, x_k) = F_{X(t_1+\tau), \dots, X(t_k+\tau)}(x_1, \dots, x_k) $$
+    这意味着过程所有的统计特性（各阶矩、联合分布等）都不随时间平移而改变。
+    *   **推论**:
+        *   一维分布不变: $F_{X(t)}(x) = F_{X(t+\tau)}(x)$。因此 $E[X(t)]$ 和 $Var(X(t))$ 是常数。
+        *   二维分布不变: $F_{X(t_1),X(t_2)}(x_1,x_2) = F_{X(t_1+\tau),X(t_2+\tau)}(x_1,x_2)$。
+            令 $t_1+\tau = s$, $t_2+\tau = s+\Delta t$ (即 $\tau = s-t_1$, $\Delta t = t_2-t_1$)，则 $R_X(t_1,t_2)$ 只依赖于时间差 $\Delta t = t_2-t_1$。
+
+*   **广义平稳过程 (Wide-Sense Stationary, WSS Process) 或 弱平稳过程**：
+    一个随机过程 $\{X(t), t \in T\}$ 是广义平稳的，如果满足：
+    1.  **均值函数为常数**:
+        $$ E[X(t)] = \mu_X \quad (\text{常数,不依赖于 } t) $$
+    2.  **自相关函数仅依赖于时间差**:
+        $$ R_X(t_1, t_2) = E[X(t_1)X(t_2)] = R_X(t_2-t_1) = R_X(\tau) $$
+        其中 $\tau = t_2-t_1$ 是时间滞后 (time lag)。
+        (注意：有些定义是 $R_X(t_1, t_2) = R_X(t_1-t_2)$，两者等价因为 $R_X(\tau)=R_X(-\tau)$ for real processes)
+
+    *   **推论**:
+        *   $E[X^2(t)] = R_X(t,t) = R_X(0)$ (平均功率为常数)。
+        *   $Var(X(t)) = E[X^2(t)] - (E[X(t)])^2 = R_X(0) - \mu_X^2$ (方差为常数)。
+        *   自协方差函数 $C_X(t_1, t_2) = R_X(t_1,t_2) - \mu_X^2 = R_X(t_2-t_1) - \mu_X^2 = C_X(t_2-t_1) = C_X(\tau)$。
+
+### 广义平稳过程与严平稳过程的区别
+
+*   **条件强度**：严平稳要求所有阶的联合分布都不随时间平移而改变，而广义平稳只要求一阶矩（均值）和二阶矩（自相关函数）具有平稳性。
+*   **关系**：
+    *   **严平稳 $\implies$ 广义平稳** (前提是均值和自相关函数存在且有限)。
+    *   **广义平稳 $\not\implies$ 严平稳** (一般情况下)。一个过程可能均值和自相关函数平稳，但其高阶矩或分布形状随时间变化。
+    *   **特殊情况：高斯过程 (Gaussian Process)**
+        如果一个高斯过程是广义平稳的，那么它也是严平稳的。
+        因为高斯过程的联合分布完全由其均值函数和协方差函数（或自相关函数）确定。若这两者平稳，则所有联合分布都平稳。
+
+*   **应用**：
+    *   严平稳是更强的条件，理论分析更完整，但实际中难以验证和满足。
+    *   广义平稳是较弱的条件，更容易验证和处理，在信号处理和通信系统中广泛应用（例如，分析线性时不变系统的响应）。
+
+### 平稳过程的自相关函数与功率谱密度
+
+对于 WSS 过程 $X(t)$：
+*   **自相关函数 $R_X(\tau)$**：
+    $R_X(\tau) = E[X(t)X(t+\tau)]$
+    性质：
+    1.  **偶对称性**: $R_X(\tau) = R_X(-\tau)$ (对于实过程)。
+    2.  **最大值在原点**: $|R_X(\tau)| \le R_X(0)$。 $R_X(0) = E[X^2(t)]$ 是过程的平均功率。
+    3.  **非负定性**: 对于任意函数 $g(t)$，$\iint g(t_1)g^*(t_2)R_X(t_1-t_2) dt_1 dt_2 \ge 0$。
+    4.  若 $X(t)$ 包含周期成分，则 $R_X(\tau)$ 也包含相应的周期成分。
+    5.  若 $\lim_{\tau \to \infty} R_X(\tau) = \mu_X^2$ (对于遍历过程)，则表示相隔很长时间的样本不相关 (如果均值为0，则趋于0)。
+
+*   **功率谱密度 (Power Spectral Density, PSD)** $S_X(f)$ (或 $S_X(\omega)$ 其中 $\omega = 2\pi f$):
+    描述了 WSS 随机过程的功率在频域上的分布。
+    根据 **维纳-辛钦定理 (Wiener-Khinchin Theorem)**，WSS 过程的 PSD 是其自相关函数的傅里叶变换：
+    $$ S_X(f) = \mathcal{F}\{R_X(\tau)\} = \int_{-\infty}^{\infty} R_X(\tau) e^{-j2\pi f \tau} d\tau $$
+    反之，自相关函数是 PSD 的傅里叶逆变换：
+    $$ R_X(\tau) = \mathcal{F}^{-1}\{S_X(f)\} = \int_{-\infty}^{\infty} S_X(f) e^{j2\pi f \tau} df $$
+    性质：
+    1.  **实偶函数**: $S_X(f)$ 是实函数且 $S_X(f) = S_X(-f)$ (因为 $R_X(\tau)$ 是实偶函数)。
+    2.  **非负性**: $S_X(f) \ge 0$ 对所有 $f$ 成立。
+    3.  **总平均功率**:
+        $$ R_X(0) = E[X^2(t)] = \int_{-\infty}^{\infty} S_X(f) df $$
+        这表示过程的总平均功率等于 PSD 在整个频率轴上的积分。
+    4.  **线性时不变 (LTI) 系统响应**:
+        若 WSS 过程 $X(t)$ 输入一个 LTI 系统，其频率响应为 $H(f)$，则输出过程 $Y(t)$ 也是 WSS，且其 PSD 为：
+        $$ S_Y(f) = |H(f)|^2 S_X(f) $$
+
+---
+
+# 第五部分：概率论的应用
+
+## 第15讲：概率论在信息论中的应用
+
+信息论由克劳德·香农 (Claude Shannon) 在1948年奠基，主要研究信息的量化、存储和通信。概率论是其核心数学工具。
+
+### 信息熵的定义与计算
+
+*   **自信息 (Self-Information)**：
+    一个事件 $A$ 发生所提供的信息量，定义为其概率 $P(A)$ 的函数。概率越小，信息量越大。
+    $$ I(A) = -\log_b P(A) $$
+    单位取决于对数的底 $b$：
+    *   $b=2$: 比特 (bits)
+    *   $b=e$: 奈特 (nats)
+    *   $b=10$: 哈特利 (Hartleys) / 迪特 (dits)
+    通常使用 $b=2$。
+
+*   **离散随机变量的熵 (Entropy)** $H(X)$:
+    衡量一个离散随机变量 $X$ 不确定性的平均度量，即 $X$ 的平均信息量。
+    设 $X$ 的 PMF 为 $p(x_i) = P(X=x_i)$，$i=1, \dots, N$。
+    $$ H(X) = E[I(X)] = E[-\log_2 p(X)] = -\sum_{i=1}^N p(x_i) \log_2 p(x_i) $$
+    (约定 $0 \log_2 0 = 0$)
+    性质：
+    1.  $H(X) \ge 0$。
+    2.  当 $X$ 等概率分布时（$p(x_i)=1/N$），熵最大，$H(X) = \log_2 N$。
+    3.  当 $X$ 是确定性变量（某个 $p(x_k)=1$，其他为0）时，熵最小，$H(X)=0$。
+
+*   **联合熵 (Joint Entropy)** $H(X,Y)$:
+    衡量一对随机变量 $(X,Y)$ 的不确定性。
+    $$ H(X,Y) = -\sum_i \sum_j p(x_i, y_j) \log_2 p(x_i, y_j) $$
+
+*   **条件熵 (Conditional Entropy)** $H(Y|X)$:
+    在已知 $X$ 的条件下，$Y$ 的剩余不确定性（平均条件信息量）。
+    $$ H(Y|X) = \sum_i p(x_i) H(Y|X=x_i) = -\sum_i \sum_j p(x_i, y_j) \log_2 p(y_j|x_i) $$
+    性质：
+    *   $H(X,Y) = H(X) + H(Y|X) = H(Y) + H(X|Y)$ (链式法则)
+    *   $H(Y|X) \le H(Y)$ (知道 $X$ 不会增加 $Y$ 的不确定性)
+
+*   **互信息 (Mutual Information)** $I(X;Y)$:
+    衡量一个随机变量包含的关于另一个随机变量的信息量，或者说，由于知道一个变量而导致另一个变量不确定性的减少量。
+    $$ I(X;Y) = H(X) - H(X|Y) = H(Y) - H(Y|X) = H(X) + H(Y) - H(X,Y) $$
+    $$ I(X;Y) = \sum_i \sum_j p(x_i, y_j) \log_2 \frac{p(x_i, y_j)}{p(x_i)p(y_j)} $$
+    性质：
+    *   $I(X;Y) \ge 0$
+    *   $I(X;Y) = I(Y;X)$ (对称性)
+    *   $I(X;X) = H(X)$
+    *   $X,Y$ 独立 $\iff I(X;Y)=0$
+
+*   **连续随机变量的微分熵 (Differential Entropy)** $h(X)$:
+    对于 PDF 为 $f(x)$ 的连续随机变量 $X$：
+    $$ h(X) = -\int_{-\infty}^{\infty} f(x) \log_2 f(x) dx $$
+    注意：微分熵可以为负，且不像离散熵那样具有绝对的度量意义，更多用于比较。
+
+### 信道容量的定义与计算
+
+*   **离散无记忆信道 (Discrete Memoryless Channel, DMC)**：
+    由输入字母表 $\mathcal{X}$，输出字母表 $\mathcal{Y}$，以及一组条件概率 $p(y|x)$ (从输入 $x \in \mathcal{X}$ 得到输出 $y \in \mathcal{Y}$ 的转移概率) 描述。
+
+*   **信道容量 (Channel Capacity)** $C$:
+    信道能够可靠传输信息的最大速率 (单位：比特/信道使用)。
+    对于 DMC，信道容量定义为在所有可能的输入分布 $p(x)$ 下，输入 $X$ 和输出 $Y$ 之间互信息的最大值：
+    $$ C = \max_{p(x)} I(X;Y) $$
+    *   计算 $C$ 通常是一个优化问题。
+
+*   **香农-哈特利定理 (Shannon-Hartley Theorem)**：
+    对于加性高斯白噪声 (AWGN) 信道，其容量为：
+    $$ C = B \log_2 \left(1 + \frac{S}{N}\right) \quad (\text{bits per second}) $$
+    其中：
+    *   $B$ 是信道带宽 (Hz)。
+    *   $S$ 是接收信号的平均功率。
+    *   $N = N_0 B$ 是噪声功率，$N_0$ 是噪声功率谱密度 (W/Hz)。
+    *   $S/N$ 是信噪比 (Signal-to-Noise Ratio, SNR)。
+    此公式表明，带宽和信噪比是限制通信速率的关键因素。
+
+### 概率论在数据压缩与加密中的应用
+
+*   **数据压缩 (Data Compression)**：
+    *   **无损压缩 (Lossless Compression)**：目标是以最少的比特数表示信息源，且能完美重构原始数据。
+        香农的信源编码定理指出，一个 i.i.d. 信源 $X$ 的平均编码长度 $L$ 的下界是其熵 $H(X)$：
+        $$ L \ge H(X) $$
+        像霍夫曼编码 (Huffman Coding) 和算术编码 (Arithmetic Coding) 这样的算法试图接近这个下界。它们利用符号出现的概率不均等性，给高概率符号分配短码字，低概率符号分配长码字。
+    *   **有损压缩 (Lossy Compression)**：允许在压缩和解压过程中丢失一些信息，以换取更高的压缩比。
+        率失真理论 (Rate-Distortion Theory) 研究在给定失真容限 $D$ 下，所需的最小比特率 $R(D)$。
+
+*   **加密 (Cryptography)**：
+    概率论和随机性在现代密码学中至关重要。
+    *   **密钥生成**: 强密钥必须是随机生成的，且难以预测。使用高质量的随机数生成器 (RNG) 或伪随机数生成器 (PRNG)。
+    *   **一次性密码本 (One-Time Pad, OTP)**：理论上不可破解的加密方案。要求密钥是真随机的，长度与明文相同，且只使用一次。
+    *   **密码分析**: 概率方法用于分析密码系统的安全性，例如频率分析、差分密码分析等。
+    *   **随机化加密**: 许多加密算法（如 ElGamal）引入随机元素，使得相同的明文每次加密都产生不同的密文，增加安全性。
+    *   **概率加密方案**: 如 Goldwasser-Micali 方案，其安全性基于数论问题的概率难解性。
+
+---
+
+## 第16讲：概率论在通信系统中的应用
+
+### 通信系统中的噪声模型
+
+噪声是通信系统中信号传输质量的主要限制因素。
+*   **加性高斯白噪声 (Additive White Gaussian Noise, AWGN)**：
+    最常用和基础的噪声模型。
+    *   **加性 (Additive)**：噪声 $n(t)$ 直接加到信号 $s(t)$ 上，接收信号 $r(t) = s(t) + n(t)$。
+    *   **高斯 (Gaussian)**：在任意时刻 $t$，噪声样本 $n(t)$ 是一个服从高斯（正态）分布的随机变量，通常均值为0。
+    *   **白 (White)**：噪声的功率谱密度在所有频率上是常数 $N_0/2$ (双边谱) 或 $N_0$ (单边谱)。这意味着其自相关函数是一个狄拉克$\delta$函数 $R_n(\tau) = (N_0/2) \delta(\tau)$，表示不同时刻的噪声样本不相关（对于高斯噪声，也意味着独立）。
+
+*   **其他噪声模型**：
+    *   **散粒噪声 (Shot Noise)**：由电流中离散载流子（电子、空穴）的随机性引起，常见于半导体器件。通常用泊松过程建模。
+    *   **热噪声 (Thermal Noise / Johnson-Nyquist Noise)**：由导体中电荷载流子的热骚动引起。是 AWGN 的一个主要来源。
+    *   **脉冲噪声 (Impulsive Noise)**：特点是持续时间短、幅度大的突发性干扰，如闪电、开关操作引起的噪声。
+    *   **窄带噪声 (Narrowband Noise)**：集中在某个特定频率范围内的噪声，通常由其他通信系统的干扰引起。可以表示为 $n(t) = n_I(t) \cos(\omega_c t) - n_Q(t) \sin(\omega_c t)$，其中 $n_I(t), n_Q(t)$ 是低通随机过程。
+    *   **衰落信道中的噪声 (Fading Channels)**：无线通信中，信号经历多径传播导致幅度和相位随机变化（衰落），如瑞利衰落 (Rayleigh fading)、莱斯衰落 (Rician fading)。虽然衰落本身不是噪声，但它与噪声共同影响接收信号质量。
+
+### 信号检测与估计的理论基础
+
+接收端根据接收到的含噪信号 $r(t)$ 对发送的信号 $s(t)$ 或其参数进行判断或估计。
+*   **信号检测 (Signal Detection / Hypothesis Testing)**：
+    判断发送的是哪个预定义的信号之一。
+    例如，二进制通信中，判断发送的是信号 $s_0(t)$ (代表比特0) 还是 $s_1(t)$ (代表比特1)。
+    这是一个**假设检验 (Hypothesis Testing)** 问题：
+    $H_0$: 发送的是 $s_0(t)$
+    $H_1$: 发送的是 $s_1(t)$
+    接收信号 $r(t) = s_i(t) + n(t)$, $i \in \{0,1\}$。
+    常用判决准则：
+    1.  **最大后验概率 (Maximum A Posteriori, MAP) 准则**：
+        选择后验概率 $P(H_i|r)$ 最大的假设。
+        如果 $P(r|H_1)P(H_1) > P(r|H_0)P(H_0)$，则判为 $H_1$，否则判为 $H_0$。
+        等价于比较似然比 $\Lambda(r) = \frac{P(r|H_1)}{P(r|H_0)}$ 与阈值 $\frac{P(H_0)}{P(H_1)}$。
+        最小化平均错误概率。
+    2.  **最大似然 (Maximum Likelihood, ML) 准则**：
+        MAP 准则在先验概率 $P(H_0)=P(H_1)$ 时的特例。
+        选择使似然函数 $P(r|H_i)$ 最大的假设。
+        等价于比较似然比 $\Lambda(r)$ 与阈值 $1$。
+    3.  **奈曼-皮尔逊 (Neyman-Pearson) 准则**：
+        在虚警概率 $P_{FA} = P(\text{判}H_1|H_0 \text{为真})$ 不超过某个预设值 $\alpha$ 的前提下，最大化检测概率 $P_D = P(\text{判}H_1|H_1 \text{为真})$。
+        也通过似然比检验实现，但阈值由 $P_{FA} \le \alpha$ 确定。
+
+*   **信号估计 (Signal Estimation / Parameter Estimation)**：
+    估计信号中感兴趣的未知参数，如幅度、相位、频率、到达时间等。
+    设接收信号 $r(t) = s(t; \theta) + n(t)$，其中 $\theta$ 是待估计的参数。
+    常用估计方法：
+    1.  **最大似然估计 (MLE)**：选择使观测数据 $r$ 出现的似然 $f(r|\theta)$ 最大的参数值 $\hat{\theta}_{ML}$。
+    2.  **最小均方误差 (MMSE) 估计**：选择使均方误差 $E[(\hat{\theta}-\theta)^2]$ 最小的估计 $\hat{\theta}_{MMSE}$。
+        $\hat{\theta}_{MMSE} = E[\theta|r]$ (后验均值)。
+    3.  **最大后验概率 (MAP) 估计**：选择使后验概率密度 $f(\theta|r)$ 最大的参数值 $\hat{\theta}_{MAP}$。
+        $f(\theta|r) = \frac{f(r|\theta)f(\theta)}{f(r)}$，所以 $\hat{\theta}_{MAP} = \arg\max_\theta [f(r|\theta)f(\theta)]$。
+
+### 概率论在无线通信中的应用
+
+无线通信环境复杂，概率论是分析和设计无线系统的关键工具。
+*   **信道建模 (Channel Modeling)**：
+    *   **大尺度衰落 (Large-scale Fading)**：由路径损耗和阴影效应引起，描述信号功率随距离和障碍物的平均变化。路径损耗模型 (如自由空间、Okumura-Hata)，对数正态阴影模型。
+    *   **小尺度衰落 (Small-scale Fading)**：由多径传播引起，导致信号幅度和相位的快速波动。
+        *   **瑞利衰落 (Rayleigh Fading)**：当不存在直射路径 (LOS) 时，多条反射/散射路径叠加。信号包络服从瑞利分布，相位服从均匀分布。
+        *   **莱斯衰落 (Rician Fading)**：当存在一条主要的直射路径时，信号包络服从莱斯分布。
+        *   **多普勒效应 (Doppler Effect)**：由于移动台或散射体的运动，导致接收信号频率发生偏移和扩展，产生时间选择性衰落。
+        *   **时延扩展 (Delay Spread)**：多径信号到达时间不同，导致符号间干扰 (ISI)，产生频率选择性衰落。
+
+*   **分集技术 (Diversity Techniques)**：
+    用于对抗衰落影响，提高通信可靠性。通过提供多个独立的信号路径，使得所有路径同时处于深衰落的概率降低。
+    *   **空间分集 (Space Diversity)**：使用多个天线。如选择合并、最大比合并 (MRC)、等增益合并 (EGC)。
+    *   **时间分集 (Time Diversity)**：在不同时间发送相同信息（如交织和信道编码）。
+    *   **频率分集 (Frequency Diversity)**：在不同频率载波上传输信息（如OFDM）。
+    概率论用于分析不同分集方案下的中断概率、平均信噪比、误码率等性能。
+
+*   **错误控制编码 (Error Control Coding)**：
+    通过在数据中添加冗余比特，使得接收端可以检测和纠正传输中发生的错误。
+    *   如线性分组码、循环码、卷积码、Turbo码、LDPC码。
+    *   编码的性能分析（如误码率、误包率）依赖于信道模型（如BSC, AWGN）和概率计算。
+
+*   **多址接入技术 (Multiple Access Techniques)**：
+    允许多个用户共享有限的无线资源。
+    *   FDMA, TDMA, CDMA, OFDMA, NOMA。
+    *   性能分析（如容量、吞吐量、延迟、干扰）涉及复杂的概率模型。例如，CDMA中的多用户干扰可以建模为高斯随机变量。
+
+*   **网络性能分析**：
+    如蜂窝网络中的切换 (Handover) 概率、呼叫阻塞概率、覆盖概率等，均使用概率模型和排队论等工具进行分析。

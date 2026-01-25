@@ -1,0 +1,144 @@
+---
+title: 'Web Security Deep Dive: CSRF and XSS Principles and Defense'
+description: >-
+  本文系统总结了 Web 安全中 CSRF 与 XSS 的核心原理、攻击构造及防御机制，涵盖了从 HTTP
+  协议层到浏览器安全策略的深度解析，并包含丰富的实战习题。
+pubDate: '2025-06-03T12:00:00.000Z'
+image: /images/uploads/curricular-csrf-class4-csrf-xss-cover.jpg
+badge: DeepDive
+draft: false
+categories:
+  - CS
+  - Security
+  - Course Notes
+tags:
+  - Web安全
+  - CSRF
+  - XSS
+  - 网络协议
+  - 防御策略
+---
+
+> **[迁移说明]** 本文最初发布于 `blog.zzw4257.cn`，现已迁移并在本站进行结构化整理与增强。
+
+
+# Web Security: CSRF and XSS Deep Dive
+
+## Part 1: Cross-Site Request Forgery (CSRF)
+
+### 1. Core Concepts
+
+**Definition and Root Cause**
+CSRF (Cross-Site Request Forgery) occurs when an attacker trick a victim into visiting a malicious webpage that sends unauthorized requests to a target website using the victim's session (automatically carrying browser cookies).
+
+- **Essence**: The server cannot distinguish whether a request was initiated voluntarily by the user (e.g., clicking a button) or passively (e.g., browser loading a malicious resource).
+- **Root Cause**: The browser's mechanism for handling cross-site requests—automatically attaching target domain cookies.
+
+### 2. Attack Vectors and Construction
+
+#### HTTP GET Attacks
+Leverages HTML tags like `<img>` or `<iframe>` which trigger requests via the `src` attribute automatically.
+
+```html
+<!-- Malicious webpage (attacker.html) -->
+<html>
+<body>
+  <h1>You won a prize!</h1>
+  <img src="http://www.bank.com/transfer.php?to=attacker&amount=500" width="1" height="1" />
+</body>
+</html>
+```
+
+#### HTTP POST Attacks
+Requires JavaScript and a hidden form since tags cannot send POST data directly.
+
+```javascript
+function forge_post() {
+   var fields = "<input type='hidden' name='description' value='Hacked'>";
+   fields += "<input type='hidden' name='guid' value='39'>";
+
+   var p = document.createElement("form");
+   p.action = "http://www.target.com/profile/edit";
+   p.innerHTML = fields;
+   p.method = "post";
+   
+   document.body.appendChild(p);
+   p.submit();
+}
+window.onload = forge_post;
+```
+
+### 3. Defense Mechanisms
+
+| Defense Measure | Mechanism | Pros | Cons |
+| :--- | :--- | :--- | :--- |
+| **Referer Check** | Inspects HTTP Referer header | Simple server-side config | Privacy issues, easily stripped |
+| **SameSite Cookie** | Browser blocks cross-site cookies | Native browser support | Limited by legacy browsers; Lax allows some GETs |
+| **Secret Token** | Manual token in request body | Most secure | Higher development overhead |
+
+#### SameSite Cookie Modes
+1. **Strict**: No cookies sent on any cross-site request.
+2. **Lax** (Default): Cookies sent on Top-Level Navigation GET requests (e.g., links), but blocked for POST/images.
+3. **None**: Cookies sent always (requires `Secure`).
+
+---
+
+## Part 2: CSRF Exercise Analysis
+
+**W2.1. Why does SameSite cookie help?**<br />
+It allows servers to declare whether a cookie should be sent with cross-site requests. If set to `Strict` or `Lax`, the browser won't attach the session cookie when the request originates from a third-party site, preventing the server from authenticating the forged request.
+
+**W2.2. Secret Token effectiveness**<br />
+Servers embed a random token in forms. Since attackers cannot read the victim's page content due to the **Same-Origin Policy (SOP)**, they cannot retrieve this token to include it in a forged request.
+
+**W2.3. Does HTTPS stop CSRF?**<br />
+No. HTTPS encrypts the channel but doesn't change cookie-sending behavior. Browsers still automatically attach cookies to HTTPS requests initiated from other sites.
+
+**W2.15. iFrame and Clickjacking**<br />
+An iframe loading `facebook.com` inside `example.com` makes requests from inside the frame "same-origin" to Facebook. The primary threat here is **Clickjacking**. Defense requires `X-Frame-Options: DENY` or CSP `frame-ancestors`.
+
+---
+
+## Part 3: Cross-Site Scripting (XSS)
+
+### 1. XSS Types
+
+- **Reflected (Non-persistent)**: Script is reflected off a web application to the user's browser (e.g., via URL parameters).
+- **Stored (Persistent)**: Script is permanently stored on the server (e.g., in a database via comments or profile fields).
+
+### 2. XSS vs CSRF: Key Differences
+
+- **CSRF**: The attacker **borrows** permissions. They cannot read the response.
+- **XSS**: The attacker **injects code**. They can read everything on the page (cookies, DOM, tokens) and bypass CSRF defenses.
+
+### 3. The XSS Worm (Self-Propagation)
+A worm copies itself into the victim's data. 
+- **DOM Method**: Reads its own script tag content using `document.getElementById().innerHTML`.
+- **Quine Method**: A program that produces its own source code as its only output without external input (using `Function.toString()`).
+
+### 4. Defense Strategies
+
+1. **Output Encoding (Preferred)**: Convert special characters to HTML entities (e.g., `<` becomes `&lt;`). Use `htmlspecialchars()` in PHP.
+2. **Input Filtering**: Removing tags like `<script>`. Often bypassed via `onerror` or `javascript:` protocols.
+3. **Content Security Policy (CSP)**: Defines trusted sources. 
+   - **Nonce**: Only scripts with a matching random `nonce` attribute are executed.
+   - **Disallow Inline**: Prevents `<script>alert(1)</script>` execution.
+
+---
+
+## Part 4: XSS Exercise Analysis
+
+**W3.4. Browser-side Filtering?**<br />
+Ineffective. Attackers can bypass the browser UI using tools like `curl` to send malicious payloads directly to the server.
+
+**W3.6. Can Secret Token stop XSS?**<br />
+No. Since XSS runs in the same origin as the page, the malicious script can read the DOM and extract the token.
+
+**W3.11. Data vs Code Mixing Examples**<br />
+1. **SQL Injection**: User data is misinterpreted as SQL commands.
+2. **Buffer Overflow**: Data overflows into memory and overwrites the return address (execution path).
+
+**W3.14. CSP Analysis**<br />
+Policy: `default-src 'self'; script-src 'self' 'nonce-1rA2345' 'example.com'`
+- Allowed: Scripts with the correct nonce; external scripts from the same origin or `example.com`.
+- Blocked: Inline scripts without a nonce; inline event handlers (e.g., `onclick`); scripts from untrusted domains.

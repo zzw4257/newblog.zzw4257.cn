@@ -1,0 +1,123 @@
+---
+title: 机器人机构学基础：运动副、自由度与机械臂构型
+description: 本文系统梳理了机器人机构学的核心概念，详细解析了运动副分类、自由度计算公式（Kutzbach/Grübler）以及常见工业机械臂的结构特征。
+pubDate: '2025-09-02T12:00:00.000Z'
+image: /images/uploads/curricular-class1-2mechanisms-class1-2mechanisms-cover.jpg
+badge: Course
+draft: false
+categories:
+  - Course Notes
+  - Robotics
+tags:
+  - 机器人学
+  - 机构学
+  - 自由度
+  - 机械臂
+  - 运动副
+  - SCARA
+---
+
+> **[迁移说明]** 本文最初发布于 `blog.zzw4257.cn`，现已迁移并在本站进行结构化整理与增强。
+
+
+## 机构与运动副 (Mechanisms and Kinematic Pairs)
+
+**机构 (Mechanism)** 是由两个或更多通过运动副 (Kinematic pairs) 连接的机械零件组成的系统。运动副是两个链接的机械零件之间的可移动接触。
+
+### 运动副的分类
+
+1. **按接触类型 (Pressure of Contacts):**
+   - **低副 (Lower pairs):** 接触形式为**面接触 (surface contact)**。常见类型包括：棱柱副 (Prismatic)、回转副 (Revolute)、球面副 (Spherical)、螺旋副 (Helical)、圆柱副 (Cylindrical)。
+   - **高副 (Higher pairs):** 接触形式为**点接触 (spot contact)** 或**线接触 (line contact)**。典型实例：齿轮 (Gear)、凸轮 (Cam) 机构。
+
+2. **按运动空间 (Relative Movements):**
+   - **平面副 (Planar pairs):** 运动发生在平面内，如平面棱柱副、平面回转副。
+   - **空间副 (Spatial pairs):** 运动发生在三维空间中，如球面副、螺旋副。
+
+### 机构链结构
+
+- **串联开链 (Serially-connected open chain):** 连杆依次首尾相连，末端自由。这是大多数工业机械臂（如六轴机械臂）的基本结构。
+- **串联闭链 (Serially-connected close chain):** 连杆形成一个或多个闭合回路，例如四杆机构或挖掘机动臂。
+- **并联闭链 (Parallel closed kinematic chain):** 末端平台通过多条并联的运动链与基座相连。典型代表：斯图尔特平台 (Stewart Platform)、Delta 机械臂。
+
+---
+
+## 自由度 (Degree of Freedom, DoF)
+
+### 定义与基本概念
+
+- **自由度 (DoF):** 表示确定一个物体位置和姿态所需的独立变量的数量。
+- **机器人自由度:** 通常由机器人机构中**独立驱动器 (independent actuators)** 的数量决定。
+
+**物体基本自由度：**
+- **三维空间中的自由粒子:** 3 DoF (3个平移)。
+- **三维空间中的自由刚体:** 6 DoF (3个平移 $x, y, z$ + 3个转动 $\alpha, \beta, \gamma$)。
+
+### 平面机构自由度计算 (Kutzbach/Grübler Formula)
+
+连接运动副后，总自由度会因运动副带来的**约束 (constraints)** 而减少。
+- **平面低副 (Planar Lower pair):** 带来 $C=2$ 个约束。
+- **平面高副 (Planar Higher pair):** 带来 $C=1$ 个约束。
+
+**计算公式 $F$:**
+
+$$F = 3n - (2L + H)$$
+
+其中：
+- $n = N-1$ (可动零件数，$N$ 为总零件数)。
+- $L$: 低副数量。
+- $H$: 高副数量。
+
+### 冗余性
+
+对于在三维空间中进行任意定位和定向的任务，机械臂至少需要 **6 个自由度** (3个定位 + 3个定向)。如果机械臂的自由度多于任务所需的变量，则被称为**冗余 (redundant)** 机械臂。
+
+---
+
+## 机器人机械臂 (Robot Manipulators)
+
+### 结构组成
+
+1. **机械臂 (Arm):** 确保移动能力 (mobility)。
+2. **腕部 (Wrist):** 赋予灵巧性 (dexterity)。
+3. **末端执行器 (End-effector):** 执行具体任务的工具（如手爪、焊枪）。
+
+### 结构分类
+
+下表总结了基于关节类型（棱柱 P / 回转 R）及轴线关系的常见构型：
+
+| 类型 (Type) | 关节序列 | 轴线关系 | 描述与应用 |
+| :--- | :--- | :--- | :--- |
+| **直角坐标 (Cartesian)** | P-P-P | 相互垂直 | 线性运动，工作空间为矩形。 |
+| **SCARA** | R-R-P | 平行-垂直 | 适用于平面装配，对 $Z$ 轴方向具有柔顺性。 |
+| **圆柱坐标 (Cylindrical)** | R-P-P | 平行-垂直 | 工作空间为圆柱体。 |
+| **球面坐标 (Spherical)** | R-R-P | 相互正交 | 工作空间为球体的一部分。 |
+| **拟人/铰接式 (Articulated)** | R-R-R | 正交/平行 | 模仿人臂结构，灵活性最高。 |
+
+---
+
+## 核心考点与自测
+
+### 重点摘要
+
+1. **运动副辨析:** 区分低副（面接触）与高副（点/线接触）。
+2. **公式应用:** 熟练使用 $F = 3n - (2L + H)$ 计算平面机构自由度。
+3. **构型识别:** 能够根据 P/R 序列识别机械臂类型（如 SCARA 为 RRP）。
+4. **自由度需求:** 理解 6-DoF 是实现空间任意位姿的最小要求。
+
+### 简答题练习
+
+1. **什么是机构？**<br />由两个或更多通过运动副连接的机械零件组成的系统。
+2. **SCARA 机械臂的全称及特点？**<br />全称：Selective Compliant Articulated Robot for Assembly。特点是在平面内高度灵活，但在垂直方向具有较高的刚性。
+3. **三维空间刚体有多少自由度？**<br />6个（3个平移：x, y, z；3个旋转：α, β, γ）。
+
+### 核心术语词汇表
+
+| 术语 (中文) | 术语 (英文) | 定义 |
+| :--- | :--- | :--- |
+| **运动副** | Kinematic pairs | 两个连接零件之间的可动接触。 |
+| **低副** | Lower pairs | 面接触运动副（如转动副、移动副）。 |
+| **高副** | Higher pairs | 点或线接触运动副（如齿轮、凸轮）。 |
+| **串联开链** | Open chain | 连杆首尾相连，一端固定的开放结构。 |
+| **工作空间** | Workspace | 机器人末端执行器能到达的所有空间范围。 |
+| **冗余机械臂** | Redundant Manipulator | 自由度数多于任务所需变量数的机械臂。 |

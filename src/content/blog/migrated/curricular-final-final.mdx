@@ -1,0 +1,48 @@
+---
+title: System III 期末复习综合指南
+description: 本文整理了信息安全专业 System III 课程的期末复习核心要点，涵盖了系统安全架构、底层保护机制及关键考点解析。
+pubDate: '2025-05-28T07:00:01.223Z'
+image: /images/uploads/curricular-final-final-cover.jpg
+badge: Course
+draft: false
+categories:
+  - Course Notes
+  - CS
+tags:
+  - System III
+  - 信息安全
+  - 期末复习
+  - 系统安全
+  - 课程笔记
+---
+
+> **[迁移说明]** 本文最初发布于 `blog.zzw4257.cn`，现已迁移并在本站进行结构化整理与增强。
+
+
+## 课程概述
+
+本笔记旨在总结 **System III** (系统安全/高级系统) 课程的期末复习内容。根据信息安全专业的教学大纲，本课程侧重于从底层硬件到操作系统层面的安全机制与攻防实践。
+
+## 核心考点梳理
+
+### 1. 系统架构安全
+- **可信执行环境 (TEE)**: 重点理解 SGX 与 TrustZone 的原理及其隔离机制。
+- **固件安全**: UEFI 启动过程及 Secure Boot 的信任链传递。
+
+### 2. 内存保护与漏洞利用
+- **防御机制**: 深入理解 ASLR、DEP/NX、Stack Canaries 的实现与绕过技术。
+- **控制流完整性 (CFI)**: 细粒度与粗粒度 CFI 的区别及前向/后向保护。
+
+### 3. 内核安全
+- 内核漏洞类型 (如 Null pointer dereference, Use-after-free)。
+- 内核态与用户态的权限转换及隔离。
+
+## 复习建议
+
+1. **实验回顾**: 重点复习 Lab 中涉及的缓冲区溢出 (Buffer Overflow) 与 ROP 链构造。
+2. **模型推演**: 熟练掌握访问控制模型 (如 BLP, Biba) 在实际系统中的应用。
+3. **论文阅读**: 关注课堂提及的经典系统安全论文，理解其设计思想与局限性。
+
+> 提示：期末考试通常结合实际案例分析系统设计的缺陷，建议复习时多思考“攻击者如何绕过现有的保护层”。<br />
+
+---
